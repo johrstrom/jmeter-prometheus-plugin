@@ -16,8 +16,6 @@ public class PrometheusListenerGui extends AbstractListenerGui {
 	public PrometheusListenerGui(){
 		super();
 		init();
-		setName(getStaticLabel());
-		this.namePanel.setName(getStaticLabel());
 	}
 	
 	public TestElement createTestElement() {		

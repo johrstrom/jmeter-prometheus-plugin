@@ -12,9 +12,12 @@ import org.apache.jmeter.testelement.TestStateListener;
 import org.apache.jorphan.logging.LoggingManager;
 import org.apache.log.Logger;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
 
 import io.prometheus.client.CollectorRegistry;
 import io.prometheus.client.Summary;
+import io.prometheus.client.exporter.MetricsServlet;
 
 public class PrometheusListener extends AbstractListenerElement 
 	implements SampleListener, Serializable, TestStateListener, Remoteable, NoThreadClone {
@@ -43,6 +46,8 @@ public class PrometheusListener extends AbstractListenerElement
 		String status = res.getResponseCode();
 		String name = res.getSampleLabel();
 		
+//		this.server.getThreadPool().dis
+		
 		transactions.labels(name, status).observe(latency);
 		
 	}
@@ -68,6 +73,20 @@ public class PrometheusListener extends AbstractListenerElement
 	public void testStarted() {
 		this.server = new Server(8080);
 		
+	     ServletContextHandler context = new ServletContextHandler();
+	     context.setContextPath("/");
+	     server.setHandler(context);
+	     context.addServlet(new ServletHolder(new MetricsServlet()), "/metrics");
+	     
+	     try {
+			server.start();
+	     } catch (Exception e) {
+			
+			e.printStackTrace();
+	     }
+	     
+	     	
+		
 	}
 
 	public void testStarted(String arg0) {
@@ -76,6 +95,9 @@ public class PrometheusListener extends AbstractListenerElement
 	
 	
 	private void createMetrics(){
+		
+		CollectorRegistry.defaultRegistry.clear();		
+		
 		this.transactions = Summary.build()
 				.name("synthetic_transaction")
 				.help("Counter for all synthetic transactions")
