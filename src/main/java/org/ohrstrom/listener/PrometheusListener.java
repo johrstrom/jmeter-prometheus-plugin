@@ -37,6 +37,16 @@ import io.prometheus.client.CollectorRegistry;
 import io.prometheus.client.Summary;
 import io.prometheus.client.exporter.MetricsServlet;
 
+/**
+ * The main test element listener class of this library.  Jmeter updates this class through the 
+ * SampleListener interface and it in turn updates the CollectorRegistry.  This class is also
+ * a TestStateListener to control when it starts up or shuts down the server that ultimately
+ * serves Prometheus the results through an http api. 
+ * 
+ * 
+ * @author Jeff Ohrstrom
+ *
+ */
 public class PrometheusListener extends AbstractListenerElement 
 	implements SampleListener, Serializable, TestStateListener, Remoteable, NoThreadClone {
 
@@ -47,16 +57,18 @@ public class PrometheusListener extends AbstractListenerElement
 	private Server server;
 	private Summary transactions;
 
+	/**
+	 * Constructor. 
+	 */
 	public PrometheusListener(){
-		this("Prometheus Listener");
-	}
-	
-	public PrometheusListener(String name){
 		super();
 		this.createMetrics();
 		log.info("Creating new prometheus listener.");
 	}
 
+	/* (non-Javadoc)
+	 * @see org.apache.jmeter.samplers.SampleListener#sampleOccurred(org.apache.jmeter.samplers.SampleEvent)
+	 */
 	public void sampleOccurred(SampleEvent arg0) {
 		SampleResult res = arg0.getResult();
 		
@@ -70,10 +82,19 @@ public class PrometheusListener extends AbstractListenerElement
 		
 	}
 
+	/* (non-Javadoc)
+	 * @see org.apache.jmeter.samplers.SampleListener#sampleStarted(org.apache.jmeter.samplers.SampleEvent)
+	 */
 	public void sampleStarted(SampleEvent arg0) {}
 
+	/* (non-Javadoc)
+	 * @see org.apache.jmeter.samplers.SampleListener#sampleStopped(org.apache.jmeter.samplers.SampleEvent)
+	 */
 	public void sampleStopped(SampleEvent arg0) {}
 
+	/* (non-Javadoc)
+	 * @see org.apache.jmeter.testelement.TestStateListener#testEnded()
+	 */
 	public void testEnded() {
 		try {
 			this.server.stop();
@@ -84,10 +105,16 @@ public class PrometheusListener extends AbstractListenerElement
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see org.apache.jmeter.testelement.TestStateListener#testEnded(java.lang.String)
+	 */
 	public void testEnded(String arg0) {
 		this.testEnded();
 	}
 
+	/* (non-Javadoc)
+	 * @see org.apache.jmeter.testelement.TestStateListener#testStarted()
+	 */
 	public void testStarted() {
 		this.server = new Server(8080);
 		
@@ -107,6 +134,9 @@ public class PrometheusListener extends AbstractListenerElement
 		
 	}
 
+	/* (non-Javadoc)
+	 * @see org.apache.jmeter.testelement.TestStateListener#testStarted(java.lang.String)
+	 */
 	public void testStarted(String arg0) {
 		this.testStarted();		
 	}

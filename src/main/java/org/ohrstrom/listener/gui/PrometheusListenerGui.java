@@ -24,46 +24,67 @@ import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.visualizers.gui.AbstractListenerGui;
 import org.ohrstrom.listener.PrometheusListener;
 
+/**
+ * The GUI class for the Prometheus Listener. 
+ * 
+ * Currently, all configurations are done through properties files so this
+ * class shows nothing visually other than comments.
+ * 
+ * @author Jeff Ohrstrom
+ *
+ */
 public class PrometheusListenerGui extends AbstractListenerGui {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 4984653136457108054L;
 
+	/**
+	 * Default constructor 
+	 */
 	public PrometheusListenerGui(){
 		super();
 		init();
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.apache.jmeter.gui.JMeterGUIComponent#createTestElement()
+	 */
 	public TestElement createTestElement() {		
-		PrometheusListener list = new PrometheusListener(getStaticLabel());
-		modifyTestElement(list);
+		PrometheusListener listener = new PrometheusListener();
+		modifyTestElement(listener);
 		
-		list.setProperty(TestElement.GUI_CLASS, org.ohrstrom.listener.gui.PrometheusListenerGui.class.getName());
-		list.setProperty(TestElement.TEST_CLASS, org.ohrstrom.listener.PrometheusListener.class.getName());
+		listener.setProperty(TestElement.GUI_CLASS, org.ohrstrom.listener.gui.PrometheusListenerGui.class.getName());
+		listener.setProperty(TestElement.TEST_CLASS, org.ohrstrom.listener.PrometheusListener.class.getName());
 		
-		return list;
+		return listener;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.apache.jmeter.gui.JMeterGUIComponent#getLabelResource()
+	 */
 	public String getLabelResource() {
 		return getClass().getCanonicalName();
 	}	
 
+	/* (non-Javadoc)
+	 * @see org.apache.jmeter.gui.AbstractJMeterGuiComponent#getStaticLabel()
+	 */
 	@Override
 	public String getStaticLabel() {
 		return "Prometheus Listener";
 	}
 
+	/* (non-Javadoc)
+	 * @see org.apache.jmeter.gui.JMeterGUIComponent#modifyTestElement(org.apache.jmeter.testelement.TestElement)
+	 */
 	public void modifyTestElement(TestElement arg0) {
 		super.configureTestElement(arg0);
 		
 		configureTestElement(arg0);
 	}
 	
-	
-	
-	
+	/* (non-Javadoc)
+	 * @see org.apache.jmeter.gui.AbstractJMeterGuiComponent#getName()
+	 */
 	@Override
 	public String getName() {
 		if (super.getName() == null) {
@@ -74,11 +95,19 @@ public class PrometheusListenerGui extends AbstractListenerGui {
 	}
 
 
+	/* (non-Javadoc)
+	 * @see org.apache.jmeter.gui.AbstractJMeterGuiComponent#configure(org.apache.jmeter.testelement.TestElement)
+	 */
 	@Override
 	public void configure(TestElement element) {
 		super.configure(element);
 	}
 
+	
+	/**
+	 * Private helper function to initialize all the Swing 
+	 * components. 
+	 */
 	private void init(){
 		setLayout(new BorderLayout(0, 5));
 		setBorder(makeBorder());
