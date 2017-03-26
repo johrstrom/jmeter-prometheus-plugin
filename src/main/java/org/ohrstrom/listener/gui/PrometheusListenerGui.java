@@ -19,10 +19,20 @@
 package org.ohrstrom.listener.gui;
 
 import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
+import javax.swing.JButton;
+import javax.swing.JPanel;
+
+import org.apache.jmeter.gui.GuiPackage;
+import org.apache.jmeter.gui.SavePropertyDialog;
 import org.apache.jmeter.testelement.TestElement;
+import org.apache.jmeter.util.JMeterUtils;
 import org.apache.jmeter.visualizers.gui.AbstractListenerGui;
+import org.apache.jorphan.gui.ComponentUtil;
 import org.ohrstrom.listener.PrometheusListener;
+import org.ohrstrom.listener.PrometheusSaveConfig;
 
 /**
  * The GUI class for the Prometheus Listener. 
@@ -36,6 +46,7 @@ import org.ohrstrom.listener.PrometheusListener;
 public class PrometheusListenerGui extends AbstractListenerGui {
 
 	private static final long serialVersionUID = 4984653136457108054L;
+	PrometheusSaveConfig config = new PrometheusSaveConfig();
 
 	/**
 	 * Default constructor 
@@ -112,9 +123,30 @@ public class PrometheusListenerGui extends AbstractListenerGui {
 		setLayout(new BorderLayout(0, 5));
 		setBorder(makeBorder());
 
-		add(makeTitlePanel(), BorderLayout.NORTH);
+		JPanel configurePanel = new JPanel();
+		configurePanel.setLayout(new BorderLayout(0,5));
 		
+		configurePanel.add(makeTitlePanel(), BorderLayout.NORTH);
+		
+		JButton saveConfigButton = new JButton(JMeterUtils.getResString("config_save_settings")); 
+		saveConfigButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                PrometheusConfigureDialog d = new PrometheusConfigureDialog(
+                        GuiPackage.getInstance().getMainFrame(),
+                        JMeterUtils.getResString("sample_result_save_configuration"),
+                        true, config);
+                
+                d.pack();
+                ComponentUtil.centerComponentInComponent(GuiPackage.getInstance().getMainFrame(), d);
+                d.setVisible(true);
+            }
+        });
 
+		configurePanel.add(saveConfigButton, BorderLayout.EAST);
+		
+		add(configurePanel, BorderLayout.NORTH);
+		
 	}
 
 }

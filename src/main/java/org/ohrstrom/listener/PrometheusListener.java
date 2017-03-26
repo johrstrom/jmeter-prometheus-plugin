@@ -19,8 +19,13 @@
 package org.ohrstrom.listener;
 
 import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.jmeter.engine.util.NoThreadClone;
+import org.apache.jmeter.report.core.Sample;
 import org.apache.jmeter.reporters.AbstractListenerElement;
 import org.apache.jmeter.samplers.Remoteable;
 import org.apache.jmeter.samplers.SampleEvent;
@@ -56,15 +61,25 @@ public class PrometheusListener extends AbstractListenerElement
 	
 	private Server server;
 	private Summary transactions;
+	private PrometheusSaveConfig config;
+	private String[] labels;
+	private Method[] sampleGetterMethods;
 
 	/**
 	 * Constructor. 
 	 */
 	public PrometheusListener(){
+		this(new PrometheusSaveConfig());
+	}
+	
+	public PrometheusListener(PrometheusSaveConfig config){
 		super();
-		this.createMetrics();
+		this.config = config;
+		this.reconfigure();
 		log.info("Creating new prometheus listener.");
 	}
+	
+//	public 
 
 	/* (non-Javadoc)
 	 * @see org.apache.jmeter.samplers.SampleListener#sampleOccurred(org.apache.jmeter.samplers.SampleEvent)
@@ -72,13 +87,11 @@ public class PrometheusListener extends AbstractListenerElement
 	public void sampleOccurred(SampleEvent arg0) {
 		SampleResult res = arg0.getResult();
 		
-		long latency = res.getLatency();
-		String status = res.getResponseCode();
-		String name = res.getSampleLabel();
-		
-//		this.server.getThreadPool().dis
-		
-		transactions.labels(name, status).observe(latency);
+		try {
+			transactions.labels(this.labelValues(arg0)).observe(res.getTime());
+		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+			log.error("Didn't updat metric because of exception. Message was: " + e.getMessage());
+		}
 		
 	}
 
@@ -133,6 +146,53 @@ public class PrometheusListener extends AbstractListenerElement
 	     	
 		
 	}
+	
+	protected String[] labelValues(SampleEvent event) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException{
+		String[] values = new String[labels.length];
+		
+		for (int i =0; i < labels.length; i++){
+			Method m = this.sampleGetterMethods[i];
+			String res = m.invoke(event.getResult()).toString();
+			values[i] = res;
+		}
+		
+//		event.getResult().issu
+		return values;
+	}
+	
+	protected void reconfigure(){
+		List<String> tmpLabels = new ArrayList<String>();
+		List<Method> tmpMethods = new ArrayList<Method>();
+		
+		try {
+			
+			if(this.config.saveLabel()){
+				tmpLabels.add("label");
+				tmpMethods.add(SampleResult.class.getMethod("getSampleLabel"));
+			}
+				
+			if(this.config.saveCode()){
+				tmpLabels.add("code");
+				tmpMethods.add(SampleResult.class.getMethod("getResponseCode"));
+			}
+			
+			if(this.config.saveSuccess()){
+				tmpLabels.add("success");
+				tmpMethods.add(SampleResult.class.getMethod("isSuccessful"));
+			}
+			
+		
+		} catch (NoSuchMethodException | SecurityException e) {
+			log.error("Didn't reconfigure correctly. Keeping old configs. Message was: " + e.getMessage());
+			return;
+		}
+		
+
+		
+		this.labels = tmpLabels.toArray(new String[tmpLabels.size()]);
+		this.sampleGetterMethods = tmpMethods.toArray(new Method[tmpMethods.size()]);
+		this.createMetrics();
+	}
 
 	/* (non-Javadoc)
 	 * @see org.apache.jmeter.testelement.TestStateListener#testStarted(java.lang.String)
@@ -142,14 +202,14 @@ public class PrometheusListener extends AbstractListenerElement
 	}
 	
 	
-	private void createMetrics(){
+	protected void createMetrics(){
 		
 		CollectorRegistry.defaultRegistry.clear();		
 		
 		this.transactions = Summary.build()
 				.name("synthetic_transaction")
 				.help("Counter for all synthetic transactions")
-				.labelNames("name", "status")
+				.labelNames(this.labels)
 				.quantile(0.5, 0.1)
 				.quantile(0.99, 0.1)
 				.create()
