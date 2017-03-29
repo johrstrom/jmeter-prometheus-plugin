@@ -61,10 +61,11 @@ public class PrometheusConfigureDialog extends JDialog implements ActionListener
             
             check.addActionListener(this);
             check.setActionCommand(name);
-            checkPanel.add(check);
+            checkPanel.add(check, BorderLayout.NORTH);
             
 		}
 		
+		this.add(checkPanel);
 		
 	}
 	
