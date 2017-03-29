@@ -10,10 +10,10 @@ public class PrometheusSaveConfig {
             "Label",
             "Code", // Response Code
             "Success",
-            "Bytes",
-            "Url",
-            "FileName",
-            "Latency",
+//            "Bytes",
+//            "Url",
+//            "FileName",
+//            "Latency",
 //            "ConnectTime",	//TODO?
 //            "IdleTime",		//TODO?
         }));

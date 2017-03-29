@@ -84,15 +84,12 @@ public class PrometheusListener extends AbstractListenerElement
 	/* (non-Javadoc)
 	 * @see org.apache.jmeter.samplers.SampleListener#sampleOccurred(org.apache.jmeter.samplers.SampleEvent)
 	 */
-	public void sampleOccurred(SampleEvent arg0) {
-		SampleResult res = arg0.getResult();
-		
+	public void sampleOccurred(SampleEvent event) {		
 		try {
-			transactions.labels(this.labelValues(arg0)).observe(res.getTime());
+			transactions.labels(this.labelValues(event)).observe(event.getResult().getTime());
 		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 			log.error("Didn't updat metric because of exception. Message was: " + e.getMessage());
 		}
-		
 	}
 
 	/* (non-Javadoc)
