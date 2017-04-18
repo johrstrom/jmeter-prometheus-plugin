@@ -4,18 +4,17 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.jorphan.logging.LoggingManager;
+import org.apache.log.Logger;
+
 public class PrometheusSaveConfig {
+	
+	private static final Logger log = LoggingManager.getLoggerForClass();
 
     public static final List<String> SAVE_CONFIG_NAMES = Collections.unmodifiableList(Arrays.asList(new String[]{
             "Label",
             "Code", // Response Code
             "Success",
-//            "Bytes",
-//            "Url",
-//            "FileName",
-//            "Latency",
-//            "ConnectTime",	//TODO?
-//            "IdleTime",		//TODO?
         }));
     
     private boolean label, code, success;
@@ -35,6 +34,7 @@ public class PrometheusSaveConfig {
     }
     
     public void setSaveLabel(boolean save){
+    	log.debug("Setting save label to " + save);
     	this.label = save;
     }
     
@@ -43,6 +43,7 @@ public class PrometheusSaveConfig {
     }
     
     public void setSaveCode(boolean save){
+    	log.debug("Setting save code to " + save);
     	this.code = save;
     }
     
@@ -51,6 +52,7 @@ public class PrometheusSaveConfig {
     }
     
     public void setSaveSuccess(boolean save){
+    	log.debug("Setting save success to " + save);
     	this.success = save;
     }
 }

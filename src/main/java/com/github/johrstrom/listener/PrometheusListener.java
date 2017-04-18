@@ -31,7 +31,10 @@ import org.apache.jmeter.samplers.Remoteable;
 import org.apache.jmeter.samplers.SampleEvent;
 import org.apache.jmeter.samplers.SampleListener;
 import org.apache.jmeter.samplers.SampleResult;
+import org.apache.jmeter.samplers.SampleSaveConfiguration;
 import org.apache.jmeter.testelement.TestStateListener;
+import org.apache.jmeter.testelement.property.JMeterProperty;
+import org.apache.jmeter.testelement.property.ObjectProperty;
 import org.apache.jorphan.logging.LoggingManager;
 import org.apache.log.Logger;
 import org.eclipse.jetty.server.Server;
@@ -55,13 +58,14 @@ import io.prometheus.client.exporter.MetricsServlet;
 public class PrometheusListener extends AbstractListenerElement 
 	implements SampleListener, Serializable, TestStateListener, Remoteable, NoThreadClone {
 
+	
+	public static final String SAVE_CONFIG = "johrstrom.save_config";
 	private static final long serialVersionUID = -4833646252357876746L;
 
 	private static final Logger log = LoggingManager.getLoggerForClass();
 	
 	private Server server;
 	private Summary transactions;
-	private PrometheusSaveConfig config;
 	private String[] labels;
 	private Method[] sampleGetterMethods;
 
@@ -74,9 +78,8 @@ public class PrometheusListener extends AbstractListenerElement
 	
 	public PrometheusListener(PrometheusSaveConfig config){
 		super();
-		this.config = config;
-		this.reconfigure();
-		log.info("Creating new prometheus listener.");
+		this.setSaveConfig(config);
+		log.debug("Creating new prometheus listener.");
 	}
 	
 //	public 
@@ -140,8 +143,23 @@ public class PrometheusListener extends AbstractListenerElement
 			e.printStackTrace();
 	     }
 	     
-	     	
-		
+	}
+	
+	/**
+	 * Set a new Save configuration.  Note that this function reconfigures 
+	 * this object and one should not set the save config directly through {@link #setProperty(org.apache.jmeter.testelement.property.JMeterProperty)}
+	 * functions. 
+	 * 
+	 * @param config - the configuration object
+	 */
+	public void setSaveConfig(PrometheusSaveConfig config){
+		this.setProperty(new ObjectProperty(SAVE_CONFIG, config));
+		this.reconfigure();
+	}
+	
+	
+	public PrometheusSaveConfig getSaveConfig(){
+		return (PrometheusSaveConfig) this.getProperty(SAVE_CONFIG).getObjectValue();
 	}
 	
 	protected String[] labelValues(SampleEvent event) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException{
@@ -153,27 +171,33 @@ public class PrometheusListener extends AbstractListenerElement
 			values[i] = res;
 		}
 		
-//		event.getResult().issu
 		return values;
 	}
 	
+	
+	/**
+	 * Helper function to modify private member variables {@link #labels} and {@link #sampleGetterMethods}.  These 2 
+	 * arrays are used to translate JMeter SampleEvents to an array of Strings.    
+	 */
 	protected void reconfigure(){
 		List<String> tmpLabels = new ArrayList<String>();
 		List<Method> tmpMethods = new ArrayList<Method>();
 		
+		PrometheusSaveConfig config = this.getSaveConfig();
+
 		try {
 			
-			if(this.config.saveLabel()){
+			if(config.saveLabel()){
 				tmpLabels.add("label");
 				tmpMethods.add(SampleResult.class.getMethod("getSampleLabel"));
 			}
 				
-			if(this.config.saveCode()){
+			if(config.saveCode()){
 				tmpLabels.add("code");
 				tmpMethods.add(SampleResult.class.getMethod("getResponseCode"));
 			}
 			
-			if(this.config.saveSuccess()){
+			if(config.saveSuccess()){
 				tmpLabels.add("success");
 				tmpMethods.add(SampleResult.class.getMethod("isSuccessful"));
 			}

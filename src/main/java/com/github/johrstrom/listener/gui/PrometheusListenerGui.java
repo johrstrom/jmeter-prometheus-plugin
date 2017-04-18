@@ -46,6 +46,9 @@ import com.github.johrstrom.listener.PrometheusSaveConfig;
 public class PrometheusListenerGui extends AbstractListenerGui {
 
 	private static final long serialVersionUID = 4984653136457108054L;
+	public static final String SAVE_CONFIG = "johrstrom.prometheus.save_config";
+	
+	
 	PrometheusSaveConfig config = new PrometheusSaveConfig();
 
 	/**
@@ -87,10 +90,13 @@ public class PrometheusListenerGui extends AbstractListenerGui {
 	/* (non-Javadoc)
 	 * @see org.apache.jmeter.gui.JMeterGUIComponent#modifyTestElement(org.apache.jmeter.testelement.TestElement)
 	 */
-	public void modifyTestElement(TestElement arg0) {
-		super.configureTestElement(arg0);
+	public void modifyTestElement(TestElement element) {
+		super.configureTestElement(element);
 		
-		configureTestElement(arg0);
+		if(element instanceof PrometheusListener){
+			PrometheusListener listener = (PrometheusListener) element;
+			listener.setSaveConfig(this.config);			
+		}
 	}
 	
 	/* (non-Javadoc)
@@ -112,6 +118,9 @@ public class PrometheusListenerGui extends AbstractListenerGui {
 	@Override
 	public void configure(TestElement element) {
 		super.configure(element);
+		if(element instanceof PrometheusListener){
+			this.config = ((PrometheusListener) element).getSaveConfig();
+		}
 	}
 
 	

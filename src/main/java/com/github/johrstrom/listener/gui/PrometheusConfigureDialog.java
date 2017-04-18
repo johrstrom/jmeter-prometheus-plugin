@@ -10,12 +10,11 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 
-import org.apache.jmeter.samplers.SampleSaveConfiguration;
-import org.apache.jmeter.util.JMeterUtils;
 import org.apache.jorphan.logging.LoggingManager;
 import org.apache.log.Logger;
 
@@ -37,9 +36,18 @@ public class PrometheusConfigureDialog extends JDialog implements ActionListener
 	}
 	
 	@Override
-	public void actionPerformed(ActionEvent arg0) {
-		// TODO Auto-generated method stub
-		
+	public void actionPerformed(ActionEvent e) {
+        String action = e.getActionCommand();
+        Method func = mutators.get(action);
+        if(func != null){
+    		try {
+    			func.invoke(config, new Object[] {Boolean.valueOf(((JCheckBox) e.getSource()).isSelected()) });
+    		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e1) {
+   				log.error("Couldn't save property. No function available " + func.toString() + ". Did not set property.");
+    		}
+        }else {
+        	log.error("Couldn't save property.  No function available to modify configuration.");
+        }        
 	}
 	
 	private void init(){
@@ -65,6 +73,15 @@ public class PrometheusConfigureDialog extends JDialog implements ActionListener
             checkPanel.add(check, BorderLayout.NORTH);
             
 		}
+		
+        JButton exit = new JButton("Done");
+        this.getContentPane().add(exit, BorderLayout.SOUTH);
+        exit.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dispose();
+            }
+        });
 		
 		this.add(checkPanel);
 		
@@ -95,6 +112,8 @@ public class PrometheusConfigureDialog extends JDialog implements ActionListener
 			
 			
 		}
+		
+
 		
 		
 	}
