@@ -16,7 +16,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.ohrstrom.listener.gui;
+package com.github.johrstrom.listener.gui;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
@@ -31,8 +31,8 @@ import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.util.JMeterUtils;
 import org.apache.jmeter.visualizers.gui.AbstractListenerGui;
 import org.apache.jorphan.gui.ComponentUtil;
-import org.ohrstrom.listener.PrometheusListener;
-import org.ohrstrom.listener.PrometheusSaveConfig;
+import com.github.johrstrom.listener.PrometheusListener;
+import com.github.johrstrom.listener.PrometheusSaveConfig;
 
 /**
  * The GUI class for the Prometheus Listener. 
@@ -63,8 +63,8 @@ public class PrometheusListenerGui extends AbstractListenerGui {
 		PrometheusListener listener = new PrometheusListener();
 		modifyTestElement(listener);
 		
-		listener.setProperty(TestElement.GUI_CLASS, org.ohrstrom.listener.gui.PrometheusListenerGui.class.getName());
-		listener.setProperty(TestElement.TEST_CLASS, org.ohrstrom.listener.PrometheusListener.class.getName());
+		listener.setProperty(TestElement.GUI_CLASS, com.github.johrstrom.listener.gui.PrometheusListenerGui.class.getName());
+		listener.setProperty(TestElement.TEST_CLASS, com.github.johrstrom.listener.PrometheusListener.class.getName());
 		
 		return listener;
 	}

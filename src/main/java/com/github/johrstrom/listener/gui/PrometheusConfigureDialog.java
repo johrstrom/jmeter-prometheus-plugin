@@ -1,4 +1,4 @@
-package org.ohrstrom.listener.gui;
+package com.github.johrstrom.listener.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Frame;
@@ -18,7 +18,8 @@ import org.apache.jmeter.samplers.SampleSaveConfiguration;
 import org.apache.jmeter.util.JMeterUtils;
 import org.apache.jorphan.logging.LoggingManager;
 import org.apache.log.Logger;
-import org.ohrstrom.listener.PrometheusSaveConfig;
+
+import com.github.johrstrom.listener.PrometheusSaveConfig;
 
 public class PrometheusConfigureDialog extends JDialog implements ActionListener{
 
