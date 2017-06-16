@@ -26,7 +26,6 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 
 import org.apache.jmeter.gui.GuiPackage;
-import org.apache.jmeter.gui.SavePropertyDialog;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.util.JMeterUtils;
 import org.apache.jmeter.visualizers.gui.AbstractListenerGui;
@@ -35,10 +34,10 @@ import com.github.johrstrom.listener.PrometheusListener;
 import com.github.johrstrom.listener.PrometheusSaveConfig;
 
 /**
- * The GUI class for the Prometheus Listener. 
+ * The GUI class for the Prometheus Listener.
  * 
- * Currently, all configurations are done through properties files so this
- * class shows nothing visually other than comments.
+ * Currently, all configurations are done through properties files so this class
+ * shows nothing visually other than comments.
  * 
  * @author Jeff Ohrstrom
  *
@@ -47,39 +46,44 @@ public class PrometheusListenerGui extends AbstractListenerGui {
 
 	private static final long serialVersionUID = 4984653136457108054L;
 	public static final String SAVE_CONFIG = "johrstrom.prometheus.save_config";
-	
-	
+
 	PrometheusSaveConfig config = new PrometheusSaveConfig();
 
 	/**
-	 * Default constructor 
+	 * Default constructor
 	 */
-	public PrometheusListenerGui(){
+	public PrometheusListenerGui() {
 		super();
 		init();
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.apache.jmeter.gui.JMeterGUIComponent#createTestElement()
 	 */
-	public TestElement createTestElement() {		
+	public TestElement createTestElement() {
 		PrometheusListener listener = new PrometheusListener();
 		modifyTestElement(listener);
-		
-		listener.setProperty(TestElement.GUI_CLASS, com.github.johrstrom.listener.gui.PrometheusListenerGui.class.getName());
+		listener.setProperty(TestElement.GUI_CLASS,
+				com.github.johrstrom.listener.gui.PrometheusListenerGui.class.getName());
 		listener.setProperty(TestElement.TEST_CLASS, com.github.johrstrom.listener.PrometheusListener.class.getName());
-		
+
 		return listener;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.apache.jmeter.gui.JMeterGUIComponent#getLabelResource()
 	 */
 	public String getLabelResource() {
 		return getClass().getCanonicalName();
-	}	
+	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.apache.jmeter.gui.AbstractJMeterGuiComponent#getStaticLabel()
 	 */
 	@Override
@@ -87,75 +91,80 @@ public class PrometheusListenerGui extends AbstractListenerGui {
 		return "Prometheus Listener";
 	}
 
-	/* (non-Javadoc)
-	 * @see org.apache.jmeter.gui.JMeterGUIComponent#modifyTestElement(org.apache.jmeter.testelement.TestElement)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.apache.jmeter.gui.JMeterGUIComponent#modifyTestElement(org.apache.
+	 * jmeter.testelement.TestElement)
 	 */
 	public void modifyTestElement(TestElement element) {
 		super.configureTestElement(element);
-		
-		if(element instanceof PrometheusListener){
+
+		if (element instanceof PrometheusListener) {
 			PrometheusListener listener = (PrometheusListener) element;
-			listener.setSaveConfig(this.config);			
+			listener.setSaveConfig(this.config);
 		}
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.apache.jmeter.gui.AbstractJMeterGuiComponent#getName()
 	 */
 	@Override
 	public String getName() {
 		if (super.getName() == null) {
 			return this.getStaticLabel();
-		}else{
+		} else {
 			return super.getName();
 		}
 	}
 
-
-	/* (non-Javadoc)
-	 * @see org.apache.jmeter.gui.AbstractJMeterGuiComponent#configure(org.apache.jmeter.testelement.TestElement)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.apache.jmeter.gui.AbstractJMeterGuiComponent#configure(org.apache.
+	 * jmeter.testelement.TestElement)
 	 */
 	@Override
 	public void configure(TestElement element) {
 		super.configure(element);
-		if(element instanceof PrometheusListener){
+		if (element instanceof PrometheusListener) {
 			this.config = ((PrometheusListener) element).getSaveConfig();
 		}
 	}
 
-	
 	/**
-	 * Private helper function to initialize all the Swing 
-	 * components. 
+	 * Private helper function to initialize all the Swing components.
 	 */
-	private void init(){
+	private void init() {
 		setLayout(new BorderLayout(0, 5));
 		setBorder(makeBorder());
 
 		JPanel configurePanel = new JPanel();
-		configurePanel.setLayout(new BorderLayout(0,5));
-		
+		configurePanel.setLayout(new BorderLayout(0, 5));
+
 		configurePanel.add(makeTitlePanel(), BorderLayout.NORTH);
-		
-		JButton saveConfigButton = new JButton(JMeterUtils.getResString("config_save_settings")); 
+
+		JButton saveConfigButton = new JButton(JMeterUtils.getResString("config_save_settings"));
 		saveConfigButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                PrometheusConfigureDialog d = new PrometheusConfigureDialog(
-                        GuiPackage.getInstance().getMainFrame(),
-                        JMeterUtils.getResString("sample_result_save_configuration"),
-                        true, config);
-                
-                d.pack();
-                ComponentUtil.centerComponentInComponent(GuiPackage.getInstance().getMainFrame(), d);
-                d.setVisible(true);
-            }
-        });
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				PrometheusConfigureDialog d = new PrometheusConfigureDialog(GuiPackage.getInstance().getMainFrame(),
+						JMeterUtils.getResString("sample_result_save_configuration"), true, config);
+
+				d.pack();
+				ComponentUtil.centerComponentInComponent(GuiPackage.getInstance().getMainFrame(), d);
+				d.setVisible(true);
+			}
+		});
 
 		configurePanel.add(saveConfigButton, BorderLayout.EAST);
-		
+
 		add(configurePanel, BorderLayout.NORTH);
-		
+
 	}
 
 }
