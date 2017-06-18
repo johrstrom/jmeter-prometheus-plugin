@@ -4,12 +4,12 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.jorphan.logging.LoggingManager;
-import org.apache.log.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class PrometheusSaveConfig {
 
-	private static final Logger log = LoggingManager.getLoggerForClass();
+	private static final Logger log = LoggerFactory.getLogger(PrometheusSaveConfig.class);
 
 	public static final List<String> SAVE_CONFIG_NAMES = Collections
 			.unmodifiableList(Arrays.asList(new String[] { "Label", "Code", // Response

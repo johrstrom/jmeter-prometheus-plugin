@@ -33,8 +33,8 @@ import org.apache.jmeter.samplers.SampleListener;
 import org.apache.jmeter.samplers.SampleResult;
 import org.apache.jmeter.testelement.TestStateListener;
 import org.apache.jmeter.testelement.property.ObjectProperty;
-import org.apache.jorphan.logging.LoggingManager;
-import org.apache.log.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
@@ -60,7 +60,7 @@ public class PrometheusListener extends AbstractListenerElement
 	public static final String SAVE_CONFIG = "johrstrom.save_config";
 	private static final long serialVersionUID = -4833646252357876746L;
 
-	private static final Logger log = LoggingManager.getLoggerForClass();
+	private static final Logger log = LoggerFactory.getLogger(PrometheusListener.class);
 
 	private Server server;
 	private Summary requests_collector;
