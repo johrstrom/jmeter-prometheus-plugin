@@ -1,9 +1,7 @@
 package com.github.johrstrom.util;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import org.apache.jmeter.assertions.AssertionResult;
 import org.apache.jmeter.samplers.SampleResult;
@@ -18,8 +16,8 @@ import org.apache.jmeter.samplers.SampleResult;
  */
 public class CollectorConfig {
 	
-	private List<String> labels = new ArrayList<String>();
-	private List<Method> getterMethods = new ArrayList<Method>();
+	private String[] labels = new String[]{};
+	private Method[] methods = new Method[]{};
 	
 	public static final String SAMPLER_NAME_LABEL = "sampler_name";
 	public static final String ASSERTION_NAME_LABEL = "assertion_name";
@@ -33,7 +31,7 @@ public class CollectorConfig {
 	 * @return - an ordered array of labels.
 	 */
 	public String[] getLabels() {
-		return Arrays.copyOf(this.labels.toArray(new String[]{}), this.labels.size());
+		return this.labels;
 	}
 	
 	/**
@@ -41,7 +39,7 @@ public class CollectorConfig {
 	 *  
 	 * @param labels - the orderd list to set to.
 	 */
-	protected void setLabels(List<String> labels) {
+	protected void setLabels(String[] labels) {
 		this.labels = labels;
 	}
 
@@ -51,8 +49,8 @@ public class CollectorConfig {
 	 * 
 	 * @return - an ordered array of methods. 
 	 */
-	public Method[] getGetterMethods() {
-		return Arrays.copyOf(this.getterMethods.toArray(new Method[]{}), this.labels.size());
+	public Method[] getMethods() {
+		return this.methods;
 	}
 
 	/**
@@ -60,8 +58,8 @@ public class CollectorConfig {
 	 * 
 	 * @param getterMethods - the ordered list to set to.
 	 */
-	protected void setGetterMethods(List<Method> getterMethods) {
-		this.getterMethods = getterMethods;
+	protected void setMethods(Method[] methods) {
+		this.methods = methods;
 	}
 	
 	/**
@@ -70,7 +68,10 @@ public class CollectorConfig {
 	 * @param label - the label to add
 	 */
 	public void addLabel(String label){
-		this.labels.add(label);
+		int len = this.getLabels().length; 
+		String[] newArr = Arrays.copyOf(this.getLabels(), len+1);
+		newArr[len] = label;
+		this.setLabels(newArr);
 	}
 	
 	/**
@@ -79,7 +80,10 @@ public class CollectorConfig {
 	 * @param m - the method to add
 	 */
 	public void addGetterMethod(Method m){
-		this.getterMethods.add(m);
+		int len = this.getMethods().length;
+		Method[] newArr = Arrays.copyOf(this.getMethods(), len+1);
+		newArr[len] = m;
+		this.setMethods(newArr);
 	}
 	
 	/**
@@ -147,10 +151,10 @@ public class CollectorConfig {
 		sb.append("{");
 		
 		//print all the labels
-		if(!this.labels.isEmpty()){
+		if(this.getLabels().length != 0){
 			sb.append("labels: [");
 			
-			for(String label : this.labels){
+			for(String label : this.getLabels()){
 				sb.append(String.format("%s,", label));
 			}
 			
@@ -159,10 +163,10 @@ public class CollectorConfig {
 		
 		//print all the methods
 		
-		if(!this.getterMethods.isEmpty()){
+		if(this.getMethods().length != 0){
 			sb.append("methods: [");
 			
-			for(Method method : this.getterMethods){
+			for(Method method : this.getMethods()){
 				sb.append(String.format("%s,", method.toString()));
 			}
 			

@@ -21,8 +21,6 @@ package com.github.johrstrom.listener;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.apache.jmeter.assertions.AssertionResult;
 import org.apache.jmeter.engine.util.NoThreadClone;
@@ -30,7 +28,6 @@ import org.apache.jmeter.reporters.AbstractListenerElement;
 import org.apache.jmeter.samplers.Remoteable;
 import org.apache.jmeter.samplers.SampleEvent;
 import org.apache.jmeter.samplers.SampleListener;
-import org.apache.jmeter.samplers.SampleResult;
 import org.apache.jmeter.testelement.TestStateListener;
 import org.apache.jmeter.testelement.property.ObjectProperty;
 import org.slf4j.LoggerFactory;
@@ -243,7 +240,7 @@ public class PrometheusListener extends AbstractListenerElement
 		String[] values = new String[this.samplerConfig.getLabels().length];
 
 		for (int i = 0; i < values.length; i++) {
-			Method m = this.samplerConfig.getGetterMethods()[i];
+			Method m = this.samplerConfig.getMethods()[i];
 			values[i] = m.invoke(event.getResult()).toString();
 		}
 
@@ -269,7 +266,7 @@ public class PrometheusListener extends AbstractListenerElement
 		String[] values = new String[this.assertionConfig.getLabels().length];
 
 		for (int i = 0; i < values.length; i++) {
-			Method m = this.assertionConfig.getGetterMethods()[i];
+			Method m = this.assertionConfig.getMethods()[i];
 			if (m.getDeclaringClass().equals(AssertionResult.class))
 				values[i] = m.invoke(assertionResult).toString();
 			else
