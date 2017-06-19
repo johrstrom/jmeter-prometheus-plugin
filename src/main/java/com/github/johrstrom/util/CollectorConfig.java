@@ -8,6 +8,14 @@ import java.util.List;
 import org.apache.jmeter.assertions.AssertionResult;
 import org.apache.jmeter.samplers.SampleResult;
 
+/**
+ * A simple Pojo for mapping configurations from Jmeter to the Prometheus
+ * collectors. It holds an array of labels for a given collector 
+ * and the methods to access SamplerResult and AssertionResult.
+ * 
+ * @author Jeff Ohrstrom
+ *
+ */
 public class CollectorConfig {
 	
 	private List<String> labels = new ArrayList<String>();
@@ -19,31 +27,64 @@ public class CollectorConfig {
 	public static final String FAILURE_LABEL = "failure";
 	public static final String CODE_LABEL = "code";
 	
+	/**
+	 * Get all the labels for this Collector.
+	 * 
+	 * @return - an ordered array of labels.
+	 */
 	public String[] getLabels() {
 		return Arrays.copyOf(this.labels.toArray(new String[]{}), this.labels.size());
 	}
 	
-	public void setLabels(List<String> labels) {
+	/**
+	 * Set the labels for this Collector.
+	 *  
+	 * @param labels - the orderd list to set to.
+	 */
+	protected void setLabels(List<String> labels) {
 		this.labels = labels;
 	}
 
+	/**
+	 * Get an array of all the Methods to use when updating
+	 * the Collector. 
+	 * 
+	 * @return - an ordered array of methods. 
+	 */
 	public Method[] getGetterMethods() {
 		return Arrays.copyOf(this.getterMethods.toArray(new Method[]{}), this.labels.size());
 	}
 
-	public void setGetterMethods(List<Method> getterMethods) {
+	/**
+	 * Modify the list of getter methods.
+	 * 
+	 * @param getterMethods - the ordered list to set to.
+	 */
+	protected void setGetterMethods(List<Method> getterMethods) {
 		this.getterMethods = getterMethods;
 	}
 	
+	/**
+	 * Add a label to the list of labels.
+	 * 
+	 * @param label - the label to add
+	 */
 	public void addLabel(String label){
 		this.labels.add(label);
 	}
 	
+	/**
+	 * Add a method to the list of methods.
+	 * 
+	 * @param m - the method to add
+	 */
 	public void addGetterMethod(Method m){
 		this.getterMethods.add(m);
 	}
 	
 	/**
+	 * Convenience method for exposing sampler labels.
+	 * 
 	 * @throws NoSuchMethodException
 	 * @throws SecurityException
 	 */
@@ -53,6 +94,8 @@ public class CollectorConfig {
 	}
 
 	/**
+	 * Convenience method for exposing sampler success.
+	 * 
 	 * @throws NoSuchMethodException
 	 * @throws SecurityException
 	 */
@@ -62,6 +105,8 @@ public class CollectorConfig {
 	}
 	
 	/**
+	 * Convenience method for exposing sampler response code.
+	 * 
 	 * @throws NoSuchMethodException
 	 * @throws SecurityException
 	 */
@@ -71,6 +116,8 @@ public class CollectorConfig {
 	}
 	
 	/**
+	 * Convenience method for exposing assertion failures.
+	 * 
 	 * @throws NoSuchMethodException
 	 * @throws SecurityException
 	 */
@@ -80,6 +127,8 @@ public class CollectorConfig {
 	}
 	
 	/**
+	 * Convenience method for exposing assertion names.
+	 * 
 	 * @throws NoSuchMethodException
 	 * @throws SecurityException
 	 */
@@ -89,6 +138,9 @@ public class CollectorConfig {
 	}
 	
 	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
 	@Override
 	public String toString(){
 		StringBuilder sb = new StringBuilder();

@@ -78,19 +78,22 @@ public class PrometheusListener extends AbstractListenerElement
 	private CollectorConfig assertionConfig = new CollectorConfig(); 
 
 	/**
-	 * Constructor.
+	 * Default Constructor.
 	 */
 	public PrometheusListener() {
 		this(new PrometheusSaveConfig());
 	}
 
+	/**
+	 * Constructor with a configuration argument. 
+	 * 
+	 * @param config - the configuration to use.
+	 */
 	public PrometheusListener(PrometheusSaveConfig config) {
 		super();
 		this.setSaveConfig(config);
 		log.debug("Creating new prometheus listener.");
 	}
-
-	// public
 
 	/*
 	 * (non-Javadoc)
@@ -126,6 +129,7 @@ public class PrometheusListener extends AbstractListenerElement
 	 * .samplers.SampleEvent)
 	 */
 	public void sampleStarted(SampleEvent arg0) {
+		//do nothing
 	}
 
 	/*
@@ -136,6 +140,7 @@ public class PrometheusListener extends AbstractListenerElement
 	 * .samplers.SampleEvent)
 	 */
 	public void sampleStopped(SampleEvent arg0) {
+		//do nothing
 	}
 
 	/*
@@ -169,7 +174,7 @@ public class PrometheusListener extends AbstractListenerElement
 	public void testStarted() {
 		// update the configuration
 		this.reconfigure();
-		this.server = new Server(8080);
+		this.server = new Server(this.getSaveConfig().getPort());
 
 		ServletContextHandler context = new ServletContextHandler();
 		context.setContextPath("/");
@@ -198,10 +203,40 @@ public class PrometheusListener extends AbstractListenerElement
 		this.reconfigure();
 	}
 
+	/**
+	 * Get the current Save configuration
+	 * 
+	 * @return
+	 */
 	public PrometheusSaveConfig getSaveConfig() {
 		return (PrometheusSaveConfig) this.getProperty(SAVE_CONFIG).getObjectValue();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.apache.jmeter.testelement.TestStateListener#testStarted(java.lang.
+	 * String)
+	 */
+	public void testStarted(String arg0) {
+		this.testStarted();
+	}
+	
+	
+	
+
+	/**
+	 * For a given SampleEvent, get all the label values as determined by the configuration. 
+	 * Can return reflection related errors because this invokes SampleEvent accessor methods
+	 * like getResponseCode or getSuccess.   
+	 * 
+	 * @param event - the event that occurred
+	 * @return
+	 * @throws IllegalAccessException
+	 * @throws IllegalArgumentException
+	 * @throws InvocationTargetException
+	 */
 	protected String[] labelValues(SampleEvent event)
 			throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 		
@@ -216,6 +251,18 @@ public class PrometheusListener extends AbstractListenerElement
 
 	}
 
+	/**
+	 * For a given SampleEvent and AssertionResult, get all the label values as determined by the configuration. 
+	 * Can return reflection related errors because this invokes SampleEvent accessor methods
+	 * like getResponseCode or getSuccess.   
+	 * 
+	 * @param event - the event that occurred
+	 * @param assertionResult - the assertion results associated to the event
+	 * @return
+	 * @throws IllegalAccessException
+	 * @throws IllegalArgumentException
+	 * @throws InvocationTargetException
+	 */
 	protected String[] labelValues(SampleEvent event, AssertionResult assertionResult)
 			throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 
@@ -234,9 +281,9 @@ public class PrometheusListener extends AbstractListenerElement
 	}
 
 	/**
-	 * Helper function to modify private member variables {@link #labels} and
-	 * {@link #requestsGetterMethods}. These 2 arrays are used to translate
-	 * JMeter SampleEvents to an array of Strings.
+	 * Helper function to modify private member collectors and collector configurations. 
+	 * Any invocation of this method will modify them, even if configuration fails due to 
+	 * reflection errors, default configurations are applied and new collectors created. 
 	 */
 	protected void reconfigure() {
 		
@@ -276,19 +323,6 @@ public class PrometheusListener extends AbstractListenerElement
 		
 	}
 	
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.apache.jmeter.testelement.TestStateListener#testStarted(java.lang.
-	 * String)
-	 */
-	public void testStarted(String arg0) {
-		this.testStarted();
-	}
-	
-	
 	
 	/**
 	 * Create a new CollectorConfig for Samplers. Due to reflection this throws 
@@ -318,6 +352,14 @@ public class PrometheusListener extends AbstractListenerElement
 	}
 	
 	
+	/**
+	 * Create a new CollectorConfig for Assertions. Due to reflection this throws 
+	 * errors based on security and absence of method definitions.
+	 * 
+	 * @return
+	 * @throws NoSuchMethodException
+	 * @throws SecurityException
+	 */
 	protected CollectorConfig newAssertionCollectorConfig() throws NoSuchMethodException, SecurityException{
 		PrometheusSaveConfig saveConfig = this.getSaveConfig();
 		CollectorConfig collectorConfig = new CollectorConfig();
