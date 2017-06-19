@@ -58,6 +58,7 @@ public class PrometheusListener extends AbstractListenerElement
 		implements SampleListener, Serializable, TestStateListener, Remoteable, NoThreadClone {
 
 	public static final String SAVE_CONFIG = "johrstrom.save_config";
+	public static final String SAMPLE_NAME_LABEL = "sample_name";
 	private static final long serialVersionUID = -4833646252357876746L;
 
 	private static final Logger log = LoggerFactory.getLogger(PrometheusListener.class);
@@ -92,14 +93,12 @@ public class PrometheusListener extends AbstractListenerElement
 	 * jmeter.samplers.SampleEvent)
 	 */
 	public void sampleOccurred(SampleEvent event) {
-		// Get the right collector
-		// if (event.getResult().getAssertionResults().length > 0)
-		//
-
+		
 		try {
 
 			// build the label values from the event and observe it
 			String[] requestLabelValues = this.labelValues(event);
+			
 			requests_collector.labels(requestLabelValues).observe(event.getResult().getTime());
 			if (event.getResult().getAssertionResults().length > 0) {
 				for (AssertionResult assertionResult : event.getResult().getAssertionResults()) {
@@ -108,7 +107,7 @@ public class PrometheusListener extends AbstractListenerElement
 				}
 			}
 		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-			log.error("Didn't update metric because of exception. Message was: " + e.getMessage());
+			log.error("Didn't update metric because of exception. Message was: {}", e.getMessage());
 		}
 	}
 
@@ -141,9 +140,7 @@ public class PrometheusListener extends AbstractListenerElement
 		try {
 			this.server.stop();
 		} catch (Exception e) {
-
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.error("Couldn't stop http server",e);
 		}
 	}
 
@@ -175,8 +172,7 @@ public class PrometheusListener extends AbstractListenerElement
 		try {
 			server.start();
 		} catch (Exception e) {
-
-			e.printStackTrace();
+			log.error("Couldn't start http server",e);
 		}
 
 	}
@@ -248,7 +244,7 @@ public class PrometheusListener extends AbstractListenerElement
 		try {
 
 			if (config.saveLabel()) {
-				tmpLabels.add("request_name");
+				tmpLabels.add(SAMPLE_NAME_LABEL);
 				tmpMethods.add(SampleResult.class.getMethod("getSampleLabel"));
 			}
 
@@ -267,19 +263,16 @@ public class PrometheusListener extends AbstractListenerElement
 			return;
 		}
 
-		this.requests_labels = tmpLabels.toArray(new String[tmpLabels.size()]);
-		this.requestsGetterMethods = tmpMethods.toArray(new Method[tmpMethods.size()]);
 
-		this.requests_collector = Summary.build().name("jmeter_request").help("Counter for requests")
-				.labelNames(requests_labels).quantile(0.5, 0.1).quantile(0.99, 0.1).create()
-				.register(CollectorRegistry.defaultRegistry);
-		;
+
+
+		
 
 		// add the assertions collector
 		if (config.saveAssertions()) {
 			try {
 				this.assertions_labels = new String[3];
-				this.assertions_labels[0] = "request_name";
+				this.assertions_labels[0] = SAMPLE_NAME_LABEL;
 				this.assertions_labels[1] = "assertion_name";
 				this.assertions_labels[2] = "value";
 
@@ -288,15 +281,27 @@ public class PrometheusListener extends AbstractListenerElement
 				this.assertionsGetterMethods[1] = AssertionResult.class.getMethod("getName");
 				this.assertionsGetterMethods[2] = AssertionResult.class.getMethod("isFailure");
 
-				this.assertions_collector = Summary.build().name("jmeter_assertions").help("Counter for assertions")
-						.labelNames(assertions_labels).quantile(0.5, 0.1).quantile(0.99, 0.1).create()
-						.register(CollectorRegistry.defaultRegistry);
+
 			} catch (NoSuchMethodException | SecurityException e) {
 				log.error("Didn't create the assertion listener. Message was: " + e.getMessage());
 				return;
 			}
 		}
+		
+		//be sure the new config assigments are the very last step
+		this.requests_labels = tmpLabels.toArray(new String[tmpLabels.size()]);
+		this.requestsGetterMethods = tmpMethods.toArray(new Method[tmpMethods.size()]);
+		
+		this.requests_collector = Summary.build().name("jmeter_samples_latency").help("Summary for Sample Latency")
+				.labelNames(requests_labels).quantile(0.5, 0.1).quantile(0.99, 0.1).create()
+				.register(CollectorRegistry.defaultRegistry);
+		
+		this.assertions_collector = Summary.build().name("jmeter_assertions_total").help("Counter for assertions")
+				.labelNames(assertions_labels).quantile(0.5, 0.1).quantile(0.99, 0.1).create()
+				.register(CollectorRegistry.defaultRegistry);
+		
 	}
+	
 
 	/*
 	 * (non-Javadoc)
