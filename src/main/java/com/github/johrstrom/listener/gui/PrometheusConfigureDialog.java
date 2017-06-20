@@ -70,14 +70,16 @@ public class PrometheusConfigureDialog extends JDialog implements ActionListener
 
 			if (name.equals("Port")) {
 				int port = this.config.getPort();
+				JPanel portPanel = new JPanel();
 				JLabel portLabel = new JLabel(name);
-				checkPanel.add(portLabel);
+				portPanel.add(portLabel);
 				portField = new JTextArea();
 				portField.setColumns(8);
 				portField.setRows(1);
 				portField.setEditable(true);
-				portField.setText(String.valueOf(port));				
-				checkPanel.add(portField);
+				portField.setText(String.valueOf(port));
+				portPanel.add(portField);
+				checkPanel.add(portPanel);
 
 			} else {
 				Method m = this.accessors.get(name);

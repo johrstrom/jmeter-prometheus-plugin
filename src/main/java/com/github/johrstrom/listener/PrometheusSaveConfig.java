@@ -14,9 +14,9 @@ public class PrometheusSaveConfig {
 	public static final List<String> SAVE_CONFIG_NAMES = Collections
 			.unmodifiableList(Arrays.asList(new String[] { "Label", "Code", // Response
 																			// Code
-					"Success", "Assertions", "Port", }));
+					"Success", "Threads", "Assertions", "Port", }));
 
-	private boolean label, code, success, assertions;
+	private boolean label, code, success, assertions, threads;
 	private int port;
 
 	public PrometheusSaveConfig() {
@@ -26,9 +26,10 @@ public class PrometheusSaveConfig {
 	public PrometheusSaveConfig(boolean save) {
 		this.setSaveLabel(save);
 		this.setSaveCode(save);
+		this.setSaveThreads(save);
 		this.setSaveSuccess(save);
 		this.setSaveAssertions(save);
-		this.setPort(8080);
+		this.setPort(9270);
 	}
 
 	public boolean saveLabel() {
@@ -65,6 +66,15 @@ public class PrometheusSaveConfig {
 	public void setSaveAssertions(boolean save) {
 		log.debug("Setting save assertions to " + save);
 		this.assertions = save;
+	}
+	
+	public boolean saveThreads() {
+		return this.threads;
+	}
+
+	public void setSaveThreads(boolean save) {
+		log.debug("Setting save threads to " + save);
+		this.threads = save;
 	}
 
 	public int getPort() {
