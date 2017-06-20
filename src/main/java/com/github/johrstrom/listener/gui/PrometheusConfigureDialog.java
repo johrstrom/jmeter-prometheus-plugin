@@ -17,15 +17,15 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
-import org.apache.jorphan.logging.LoggingManager;
-import org.apache.log.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import com.github.johrstrom.listener.PrometheusSaveConfig;
 
 public class PrometheusConfigureDialog extends JDialog implements ActionListener {
 
 	private static final long serialVersionUID = 7132092878660788111L;
-	private static final Logger log = LoggingManager.getLoggerForClass();
+	private static final Logger log = LoggerFactory.getLogger(PrometheusConfigureDialog.class);
 
 	private PrometheusSaveConfig config;
 	Map<String, Method> accessors;
