@@ -22,14 +22,21 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 
 import org.apache.jmeter.gui.GuiPackage;
+import org.apache.jmeter.gui.util.HorizontalPanel;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.util.JMeterUtils;
 import org.apache.jmeter.visualizers.gui.AbstractListenerGui;
 import org.apache.jorphan.gui.ComponentUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.github.johrstrom.listener.PrometheusListener;
 import com.github.johrstrom.listener.PrometheusSaveConfig;
 
@@ -46,15 +53,17 @@ public class PrometheusListenerGui extends AbstractListenerGui {
 
 	private static final long serialVersionUID = 4984653136457108054L;
 	public static final String SAVE_CONFIG = "johrstrom.prometheus.save_config";
-
-	PrometheusSaveConfig config = new PrometheusSaveConfig();
+	private static final Logger log = LoggerFactory.getLogger(PrometheusListenerGui.class);
+	
+	//Server related configs
+	private JTextField portTextField;
 
 	/**
 	 * Default constructor
 	 */
 	public PrometheusListenerGui() {
 		super();
-		init();
+		createGUI();
 	}
 
 	/*
@@ -103,7 +112,11 @@ public class PrometheusListenerGui extends AbstractListenerGui {
 
 		if (element instanceof PrometheusListener) {
 			PrometheusListener listener = (PrometheusListener) element;
-			listener.setSaveConfig(this.config);
+			
+			PrometheusSaveConfig config = new PrometheusSaveConfig();
+			this.setServerConfigs(config);			
+			
+			listener.setSaveConfig(config);
 		}
 	}
 
@@ -132,39 +145,90 @@ public class PrometheusListenerGui extends AbstractListenerGui {
 	public void configure(TestElement element) {
 		super.configure(element);
 		if (element instanceof PrometheusListener) {
-			this.config = ((PrometheusListener) element).getSaveConfig();
+			PrometheusSaveConfig config = ((PrometheusListener) element).getSaveConfig();
+			
+			this.portTextField.setText(Integer.toString(config.getPort()));
 		}
 	}
 
 	/**
 	 * Private helper function to initialize all the Swing components.
 	 */
-	private void init() {
+	protected void createGUI() {
 		setLayout(new BorderLayout(0, 5));
 		setBorder(makeBorder());
 
-		JPanel configurePanel = new JPanel();
-		configurePanel.setLayout(new BorderLayout(0, 5));
+		JPanel mainPanel = new JPanel();
+		mainPanel.setLayout(new BorderLayout(0, 5));
+		mainPanel.add(makeTitlePanel(), BorderLayout.NORTH);
 
-		configurePanel.add(makeTitlePanel(), BorderLayout.NORTH);
-
-		JButton saveConfigButton = new JButton(JMeterUtils.getResString("config_save_settings"));
-		saveConfigButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				PrometheusConfigureDialog d = new PrometheusConfigureDialog(GuiPackage.getInstance().getMainFrame(),
-						JMeterUtils.getResString("sample_result_save_configuration"), true, config);
-
-				d.pack();
-				ComponentUtil.centerComponentInComponent(GuiPackage.getInstance().getMainFrame(), d);
-				d.setVisible(true);
-			}
-		});
-
-		configurePanel.add(saveConfigButton, BorderLayout.EAST);
-
-		add(configurePanel, BorderLayout.NORTH);
-
+		add(mainPanel, BorderLayout.NORTH);
+		add(createTopMostPanel(), BorderLayout.CENTER);
+	}
+	
+	
+	/**
+	 * Create the panel that holds all the other panels (except for the title panel)
+	 * 
+	 * @return - the top most JPanel
+	 */
+	protected JPanel createTopMostPanel(){
+		JPanel panel = new JPanel(new BorderLayout(5, 0));
+		
+		panel.add(createServerPanel(), BorderLayout.NORTH);
+		
+		return panel;
+	}
+	
+	/**
+	 * Create the panel that holds all the server configuration (ports, config files etc.) 
+	 * 
+	 * @return - the server configuration panel
+	 */
+	protected JPanel createServerPanel(){
+		HorizontalPanel panel = new HorizontalPanel();
+		panel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(),"Server Configurations"));
+		
+		panel.add(this.createPortPanel());
+		
+		return panel;
+	}
+	
+	
+	/**
+	 * Create the panel that holds the {@link #portTextField} for configuring the servers port.
+	 * 
+	 * @return
+	 */
+	protected JPanel createPortPanel(){
+		JPanel panel = new JPanel(new BorderLayout(5, 0));
+		JLabel label = new JLabel("Port");
+        
+		panel.add(label, BorderLayout.WEST);
+        this.portTextField = new JTextField();
+        panel.add(portTextField, BorderLayout.CENTER);
+        
+        return panel;
+	}
+	
+	
+	/**
+	 * Set the input save configuration such that it reflects what's in the GUI.
+	 * I.e., what's stored in checkboxes and text fields.
+	 * 
+	 * @param config - the save config to modify
+	 */
+	protected void setServerConfigs(PrometheusSaveConfig config){
+		int port = config.getPort();
+		try {
+			port = Integer.parseInt(this.portTextField.getText());
+		} catch (NumberFormatException e){
+			log.error("Caught {} while trying to parse {} to string. Using {} port.", 
+					e.getClass(), this.portTextField.getText(), port);
+		}
+		
+		config.setPort(port);
+		
 	}
 
 }
