@@ -22,7 +22,7 @@
 			<groupId>org.apache.jmeter</groupId>
 			<artifactId>ApacheJMeter_core</artifactId>
 			<version>${jmeter.version}</version>
-<!-- 			<scope>provided</scope> -->
+ 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>io.prometheus</groupId>
