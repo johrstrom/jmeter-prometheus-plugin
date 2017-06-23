@@ -5,6 +5,10 @@ import java.util.Collections;
 import java.util.List;
 
 import org.slf4j.LoggerFactory;
+
+import io.prometheus.client.Collector;
+import io.prometheus.client.Counter;
+
 import org.slf4j.Logger;
 
 public class PrometheusSaveConfig {
@@ -18,6 +22,7 @@ public class PrometheusSaveConfig {
 
 	private boolean label, code, success, assertions, threads;
 	private int port;
+	private Class<? extends Collector> assertionClass;
 
 	public PrometheusSaveConfig() {
 		this(true);
@@ -29,6 +34,7 @@ public class PrometheusSaveConfig {
 		this.setSaveThreads(save);
 		this.setSaveSuccess(save);
 		this.setSaveAssertions(save);
+		this.setAssertionClass(Counter.class);
 		this.setPort(9270);
 	}
 
@@ -84,5 +90,13 @@ public class PrometheusSaveConfig {
 	public void setPort(int port_value) {
 		log.debug("Setting port to " + port_value);
 		this.port = port_value;
+	}
+
+	public Class<? extends Collector> getAssertionClass() {
+		return assertionClass;
+	}
+
+	public void setAssertionClass(Class<? extends Collector> assertionClass) {
+		this.assertionClass = assertionClass;
 	}
 }

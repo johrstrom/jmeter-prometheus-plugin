@@ -39,7 +39,9 @@ import org.slf4j.LoggerFactory;
 
 import com.github.johrstrom.util.CollectorConfig;
 
+import io.prometheus.client.Collector;
 import io.prometheus.client.CollectorRegistry;
+import io.prometheus.client.Counter;
 import io.prometheus.client.Gauge;
 import io.prometheus.client.Summary;
 import io.prometheus.client.exporter.MetricsServlet;
@@ -76,7 +78,7 @@ public class PrometheusListener extends AbstractListenerElement
 	private boolean collectThreads = true;
 
 	// Assertions
-	private Summary assertionsCollector;
+	private Collector assertionsCollector;
 	private CollectorConfig assertionConfig = new CollectorConfig();
 	private boolean collectAssertions = true;
 
@@ -123,7 +125,11 @@ public class PrometheusListener extends AbstractListenerElement
 				if (event.getResult().getAssertionResults().length > 0) {
 					for (AssertionResult assertionResult : event.getResult().getAssertionResults()) {
 						String[] assertionsLabelValues = this.labelValues(event, assertionResult);
-						assertionsCollector.labels(assertionsLabelValues).observe(event.getResult().getTime());
+						
+						if(assertionsCollector instanceof Summary)
+							((Summary) assertionsCollector).labels(assertionsLabelValues).observe(event.getResult().getTime());
+						else if (assertionsCollector instanceof Counter)
+							((Counter) assertionsCollector).labels(assertionsLabelValues).inc();
 					}
 				}
 			}
@@ -334,9 +340,7 @@ public class PrometheusListener extends AbstractListenerElement
 			this.threadCollector = Gauge.build().name("jmeter_running_threads").help("Counter for running threds")
 					.create().register(CollectorRegistry.defaultRegistry);
 
-		if (collectAssertions)
-			this.assertionsCollector = Summary.build().name("jmeter_assertions_total").help("Counter for assertions")
-					.labelNames(this.assertionConfig.getLabels()).create().register(CollectorRegistry.defaultRegistry);
+		this.createAssertionCollector();
 
 		log.info("Reconfigure complete.");
 
@@ -394,6 +398,21 @@ public class PrometheusListener extends AbstractListenerElement
 		}
 
 		return collectorConfig;
+	}
+	
+	
+	protected void createAssertionCollector(){
+		if (collectAssertions){
+			if(this.getSaveConfig().getAssertionClass().equals(Summary.class))
+				this.assertionsCollector = Summary.build().name("jmeter_assertions_total").help("Counter for assertions")
+					.labelNames(this.assertionConfig.getLabels()).quantile(0.5, 0.1).quantile(0.99, 0.1)
+					.create().register(CollectorRegistry.defaultRegistry);
+			
+			else if(this.getSaveConfig().getAssertionClass().equals(Counter.class))
+				this.assertionsCollector = Counter.build().name("jmeter_assertions_total").help("Counter for assertions")
+				.labelNames(this.assertionConfig.getLabels()).create().register(CollectorRegistry.defaultRegistry);
+			
+		}
 	}
 
 }
