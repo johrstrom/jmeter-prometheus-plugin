@@ -14,7 +14,7 @@
       "type": "grafana",
       "id": "grafana",
       "name": "Grafana",
-      "version": "4.3.2"
+      "version": "4.3.1"
     },
     {
       "type": "panel",
@@ -39,12 +39,12 @@
     "list": []
   },
   "editable": true,
-  "gnetId": null,
+  "gnetId": 2492,
   "graphTooltip": 0,
   "hideControls": false,
   "id": null,
   "links": [],
-  "refresh": "5s",
+  "refresh": false,
   "rows": [
     {
       "collapse": false,
@@ -111,7 +111,7 @@
               "intervalFactor": 2,
               "legendFormat": "",
               "refId": "A",
-              "step": 2
+              "step": 40
             }
           ],
           "thresholds": "",
@@ -189,7 +189,7 @@
               "intervalFactor": 2,
               "legendFormat": "",
               "refId": "A",
-              "step": 2
+              "step": 40
             }
           ],
           "thresholds": "",
@@ -268,7 +268,7 @@
               "intervalFactor": 2,
               "legendFormat": "",
               "refId": "A",
-              "step": 2
+              "step": 40
             }
           ],
           "thresholds": "1,5",
@@ -334,7 +334,7 @@
           "steppedLine": false,
           "targets": [
             {
-              "expr": "irate (jmeter_samples_latency_sum{success=\"true\"}[1m])",
+              "expr": "irate (jmeter_samples_latency_sum{success=\"true\"}[1m]) / irate(jmeter_samples_latency_count{success=\"true\"}[1m])",
               "format": "time_series",
               "interval": "",
               "intervalFactor": 1,
@@ -922,7 +922,7 @@
     "list": []
   },
   "time": {
-    "from": "now-1m",
+    "from": "now-30m",
     "to": "now"
   },
   "timepicker": {
