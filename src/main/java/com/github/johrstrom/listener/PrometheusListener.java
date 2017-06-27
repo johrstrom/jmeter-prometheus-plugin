@@ -116,7 +116,8 @@ public class PrometheusListener extends AbstractListenerElement
 				samplerCollector.labels(samplerLabelValues).observe(event.getResult().getTime());
 
 			if (collectThreads)
-				threadCollector.set(JMeterContextService.getContext().getThreadGroup().getNumberOfThreads());
+				if (JMeterContextService.getContext().getThreadGroup() != null)
+					threadCollector.set(JMeterContextService.getContext().getThreadGroup().getNumberOfThreads());
 
 			// if there are any assertions to
 			if (collectAssertions) {
