@@ -1,5 +1,6 @@
 package com.github.johrstrom.util;
 
+import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 
@@ -14,10 +15,12 @@ import org.apache.jmeter.samplers.SampleResult;
  * @author Jeff Ohrstrom
  *
  */
-public class CollectorConfig {
+public class CollectorConfig implements Serializable {
+	
+	private static final long serialVersionUID = 6317013594387218799L;
 	
 	private String[] labels = new String[]{};
-	private Method[] methods = new Method[]{};
+	private transient Method[] methods = new Method[]{};
 	
 	public static final String SAMPLER_NAME_LABEL = "sampler_name";
 	public static final String ASSERTION_NAME_LABEL = "assertion_name";
