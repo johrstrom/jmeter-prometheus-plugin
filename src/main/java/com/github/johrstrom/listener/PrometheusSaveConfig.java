@@ -1,5 +1,6 @@
 package com.github.johrstrom.listener;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -11,7 +12,9 @@ import io.prometheus.client.Counter;
 
 import org.slf4j.Logger;
 
-public class PrometheusSaveConfig {
+public class PrometheusSaveConfig implements Serializable {
+
+	private static final long serialVersionUID = 3374323089879858706L;
 
 	private static final Logger log = LoggerFactory.getLogger(PrometheusSaveConfig.class);
 

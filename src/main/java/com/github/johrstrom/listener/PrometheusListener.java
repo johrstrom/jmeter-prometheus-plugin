@@ -25,7 +25,6 @@ import java.lang.reflect.Method;
 import org.apache.jmeter.assertions.AssertionResult;
 import org.apache.jmeter.engine.util.NoThreadClone;
 import org.apache.jmeter.reporters.AbstractListenerElement;
-import org.apache.jmeter.samplers.Remoteable;
 import org.apache.jmeter.samplers.SampleEvent;
 import org.apache.jmeter.samplers.SampleListener;
 import org.apache.jmeter.testelement.TestStateListener;
@@ -58,7 +57,7 @@ import io.prometheus.client.exporter.MetricsServlet;
  *
  */
 public class PrometheusListener extends AbstractListenerElement
-		implements SampleListener, Serializable, TestStateListener, Remoteable, NoThreadClone {
+		implements SampleListener, Serializable, TestStateListener, NoThreadClone {
 
 	public static final String SAVE_CONFIG = "johrstrom.save_config";
 
@@ -66,19 +65,19 @@ public class PrometheusListener extends AbstractListenerElement
 
 	private static final Logger log = LoggerFactory.getLogger(PrometheusListener.class);
 
-	private Server server;
+	private transient Server server;
 
 	// Samplers
-	private Summary samplerCollector;
+	private transient Summary samplerCollector;
 	private CollectorConfig samplerConfig = new CollectorConfig();
 	private boolean collectSamples = true;
 
 	// Thread counter
-	private Gauge threadCollector;
+	private transient Gauge threadCollector;
 	private boolean collectThreads = true;
 
 	// Assertions
-	private Collector assertionsCollector;
+	private transient Collector assertionsCollector;
 	private CollectorConfig assertionConfig = new CollectorConfig();
 	private boolean collectAssertions = true;
 
