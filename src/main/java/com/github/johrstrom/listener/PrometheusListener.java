@@ -65,7 +65,7 @@ public class PrometheusListener extends AbstractListenerElement
 
 	private static final Logger log = LoggerFactory.getLogger(PrometheusListener.class);
 
-	private Server server;
+	private transient Server server;
 
 	// Samplers
 	private transient Summary samplerCollector;
