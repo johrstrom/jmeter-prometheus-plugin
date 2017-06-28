@@ -38,7 +38,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.johrstrom.util.CollectorConfig;
-import com.github.johrstrom.util.ServerInstantiator;
 
 import io.prometheus.client.Collector;
 import io.prometheus.client.CollectorRegistry;
@@ -66,6 +65,8 @@ public class PrometheusListener extends AbstractListenerElement
 	private static final long serialVersionUID = -4833646252357876746L;
 
 	private static final Logger log = LoggerFactory.getLogger(PrometheusListener.class);
+
+	private Server server;
 
 	// Samplers
 	private Summary samplerCollector;
@@ -117,18 +118,16 @@ public class PrometheusListener extends AbstractListenerElement
 				samplerCollector.labels(samplerLabelValues).observe(event.getResult().getTime());
 
 			if (collectThreads)
-				if (JMeterContextService.getContext().getThreadGroup() != null)
-					threadCollector.set(JMeterContextService.getContext().getThreadGroup().getNumberOfThreads());
+				threadCollector.set(JMeterContextService.getContext().getThreadGroup().getNumberOfThreads());
 
 			// if there are any assertions to
 			if (collectAssertions) {
 				if (event.getResult().getAssertionResults().length > 0) {
 					for (AssertionResult assertionResult : event.getResult().getAssertionResults()) {
 						String[] assertionsLabelValues = this.labelValues(event, assertionResult);
-
-						if (assertionsCollector instanceof Summary)
-							((Summary) assertionsCollector).labels(assertionsLabelValues)
-									.observe(event.getResult().getTime());
+						
+						if(assertionsCollector instanceof Summary)
+							((Summary) assertionsCollector).labels(assertionsLabelValues).observe(event.getResult().getTime());
 						else if (assertionsCollector instanceof Counter)
 							((Counter) assertionsCollector).labels(assertionsLabelValues).inc();
 					}
@@ -169,7 +168,7 @@ public class PrometheusListener extends AbstractListenerElement
 	 */
 	public void testEnded() {
 		try {
-			ServerInstantiator.getInstance(this.getSaveConfig().getPort()).stop();
+			this.server.stop();
 		} catch (Exception e) {
 			log.error("Couldn't stop http server", e);
 		}
@@ -193,7 +192,7 @@ public class PrometheusListener extends AbstractListenerElement
 	public void testStarted() {
 		// update the configuration
 		this.reconfigure();
-		Server server = ServerInstantiator.getInstance(this.getSaveConfig().getPort());
+		this.server = new Server(this.getSaveConfig().getPort());
 
 		ServletContextHandler context = new ServletContextHandler();
 		context.setContextPath("/");
@@ -400,19 +399,19 @@ public class PrometheusListener extends AbstractListenerElement
 
 		return collectorConfig;
 	}
-
-	protected void createAssertionCollector() {
-		if (collectAssertions) {
-			if (this.getSaveConfig().getAssertionClass().equals(Summary.class))
-				this.assertionsCollector = Summary.build().name("jmeter_assertions_total")
-						.help("Counter for assertions").labelNames(this.assertionConfig.getLabels()).quantile(0.5, 0.1)
-						.quantile(0.99, 0.1).create().register(CollectorRegistry.defaultRegistry);
-
-			else if (this.getSaveConfig().getAssertionClass().equals(Counter.class))
-				this.assertionsCollector = Counter.build().name("jmeter_assertions_total")
-						.help("Counter for assertions").labelNames(this.assertionConfig.getLabels()).create()
-						.register(CollectorRegistry.defaultRegistry);
-
+	
+	
+	protected void createAssertionCollector(){
+		if (collectAssertions){
+			if(this.getSaveConfig().getAssertionClass().equals(Summary.class))
+				this.assertionsCollector = Summary.build().name("jmeter_assertions_total").help("Counter for assertions")
+					.labelNames(this.assertionConfig.getLabels()).quantile(0.5, 0.1).quantile(0.99, 0.1)
+					.create().register(CollectorRegistry.defaultRegistry);
+			
+			else if(this.getSaveConfig().getAssertionClass().equals(Counter.class))
+				this.assertionsCollector = Counter.build().name("jmeter_assertions_total").help("Counter for assertions")
+				.labelNames(this.assertionConfig.getLabels()).create().register(CollectorRegistry.defaultRegistry);
+			
 		}
 	}
 
