@@ -14,7 +14,7 @@
       "type": "grafana",
       "id": "grafana",
       "name": "Grafana",
-      "version": "4.3.1"
+      "version": "4.3.2"
     },
     {
       "type": "panel",
@@ -44,7 +44,7 @@
   "hideControls": false,
   "id": null,
   "links": [],
-  "refresh": false,
+  "refresh": "5s",
   "rows": [
     {
       "collapse": false,
@@ -96,7 +96,7 @@
               "to": "null"
             }
           ],
-          "span": 4,
+          "span": 3,
           "sparkline": {
             "fillColor": "rgba(31, 118, 189, 0.18)",
             "full": false,
@@ -111,11 +111,11 @@
               "intervalFactor": 2,
               "legendFormat": "",
               "refId": "A",
-              "step": 40
+              "step": 4
             }
           ],
           "thresholds": "",
-          "title": "running threads",
+          "title": "Running threads",
           "transparent": false,
           "type": "singlestat",
           "valueFontSize": "80%",
@@ -174,7 +174,7 @@
               "to": "null"
             }
           ],
-          "span": 4,
+          "span": 3,
           "sparkline": {
             "fillColor": "rgba(31, 118, 189, 0.18)",
             "full": false,
@@ -184,16 +184,96 @@
           "tableColumn": "",
           "targets": [
             {
-              "expr": "sum((irate(jmeter_samples_latency_count{success=\"true\"}[1m])))",
+              "expr": "sum((rate(jmeter_samples_latency_count{success=\"true\"}[$interval])))",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "",
               "refId": "A",
-              "step": 40
+              "step": 4
             }
           ],
           "thresholds": "",
-          "title": "RPS",
+          "title": "Requests per second",
+          "transparent": false,
+          "type": "singlestat",
+          "valueFontSize": "80%",
+          "valueMaps": [
+            {
+              "op": "=",
+              "text": "N/A",
+              "value": "null"
+            }
+          ],
+          "valueName": "current"
+        },
+        {
+          "cacheTimeout": null,
+          "colorBackground": false,
+          "colorValue": false,
+          "colors": [
+            "rgba(245, 54, 54, 0.9)",
+            "rgba(237, 129, 40, 0.89)",
+            "rgba(50, 172, 45, 0.97)"
+          ],
+          "datasource": "${DS_PROMETHEUS}",
+          "format": "none",
+          "gauge": {
+            "maxValue": 100,
+            "minValue": 0,
+            "show": false,
+            "thresholdLabels": false,
+            "thresholdMarkers": true
+          },
+          "id": 14,
+          "interval": null,
+          "links": [],
+          "mappingType": 1,
+          "mappingTypes": [
+            {
+              "name": "value to text",
+              "value": 1
+            },
+            {
+              "name": "range to text",
+              "value": 2
+            }
+          ],
+          "maxDataPoints": 100,
+          "nullPointMode": "connected",
+          "nullText": null,
+          "postfix": "",
+          "postfixFontSize": "50%",
+          "prefix": "",
+          "prefixFontSize": "50%",
+          "rangeMaps": [
+            {
+              "from": "null",
+              "text": "N/A",
+              "to": "null"
+            }
+          ],
+          "span": 3,
+          "sparkline": {
+            "fillColor": "rgba(31, 118, 189, 0.18)",
+            "full": false,
+            "lineColor": "rgb(31, 120, 193)",
+            "show": true
+          },
+          "tableColumn": "",
+          "targets": [
+            {
+              "expr": "sum(jmeter_samples_latency_count{success=\"true\"})",
+              "format": "time_series",
+              "interval": "",
+              "intervalFactor": 2,
+              "legendFormat": "OK",
+              "metric": "",
+              "refId": "A",
+              "step": 4
+            }
+          ],
+          "thresholds": "",
+          "title": "Total requests",
           "transparent": false,
           "type": "singlestat",
           "valueFontSize": "80%",
@@ -253,22 +333,22 @@
               "to": "null"
             }
           ],
-          "span": 4,
+          "span": 3,
           "sparkline": {
-            "fillColor": "rgba(31, 118, 189, 0.18)",
+            "fillColor": "rgba(255, 0, 0, 0.18)",
             "full": true,
-            "lineColor": "rgb(31, 120, 193)",
+            "lineColor": "rgb(255, 0, 34)",
             "show": true
           },
           "tableColumn": "Value",
           "targets": [
             {
-              "expr": "sum((irate(jmeter_samples_latency_count{success=\"false\"}[1m])))/sum((irate(jmeter_samples_latency_count[1m]))) ",
+              "expr": "sum((rate(jmeter_samples_latency_count{success=\"false\"}[$interval])))/sum((rate(jmeter_samples_latency_count[$interval]))) ",
               "format": "time_series",
               "intervalFactor": 2,
               "legendFormat": "",
               "refId": "A",
-              "step": 40
+              "step": 4
             }
           ],
           "thresholds": "1,5",
@@ -295,7 +375,7 @@
     },
     {
       "collapse": false,
-      "height": 394,
+      "height": 242,
       "panels": [
         {
           "aliasColors": {},
@@ -303,8 +383,9 @@
           "dashLength": 10,
           "dashes": false,
           "datasource": "${DS_PROMETHEUS}",
-          "description": "Samplers response times where success = true",
+          "description": "",
           "fill": 1,
+          "height": "400",
           "id": 1,
           "legend": {
             "alignAsTable": true,
@@ -334,7 +415,7 @@
           "steppedLine": false,
           "targets": [
             {
-              "expr": "irate (jmeter_samples_latency_sum{success=\"true\"}[1m]) / irate(jmeter_samples_latency_count{success=\"true\"}[1m])",
+              "expr": "rate (jmeter_samples_latency_sum{success=\"true\",sampler_name=~\"$sampler\"}[$interval]) / rate(jmeter_samples_latency_count{success=\"true\"}[$interval])",
               "format": "time_series",
               "interval": "",
               "intervalFactor": 1,
@@ -346,7 +427,91 @@
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
-          "title": "Response times by sampler",
+          "title": "Response times (OK) - average by sampler",
+          "tooltip": {
+            "shared": true,
+            "sort": 0,
+            "value_type": "individual"
+          },
+          "type": "graph",
+          "xaxis": {
+            "buckets": null,
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "format": "ms",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            },
+            {
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            }
+          ]
+        },
+        {
+          "aliasColors": {},
+          "bars": false,
+          "dashLength": 10,
+          "dashes": false,
+          "datasource": "${DS_PROMETHEUS}",
+          "description": "",
+          "fill": 1,
+          "height": "400",
+          "id": 13,
+          "legend": {
+            "alignAsTable": true,
+            "avg": true,
+            "current": true,
+            "hideEmpty": true,
+            "hideZero": true,
+            "max": true,
+            "min": true,
+            "rightSide": false,
+            "show": true,
+            "total": false,
+            "values": true
+          },
+          "lines": true,
+          "linewidth": 1,
+          "links": [],
+          "nullPointMode": "null",
+          "percentage": false,
+          "pointradius": 5,
+          "points": false,
+          "renderer": "flot",
+          "seriesOverrides": [],
+          "spaceLength": 10,
+          "span": 12,
+          "stack": false,
+          "steppedLine": false,
+          "targets": [
+            {
+              "expr": "jmeter_samples_latency{success=\"true\",sampler_name=~\"$sampler\",quantile=\"0.99\"}",
+              "format": "time_series",
+              "hide": false,
+              "interval": "",
+              "intervalFactor": 1,
+              "legendFormat": "{{sampler_name}} ",
+              "refId": "A",
+              "step": 1
+            }
+          ],
+          "thresholds": [],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "Response times (OK) - 99th percentile by sampler",
           "tooltip": {
             "shared": true,
             "sort": 0,
@@ -389,7 +554,7 @@
     },
     {
       "collapse": false,
-      "height": 622,
+      "height": 192,
       "panels": [
         {
           "aliasColors": {
@@ -400,7 +565,7 @@
           "dashLength": 10,
           "dashes": false,
           "datasource": "${DS_PROMETHEUS}",
-          "fill": 1,
+          "fill": 5,
           "height": "400",
           "id": 4,
           "legend": {
@@ -424,24 +589,24 @@
           "seriesOverrides": [],
           "spaceLength": 10,
           "span": 12,
-          "stack": false,
+          "stack": true,
           "steppedLine": false,
           "targets": [
             {
-              "expr": "sum(irate (jmeter_samples_latency_count{success=\"true\"} [1m]))",
+              "expr": "sum(rate (jmeter_samples_latency_count{success=\"true\",sampler_name=~\"$sampler\"} [$interval]))",
               "format": "time_series",
               "interval": "",
               "intervalFactor": 2,
-              "legendFormat": "success",
+              "legendFormat": "OK",
               "metric": "",
               "refId": "A",
               "step": 2
             },
             {
-              "expr": "sum(irate (jmeter_samples_latency_count{success=\"false\"} [1m]))",
+              "expr": "sum(rate (jmeter_samples_latency_count{success=\"false\",sampler_name=~\"$sampler\"} [$interval]))",
               "format": "time_series",
               "intervalFactor": 2,
-              "legendFormat": "failure",
+              "legendFormat": "KO",
               "refId": "B",
               "step": 2
             }
@@ -449,7 +614,7 @@
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
-          "title": "Total RPS",
+          "title": "Total requests per second",
           "tooltip": {
             "shared": true,
             "sort": 0,
@@ -485,15 +650,15 @@
         },
         {
           "aliasColors": {
-            "requests": "#64B0C8"
+            "HTTP 404": "#BF1B00"
           },
           "bars": false,
           "dashLength": 10,
           "dashes": false,
           "datasource": "${DS_PROMETHEUS}",
-          "fill": 1,
+          "fill": 5,
           "height": "400",
-          "id": 5,
+          "id": 6,
           "legend": {
             "alignAsTable": true,
             "avg": true,
@@ -515,15 +680,15 @@
           "seriesOverrides": [],
           "spaceLength": 10,
           "span": 12,
-          "stack": false,
+          "stack": true,
           "steppedLine": false,
           "targets": [
             {
-              "expr": "sum(irate(jmeter_samples_latency_count[1m])) by (sampler_name)",
+              "expr": "sum by (code) (rate(jmeter_samples_latency_count{sampler_name=~\"$sampler\"}[$interval])) ",
               "format": "time_series",
               "interval": "",
               "intervalFactor": 2,
-              "legendFormat": "{{sampler_name}}",
+              "legendFormat": "HTTP {{code}}",
               "refId": "A",
               "step": 2
             }
@@ -531,7 +696,7 @@
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
-          "title": "RPS by sampler",
+          "title": "Requests per second - by HTTP code",
           "tooltip": {
             "shared": true,
             "sort": 0,
@@ -565,14 +730,16 @@
           ]
         },
         {
-          "aliasColors": {},
+          "aliasColors": {
+            "requests": "#64B0C8"
+          },
           "bars": false,
           "dashLength": 10,
           "dashes": false,
           "datasource": "${DS_PROMETHEUS}",
-          "fill": 1,
+          "fill": 5,
           "height": "400",
-          "id": 6,
+          "id": 5,
           "legend": {
             "alignAsTable": true,
             "avg": true,
@@ -594,15 +761,15 @@
           "seriesOverrides": [],
           "spaceLength": 10,
           "span": 12,
-          "stack": false,
+          "stack": true,
           "steppedLine": false,
           "targets": [
             {
-              "expr": "sum by (code) (irate(jmeter_samples_latency_count[1m])) ",
+              "expr": "sum(rate(jmeter_samples_latency_count{sampler_name=~\"$sampler\",success=\"true\"}[$interval])) by (sampler_name)",
               "format": "time_series",
               "interval": "",
               "intervalFactor": 2,
-              "legendFormat": "HTTP {{code}}",
+              "legendFormat": "{{sampler_name}}",
               "refId": "A",
               "step": 2
             }
@@ -610,7 +777,7 @@
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
-          "title": "RPS by HTTP code",
+          "title": "Requests per second (OK) - by sampler",
           "tooltip": {
             "shared": true,
             "sort": 0,
@@ -648,12 +815,12 @@
       "repeatIteration": null,
       "repeatRowId": null,
       "showTitle": true,
-      "title": "Throughput",
+      "title": "Requests per second",
       "titleSize": "h6"
     },
     {
       "collapse": false,
-      "height": 393,
+      "height": 310,
       "panels": [
         {
           "aliasColors": {
@@ -669,13 +836,15 @@
           "height": "400",
           "id": 3,
           "legend": {
-            "avg": false,
-            "current": false,
-            "max": false,
-            "min": false,
+            "alignAsTable": true,
+            "avg": true,
+            "current": true,
+            "max": true,
+            "min": true,
             "show": true,
+            "sortDesc": true,
             "total": false,
-            "values": false
+            "values": true
           },
           "lines": false,
           "linewidth": 1,
@@ -692,20 +861,21 @@
           "steppedLine": false,
           "targets": [
             {
-              "expr": "sum(irate(jmeter_samples_latency_count{success=\"true\"}[1m]))/sum(irate(jmeter_samples_latency_count[1m]))",
+              "expr": "sum(rate(jmeter_samples_latency_count{success=\"true\",sampler_name=~\"$sampler\"}[$interval]))/sum(rate(jmeter_samples_latency_count{sampler_name=~\"$sampler\"}[$interval]))",
               "format": "time_series",
               "interval": "",
               "intervalFactor": 2,
-              "legendFormat": "success",
+              "legendFormat": "OK",
+              "metric": "",
               "refId": "B",
               "step": 2
             },
             {
-              "expr": "sum(irate(jmeter_samples_latency_count{success=\"false\"}[1m]))/sum(irate(jmeter_samples_latency_count[1m]))",
+              "expr": "sum(rate(jmeter_samples_latency_count{success=\"false\",sampler_name=~\"$sampler\"}[$interval]))/sum(rate(jmeter_samples_latency_count{sampler_name=~\"$sampler\"}[$interval]))",
               "format": "time_series",
               "interval": "",
               "intervalFactor": 2,
-              "legendFormat": "failure",
+              "legendFormat": "KO",
               "refId": "A",
               "step": 2
             }
@@ -713,7 +883,7 @@
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
-          "title": "success vs failure",
+          "title": "Error rate",
           "tooltip": {
             "shared": true,
             "sort": 0,
@@ -747,14 +917,16 @@
           ]
         },
         {
-          "aliasColors": {},
+          "aliasColors": {
+            "moviri.com/404 - HTTP 404": "#58140C"
+          },
           "bars": false,
           "dashLength": 10,
           "dashes": false,
           "datasource": "${DS_PROMETHEUS}",
-          "fill": 1,
+          "fill": 5,
           "height": "400",
-          "id": 11,
+          "id": 15,
           "legend": {
             "alignAsTable": true,
             "avg": true,
@@ -776,11 +948,11 @@
           "seriesOverrides": [],
           "spaceLength": 10,
           "span": 12,
-          "stack": false,
+          "stack": true,
           "steppedLine": false,
           "targets": [
             {
-              "expr": "sum by (sampler_name,code) (irate(jmeter_samples_latency_count{code=~\"5.*\"}[1m])) ",
+              "expr": "rate(jmeter_samples_latency_count{code=~\"5.*|4.*\",sampler_name=~\"$sampler\"}[$interval]) ",
               "format": "time_series",
               "interval": "",
               "intervalFactor": 2,
@@ -792,7 +964,7 @@
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
-          "title": "HTTP 5** by sampler",
+          "title": "HTTP 4** 5** per second",
           "tooltip": {
             "shared": true,
             "sort": 0,
@@ -827,15 +999,15 @@
         },
         {
           "aliasColors": {
-            "moviri.com/404 - HTTP 404": "#0A437C"
+            "moviri.com/servicesKO - servicesKO": "#58140C"
           },
           "bars": false,
           "dashLength": 10,
           "dashes": false,
           "datasource": "${DS_PROMETHEUS}",
-          "fill": 1,
+          "fill": 5,
           "height": "400",
-          "id": 9,
+          "id": 16,
           "legend": {
             "alignAsTable": true,
             "avg": true,
@@ -857,15 +1029,15 @@
           "seriesOverrides": [],
           "spaceLength": 10,
           "span": 12,
-          "stack": false,
+          "stack": true,
           "steppedLine": false,
           "targets": [
             {
-              "expr": "sum by (sampler_name,code) (irate(jmeter_samples_latency_count{code=~\"4.*\"}[1m])) ",
+              "expr": "rate(jmeter_assertions_total_count{failure=\"true\",sampler_name=~\"$sampler\"}[$interval])",
               "format": "time_series",
               "interval": "",
               "intervalFactor": 2,
-              "legendFormat": "{{sampler_name}} - HTTP {{code}}",
+              "legendFormat": "{{sampler_name}} - {{assertion_name}}",
               "refId": "A",
               "step": 2
             }
@@ -873,7 +1045,7 @@
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
-          "title": "HTTP 4** by sampler",
+          "title": "Failure by assertion",
           "tooltip": {
             "shared": true,
             "sort": 0,
@@ -919,10 +1091,68 @@
   "style": "dark",
   "tags": [],
   "templating": {
-    "list": []
+    "list": [
+      {
+        "allValue": null,
+        "current": {
+          "tags": [],
+          "text": "1m",
+          "value": "1m"
+        },
+        "hide": 0,
+        "includeAll": false,
+        "label": "interval",
+        "multi": false,
+        "name": "interval",
+        "options": [
+          {
+            "selected": false,
+            "text": "10s",
+            "value": "10s"
+          },
+          {
+            "selected": false,
+            "text": "30s",
+            "value": "30s"
+          },
+          {
+            "selected": true,
+            "text": "1m",
+            "value": "1m"
+          },
+          {
+            "selected": false,
+            "text": "5m",
+            "value": "5m"
+          }
+        ],
+        "query": "10s,30s,1m,5m",
+        "type": "custom"
+      },
+      {
+        "allValue": null,
+        "current": {},
+        "datasource": "${DS_PROMETHEUS}",
+        "hide": 0,
+        "includeAll": true,
+        "label": "sampler",
+        "multi": true,
+        "name": "sampler",
+        "options": [],
+        "query": "label_values(sampler_name)",
+        "refresh": 1,
+        "regex": "",
+        "sort": 0,
+        "tagValuesQuery": "",
+        "tags": [],
+        "tagsQuery": "",
+        "type": "query",
+        "useTags": false
+      }
+    ]
   },
   "time": {
-    "from": "now-30m",
+    "from": "now-5m",
     "to": "now"
   },
   "timepicker": {
@@ -952,5 +1182,5 @@
   },
   "timezone": "browser",
   "title": "JMeter",
-  "version": 3
+  "version": 9
 }
