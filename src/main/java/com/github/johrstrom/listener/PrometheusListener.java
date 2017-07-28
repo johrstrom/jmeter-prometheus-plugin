@@ -134,7 +134,7 @@ public class PrometheusListener extends AbstractListenerElement
 				}
 			}
 
-		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+		} catch (Exception e) {
 			log.error("Didn't update metric because of exception. Message was: {}", e.getMessage());
 		}
 	}
@@ -269,7 +269,8 @@ public class PrometheusListener extends AbstractListenerElement
 		}
 		
 		for(int i = 0; i < sampleVariableLength; i++) {
-			values[++valuesIndex] = event.getVarValue(i);
+			String varValue =  event.getVarValue(i);
+			values[++valuesIndex] = (varValue == null) ?  "" : varValue;
 		}
 
 		return values;
