@@ -30,7 +30,6 @@ import org.apache.jmeter.samplers.SampleListener;
 import org.apache.jmeter.testelement.TestStateListener;
 import org.apache.jmeter.testelement.property.ObjectProperty;
 import org.apache.jmeter.threads.JMeterContextService;
-import org.apache.jorphan.util.JMeterError;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
@@ -256,11 +255,11 @@ public class PrometheusListener extends AbstractListenerElement
 	protected String[] labelValues(SampleEvent event)
 			throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 		
+		String[] sampleVarArr = this.sampleVariableValues(event);
 		int configLabelLength = this.samplerConfig.getLabels().length;
-		int sampleVariableLength = SampleEvent.getVarCount();
-		int combinedLength = configLabelLength + sampleVariableLength;
+		int totalLength = configLabelLength + sampleVarArr.length;
 		
-		String[] values = new String[combinedLength];
+		String[] values = new String[totalLength];
 		int valuesIndex = -1;	//start at -1 so you can ++ when referencing it
 
 		for (int i = 0; i < configLabelLength; i++) {
@@ -268,10 +267,7 @@ public class PrometheusListener extends AbstractListenerElement
 			values[++valuesIndex] = m.invoke(event.getResult()).toString();
 		}
 		
-		for(int i = 0; i < sampleVariableLength; i++) {
-			String varValue =  event.getVarValue(i);
-			values[++valuesIndex] = (varValue == null) ?  "" : varValue;
-		}
+		System.arraycopy(sampleVarArr, 0, values, configLabelLength, sampleVarArr.length);
 
 		return values;
 
@@ -295,18 +291,39 @@ public class PrometheusListener extends AbstractListenerElement
 	protected String[] labelValues(SampleEvent event, AssertionResult assertionResult)
 			throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 
-		String[] values = new String[this.assertionConfig.getLabels().length];
+		String[] sampleVarArr = this.sampleVariableValues(event);
+		int assertionLabelLength = this.assertionConfig.getLabels().length;
+		int sampleVariableLength = sampleVarArr.length;
+		int combinedLength = assertionLabelLength + sampleVariableLength;
+		
+		String[] values = new String[combinedLength];
 
-		for (int i = 0; i < values.length; i++) {
+		for (int i = 0; i < assertionLabelLength; i++) {
 			Method m = this.assertionConfig.getMethods()[i];
 			if (m.getDeclaringClass().equals(AssertionResult.class))
 				values[i] = m.invoke(assertionResult).toString();
 			else
 				values[i] = m.invoke(event.getResult()).toString();
 		}
+		
+		System.arraycopy(sampleVarArr, 0, values, assertionLabelLength, sampleVariableLength);
 
+		log.info("assertion values: {}", (Object) values);
+		
 		return values;
 
+	}
+	
+	private String[] sampleVariableValues(SampleEvent event) {
+		int sampleVariableLength = SampleEvent.getVarCount();
+		String[] values = new String[sampleVariableLength];
+		
+		for(int i = 0; i < sampleVariableLength; i++) {
+			String varValue =  event.getVarValue(i);
+			values[i] = (varValue == null) ?  "" : varValue;
+		}
+		
+		return values;
 	}
 
 	/**
@@ -410,17 +427,27 @@ public class PrometheusListener extends AbstractListenerElement
 	
 	
 	protected void createAssertionCollector(){
-		if (collectAssertions){
-			if(this.getSaveConfig().getAssertionClass().equals(Summary.class))
-				this.assertionsCollector = Summary.build().name("jmeter_assertions_total").help("Counter for assertions")
-					.labelNames(this.assertionConfig.getLabels()).quantile(0.5, 0.1).quantile(0.99, 0.1)
-					.create().register(CollectorRegistry.defaultRegistry);
-			
-			else if(this.getSaveConfig().getAssertionClass().equals(Counter.class))
-				this.assertionsCollector = Counter.build().name("jmeter_assertions_total").help("Counter for assertions")
-				.labelNames(this.assertionConfig.getLabels()).create().register(CollectorRegistry.defaultRegistry);
-			
+		if (!collectAssertions){
+			return;
 		}
+		
+		String[] labelNames = new String[]{};
+		
+		if (SampleEvent.getVarCount() > 0) {
+			labelNames = this.combineAssertionLabelsWithSampleVars();
+		}else {
+			labelNames = this.assertionConfig.getLabels();
+		}
+		
+		if(this.getSaveConfig().getAssertionClass().equals(Summary.class))
+			this.assertionsCollector = Summary.build().name("jmeter_assertions_total").help("Counter for assertions")
+				.labelNames(labelNames).quantile(0.5, 0.1).quantile(0.99, 0.1)
+				.create().register(CollectorRegistry.defaultRegistry);
+		
+		else if(this.getSaveConfig().getAssertionClass().equals(Counter.class))
+			this.assertionsCollector = Counter.build().name("jmeter_assertions_total").help("Counter for assertions")
+			.labelNames(labelNames).create().register(CollectorRegistry.defaultRegistry);
+			
 	}
 
 	
@@ -443,6 +470,28 @@ public class PrometheusListener extends AbstractListenerElement
 					.create()
 					.register(CollectorRegistry.defaultRegistry);
 		}
+	}
+	
+	private String[] combineAssertionLabelsWithSampleVars() {
+		int assertionLabelLength = this.assertionConfig.getLabels().length;
+		int sampleVariableLength = SampleEvent.getVarCount();
+		int combinedLength = assertionLabelLength + sampleVariableLength;
+		
+		String[] returnArray = new String[combinedLength];
+		int returnArrayIndex = -1;	//start at -1 so you can ++ when referencing it
+		
+		//add config first
+		String[] configuredLabels = this.assertionConfig.getLabels();
+		for (int i = 0; i < assertionLabelLength; i++) {
+			returnArray[++returnArrayIndex] = configuredLabels[i];
+		}
+		
+		//now add sample variables
+		for (int i = 0; i < sampleVariableLength; i++) {
+			returnArray[++returnArrayIndex] = SampleEvent.getVarName(i);
+		}
+		
+		return returnArray;
 	}
 	
 	private String[] combineConfigLabelsWithSampleVars() {
