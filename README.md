@@ -3,7 +3,8 @@
 ## Features
 A listener for Jmeter to expose the results of your test through a Prometheus Api.
 
-It currently exposes things like Sampler latency and Assertion counts. 
+* Exposes Sampler latency and Assertion counts as metric values
+* Can use sample_variables for additional labels.
 
 ```
 # HELP jmeter_assertions_total Counter for assertions
