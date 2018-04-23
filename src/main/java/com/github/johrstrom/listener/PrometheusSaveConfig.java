@@ -1,44 +1,46 @@
 package com.github.johrstrom.listener;
 
 import java.io.Serializable;
-import java.util.Arrays;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.LoggerFactory;
-
-import io.prometheus.client.Collector;
-import io.prometheus.client.Counter;
 
 import org.slf4j.Logger;
 
 public class PrometheusSaveConfig implements Serializable {
 
+	public static final String DEFAULT_QUANTILES = "0.5,0.1|0.9,0.1|0.99,0.1";
+	public static final String DEFAULT_HISTO_BUCKETS = "100,200,500,1000,3000";
+	public static final String DEFAULT_SAMPLE_PREFIX = "jmeter_samples";
+	public static final String DEFAULT_ASSERTION_PREFIX = "jmeter_assertions";
+	
+	
 	private static final long serialVersionUID = 3374323089879858706L;
 
 	private static final Logger log = LoggerFactory.getLogger(PrometheusSaveConfig.class);
 
-	public static final List<String> SAVE_CONFIG_NAMES = Collections
-			.unmodifiableList(Arrays.asList(new String[] { "Label", "Code", // Response
-																			// Code
-					"Success", "Threads", "Assertions", "Port", }));
-
-	private boolean label, code, success, assertions, threads;
-	private int port;
-	private Class<? extends Collector> assertionClass;
+	private boolean label, code, success, assertions, counter, summary, histogram, failureCounter;
+	private String quantiles, buckets, metricPrefix;
 
 	public PrometheusSaveConfig() {
-		this(true);
+		this(false, DEFAULT_SAMPLE_PREFIX);
+	}
+	
+	public PrometheusSaveConfig(String prefix) {
+		this(false, prefix);
 	}
 
-	public PrometheusSaveConfig(boolean save) {
+	public PrometheusSaveConfig(boolean save, String prefix) {
 		this.setSaveLabel(save);
 		this.setSaveCode(save);
-		this.setSaveThreads(save);
 		this.setSaveSuccess(save);
 		this.setSaveAssertions(save);
-		this.setAssertionClass(Counter.class);
-		this.setPort(9270);
+		this.setCounter(save);
+		this.setSummary(save);
+		this.setHistogram(save);
+		this.setFailureCounter(save);
+		this.setMetricPrefix(prefix);
 	}
 
 	public boolean saveLabel() {
@@ -76,30 +78,105 @@ public class PrometheusSaveConfig implements Serializable {
 		log.debug("Setting save assertions to " + save);
 		this.assertions = save;
 	}
+
+	public boolean isCounter() {
+		return counter;
+	}
+
+	public void setCounter(boolean counter) {
+		this.counter = counter;
+	}
+
+	public boolean isHistogram() {
+		return histogram;
+	}
+
+	public void setHistogram(boolean histogram) {
+		this.histogram = histogram;
+	}
+
+	public boolean isFailureCounter() {
+		return failureCounter;
+	}
+
+	public void setFailureCounter(boolean failureCounter) {
+		this.failureCounter = failureCounter;
+	}
+
+	public String getBuckets() {
+		return buckets == null ? DEFAULT_HISTO_BUCKETS : buckets;
+	}
 	
-	public boolean saveThreads() {
-		return this.threads;
+	public List<Double> getBucketsAsDoubles() {
+		String bucketString = this.getBuckets();
+		List<Double> bucketList = new ArrayList<>();
+		
+		for(String bucket : bucketString.split(",")) {
+			try {
+				double b = Double.parseDouble(bucket);
+				bucketList.add(b);
+			} catch (NumberFormatException e) {
+				log.warn(String.format("Didn't parse bucket %s because of %s: %s", 
+						bucket, e.getClass().toString(), e.getMessage()));
+			}
+		}
+		
+		return bucketList;
 	}
 
-	public void setSaveThreads(boolean save) {
-		log.debug("Setting save threads to " + save);
-		this.threads = save;
+	public void setBuckets(String buckets) {
+		this.buckets = buckets;
 	}
 
-	public int getPort() {
-		return this.port;
+	public String getQuantiles() {
+		return quantiles == null ? DEFAULT_QUANTILES : quantiles;
+	}
+	
+	public List<Double> getQuantilesAsDoubles() {
+		String quantString = this.getQuantiles();
+		List<Double> quantileDoubles = new ArrayList<>();
+		
+		for(String subQuantiles : quantString.split("|")) {
+			String[] singleQuantile = subQuantiles.split(",");
+			if(singleQuantile.length == 2) {
+				
+				try {
+					double q = Double.parseDouble(singleQuantile[0]);
+					double e = Double.parseDouble(singleQuantile[1]);
+					
+					quantileDoubles.add(q);
+					quantileDoubles.add(e);
+				} catch (NumberFormatException e) {
+					log.warn(String.format("Didn't parse quantile %s/%s because of %s: %s", 
+							singleQuantile[0], singleQuantile[1], e.getClass().toString(), e.getMessage()));
+				}
+
+			}
+		}
+		
+		return quantileDoubles;
 	}
 
-	public void setPort(int port_value) {
-		log.debug("Setting port to " + port_value);
-		this.port = port_value;
+	public void setQuantiles(String quantiles) {
+		this.quantiles = quantiles;
 	}
 
-	public Class<? extends Collector> getAssertionClass() {
-		return assertionClass;
+	public boolean isSummary() {
+		return summary;
 	}
 
-	public void setAssertionClass(Class<? extends Collector> assertionClass) {
-		this.assertionClass = assertionClass;
+	public void setSummary(boolean summary) {
+		this.summary = summary;
 	}
+
+	public String getMetricPrefix() {
+		return metricPrefix;
+	}
+
+	public void setMetricPrefix(String metricPrefix) {
+		this.metricPrefix = metricPrefix;
+	}
+	
+	
+
 }
