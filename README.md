@@ -25,13 +25,13 @@ A grafana dashboard example to inspect jmeter exporter metrics. You can find mor
 
 ## Usage
 
-To use this plugin you'll have to clone this repo, build the shaded jar and move it to your JMeter's lib directory.
+To use this plugin you'll have to clone this repo, build the shaded jar and move it to your JMeter's lib/ext directory.
 
 To build, simply maven package:
 ```
 mvn clean package
 ```
-This creates 2 jars, a shaded jar that has all the dependencies within it (this is the one you want) and the original jar. Both are in the target directory.  Simply move the jar to your $JMETER_HOME/lib directory as with any JMeter plugin and you're ready to go!
+This creates 2 jars, a shaded jar that has all the dependencies within it (this is the one you want) and the original jar. Both are in the target directory.  Simply move the jar to your $JMETER_HOME/lib/ext directory as with any JMeter plugin and you're ready to go!
 
 ## Feedback
 
