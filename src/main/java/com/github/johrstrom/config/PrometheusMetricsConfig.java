@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.jmeter.config.ConfigElement;
-import org.apache.jmeter.config.ConfigTestElement;
 import org.apache.jmeter.engine.util.NoThreadClone;
 import org.apache.jmeter.testelement.AbstractTestElement;
 import org.apache.jmeter.testelement.TestStateListener;
@@ -19,16 +18,10 @@ import org.apache.jmeter.threads.JMeterVariables;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.johrstrom.config.CollectorConfig.QuantileDefinition;
+import com.github.johrstrom.collector.CollectorConfig;
 
 import io.prometheus.client.Collector;
-import io.prometheus.client.Collector.Type;
 import io.prometheus.client.CollectorRegistry;
-import io.prometheus.client.Counter;
-import io.prometheus.client.Gauge;
-import io.prometheus.client.Histogram;
-import io.prometheus.client.Summary;
-import io.prometheus.client.Summary.Builder;
 
 public class PrometheusMetricsConfig extends AbstractTestElement 
 	implements ConfigElement, NoThreadClone, TestStateListener {
@@ -72,7 +65,7 @@ public class PrometheusMetricsConfig extends AbstractTestElement
 		
 		while(iter.hasNext()) {
 			CollectorConfig definition = (CollectorConfig) iter.next().getObjectValue();
-			Collector collector = this.fromDefinition(definition);
+			Collector collector = CollectorConfig.fromDefinition(definition);
 			try {
 				collector.register(CollectorRegistry.defaultRegistry);
 				this.collectors.put(definition.getMetricName(), collector);
@@ -85,86 +78,6 @@ public class PrometheusMetricsConfig extends AbstractTestElement
 	}
 	
 	
-	public Collector fromDefinition(CollectorConfig cfg) {
-		Type t = cfg.getPrometheusType();
-		Collector c = null;
-		
-		try {
-			if(t.equals(Type.COUNTER)) {
-				c = this.newCounter(cfg);
-				
-			}else if(t.equals(Type.SUMMARY)) {
-				c = this.newSummary(cfg);
-				
-			}else if(t.equals(Type.HISTOGRAM)) {
-				c = this.newHistogram(cfg);
-			}else if(t.equals(Type.GAUGE)) {
-				c = this.newHistogram(cfg);
-			}
-		} catch(Exception e) {
-			log.error(String.format("Didn't create collector from definition %s because of an error", cfg), e);
-		} 
-		
-		return c;
-	}
-	
-	protected Counter newCounter(CollectorConfig cfg) throws Exception {
-		io.prometheus.client.Counter.Builder builder = new Counter.Builder()
-			.help(cfg.getHelp())
-			.name(cfg.getMetricName());
-		
-		String[] labels = cfg.getLabels();
-		if(labels.length != 0) {
-			builder.labelNames(labels);
-		}
-		
-		return builder.create();
-	}
-	
-	protected Summary newSummary(CollectorConfig cfg) throws Exception {
-		io.prometheus.client.Summary.Builder builder = new Summary.Builder()
-				.name(cfg.getMetricName())
-				.help(cfg.getHelp());
-		
-		String[] labels = cfg.getLabels();
-		if(labels.length != 0) {
-			builder.labelNames(labels);
-		}
-		
-		for(QuantileDefinition def : cfg.getQuantiles()) {
-			builder.quantile(def.quantile, def.error);
-		}
-		
-		return builder.create();
-	}
-	
-	protected Histogram newHistogram(CollectorConfig cfg) throws Exception {
-		io.prometheus.client.Histogram.Builder builder = new Histogram.Builder()
-				.name(cfg.getMetricName())
-				.help(cfg.getHelp())
-				.buckets(cfg.getBuckets());
-		
-		String[] labels = cfg.getLabels();
-		if(labels.length != 0) {
-			builder.labelNames(labels);
-		}
-		
-		return builder.create();
-	}
-	
-	protected Gauge newGauge(CollectorConfig cfg) throws Exception {
-		io.prometheus.client.Gauge.Builder builder =  new Gauge.Builder()
-				.name(cfg.getMetricName())
-				.help(cfg.getHelp());
-		
-		String[] labels = cfg.getLabels();
-		if(labels.length != 0) {
-			builder.labelNames(labels);
-		}
-		
-		return builder.create();
-	}
-
 	@Override
 	public void testEnded() {
 		this.setRunningVersion(false);

@@ -1,4 +1,4 @@
-package com.github.johrstrom.config;
+package com.github.johrstrom.collector;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,6 +12,11 @@ import org.apache.jmeter.testelement.property.PropertyIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.prometheus.client.Collector;
+import io.prometheus.client.Counter;
+import io.prometheus.client.Gauge;
+import io.prometheus.client.Histogram;
+import io.prometheus.client.Summary;
 import io.prometheus.client.Collector.Type;
 
 public class CollectorConfig extends AbstractTestElement {
@@ -27,10 +32,10 @@ public class CollectorConfig extends AbstractTestElement {
 	public static String LABELS = "collector.labels";
 	public static String QUANTILES_OR_BUCKETS = "collector.quantiles_or_buckets";
 	
-	public static double[] DEFAULT_BUCKET_SIZES = {100,200,500,1000};
+	public static double[] DEFAULT_BUCKET_SIZES = {100,500,1000,3000};
 	public static QuantileDefinition[] DEFAULT_QUANTILES = defaultQuantiles();
 	
-	private Logger log = LoggerFactory.getLogger(CollectorConfig.class);
+	private static Logger log = LoggerFactory.getLogger(CollectorConfig.class);
 
 	public String getHelp() {
 		return this.getPropertyAsString(HELP, "");
@@ -124,15 +129,94 @@ public class CollectorConfig extends AbstractTestElement {
 		
 		while(it.hasNext()) {
 			String next = it.next().getStringValue();
-			
 			sb.append(next);
 			if(it.hasNext())
 				sb.append(",");
-			
 		}
 		
 		return sb.toString();
 	}
+	
+	public static Counter newCounter(CollectorConfig cfg) throws Exception {
+		io.prometheus.client.Counter.Builder builder = new Counter.Builder()
+			.help(cfg.getHelp())
+			.name(cfg.getMetricName());
+		
+		String[] labels = cfg.getLabels();
+		if(labels.length != 0) {
+			builder.labelNames(labels);
+		}
+		
+		return builder.create();
+	}
+	
+	public static Summary newSummary(CollectorConfig cfg) throws Exception {
+		io.prometheus.client.Summary.Builder builder = new Summary.Builder()
+				.name(cfg.getMetricName())
+				.help(cfg.getHelp());
+		
+		String[] labels = cfg.getLabels();
+		if(labels.length != 0) {
+			builder.labelNames(labels);
+		}
+		
+		for(QuantileDefinition def : cfg.getQuantiles()) {
+			builder.quantile(def.quantile, def.error);
+		}
+		
+		return builder.create();
+	}
+	
+	public static Histogram newHistogram(CollectorConfig cfg) throws Exception {
+		io.prometheus.client.Histogram.Builder builder = new Histogram.Builder()
+				.name(cfg.getMetricName())
+				.help(cfg.getHelp())
+				.buckets(cfg.getBuckets());
+		
+		String[] labels = cfg.getLabels();
+		if(labels.length != 0) {
+			builder.labelNames(labels);
+		}
+		
+		return builder.create();
+	}
+	
+	public static Gauge newGauge(CollectorConfig cfg) throws Exception {
+		io.prometheus.client.Gauge.Builder builder =  new Gauge.Builder()
+				.name(cfg.getMetricName())
+				.help(cfg.getHelp());
+		
+		String[] labels = cfg.getLabels();
+		if(labels.length != 0) {
+			builder.labelNames(labels);
+		}
+		
+		return builder.create();
+	}
+	
+	public static Collector fromDefinition(CollectorConfig cfg) {
+		Type t = cfg.getPrometheusType();
+		Collector c = null;
+		
+		try {
+			if(t.equals(Type.COUNTER)) {
+				c = CollectorConfig.newCounter(cfg);
+				
+			}else if(t.equals(Type.SUMMARY)) {
+				c = CollectorConfig.newSummary(cfg);
+				
+			}else if(t.equals(Type.HISTOGRAM)) {
+				c = CollectorConfig.newHistogram(cfg);
+			}else if(t.equals(Type.GAUGE)) {
+				c = CollectorConfig.newHistogram(cfg);
+			}
+		} catch(Exception e) {
+			log.error(String.format("Didn't create collector from definition %s because of an error", cfg), e);
+		} 
+		
+		return c;
+	}
+	
 	
 	@Override
 	public String toString() {
@@ -203,6 +287,12 @@ public class CollectorConfig extends AbstractTestElement {
 		return def;
 	}
 	
+	/**
+	 * A very simple POJO for holding Quantiles and the error rating for them.
+	 * 
+	 * @author Jeff ohrstrom
+	 *
+	 */
 	public static class QuantileDefinition {
 		public double quantile;
 		public double error;
@@ -212,18 +302,19 @@ public class CollectorConfig extends AbstractTestElement {
 			this.error = error;
 		}
 		
-		QuantileDefinition(String quantile, String error){
-			this.quantile = Double.parseDouble(quantile);
-			this.error = Double.parseDouble(error);
+		QuantileDefinition(String quantile, String error) throws NumberFormatException {
+			this(new String[]{quantile, error});
 		}
 		
-		QuantileDefinition(String[] definition){
+		QuantileDefinition(String[] definition) throws NumberFormatException {
 			if(definition.length != 2) {
 				throw new IllegalArgumentException(String.format("Quantiles need exactly 2 parameters. %d given.", definition.length));
 			}
 			this.quantile = Double.parseDouble(definition[0]);
 			this.error = Double.parseDouble(definition[1]);
 		}
+		
+		
 	}
 
 }

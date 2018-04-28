@@ -25,7 +25,7 @@ import org.apache.jmeter.testelement.property.PropertyIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.johrstrom.config.CollectorConfig;
+import com.github.johrstrom.collector.CollectorConfig;
 import com.github.johrstrom.config.PrometheusMetricsConfig;
 
 import io.prometheus.client.Collector.Type;
