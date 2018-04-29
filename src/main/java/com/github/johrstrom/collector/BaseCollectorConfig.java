@@ -5,12 +5,15 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+
 import org.apache.jmeter.testelement.AbstractTestElement;
 import org.apache.jmeter.testelement.property.CollectionProperty;
 import org.apache.jmeter.testelement.property.JMeterProperty;
+import org.apache.jmeter.testelement.property.NullProperty;
 import org.apache.jmeter.testelement.property.PropertyIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 
 import io.prometheus.client.Collector;
 import io.prometheus.client.Counter;
@@ -19,7 +22,7 @@ import io.prometheus.client.Histogram;
 import io.prometheus.client.Summary;
 import io.prometheus.client.Collector.Type;
 
-public class CollectorConfig extends AbstractTestElement {
+public class BaseCollectorConfig extends AbstractTestElement  {
 	
 	/**
 	 * 
@@ -35,7 +38,15 @@ public class CollectorConfig extends AbstractTestElement {
 	public static double[] DEFAULT_BUCKET_SIZES = {100,500,1000,3000};
 	public static QuantileDefinition[] DEFAULT_QUANTILES = defaultQuantiles();
 	
-	private static Logger log = LoggerFactory.getLogger(CollectorConfig.class);
+	private static Logger log = LoggerFactory.getLogger(BaseCollectorConfig.class);
+	
+	public BaseCollectorConfig(){
+		this.setHelp("");
+		this.setMetricName("");
+		this.setType(Type.COUNTER.name());
+		this.setLabels(new String[0]);
+		this.setQuantileOrBucket("");
+	}
 
 	public String getHelp() {
 		return this.getPropertyAsString(HELP, "");
@@ -93,6 +104,10 @@ public class CollectorConfig extends AbstractTestElement {
 		this.setProperty(NAME, name);
 	}
 	
+	public void setLabels(String labels) {
+		this.setLabels(labels.split(","));
+	}
+	
 	public void setLabels(String[] labels) {
 		List<String> list = new ArrayList<String>(Arrays.asList(labels));
 		
@@ -108,9 +123,14 @@ public class CollectorConfig extends AbstractTestElement {
 	}
 	
 	public String[] getLabels() {
-		CollectionProperty prop = (CollectionProperty) this.getProperty(LABELS);
-		String[] retArray = new String[prop.size()];
-		PropertyIterator it = prop.iterator();
+		JMeterProperty prop = this.getProperty(LABELS);
+		if(prop == null || prop instanceof NullProperty) {
+			return new String[0];
+		}
+		 
+		CollectionProperty colletion = (CollectionProperty) prop;
+		String[] retArray = new String[colletion.size()];
+		PropertyIterator it = colletion.iterator();
 		
 		int i=0;
 		while(it.hasNext()) {
@@ -123,21 +143,19 @@ public class CollectorConfig extends AbstractTestElement {
 	}
 	
 	public String getLabelsAsString() {
-		CollectionProperty prop = (CollectionProperty) this.getProperty(LABELS);
 		StringBuilder sb = new StringBuilder();
-		PropertyIterator it = prop.iterator();
 		
-		while(it.hasNext()) {
-			String next = it.next().getStringValue();
-			sb.append(next);
-			if(it.hasNext())
+		String[] labels = this.getLabels();
+		for(int i = 0; i < labels.length; i++) {
+			sb.append(labels[i]);
+			if(i+1 < labels.length)
 				sb.append(",");
 		}
 		
 		return sb.toString();
 	}
 	
-	public static Counter newCounter(CollectorConfig cfg) throws Exception {
+	public static Counter newCounter(BaseCollectorConfig cfg) throws Exception {
 		io.prometheus.client.Counter.Builder builder = new Counter.Builder()
 			.help(cfg.getHelp())
 			.name(cfg.getMetricName());
@@ -150,7 +168,7 @@ public class CollectorConfig extends AbstractTestElement {
 		return builder.create();
 	}
 	
-	public static Summary newSummary(CollectorConfig cfg) throws Exception {
+	public static Summary newSummary(BaseCollectorConfig cfg) throws Exception {
 		io.prometheus.client.Summary.Builder builder = new Summary.Builder()
 				.name(cfg.getMetricName())
 				.help(cfg.getHelp());
@@ -167,7 +185,7 @@ public class CollectorConfig extends AbstractTestElement {
 		return builder.create();
 	}
 	
-	public static Histogram newHistogram(CollectorConfig cfg) throws Exception {
+	public static Histogram newHistogram(BaseCollectorConfig cfg) throws Exception {
 		io.prometheus.client.Histogram.Builder builder = new Histogram.Builder()
 				.name(cfg.getMetricName())
 				.help(cfg.getHelp())
@@ -181,7 +199,7 @@ public class CollectorConfig extends AbstractTestElement {
 		return builder.create();
 	}
 	
-	public static Gauge newGauge(CollectorConfig cfg) throws Exception {
+	public static Gauge newGauge(BaseCollectorConfig cfg) throws Exception {
 		io.prometheus.client.Gauge.Builder builder =  new Gauge.Builder()
 				.name(cfg.getMetricName())
 				.help(cfg.getHelp());
@@ -194,21 +212,21 @@ public class CollectorConfig extends AbstractTestElement {
 		return builder.create();
 	}
 	
-	public static Collector fromDefinition(CollectorConfig cfg) {
+	public static Collector fromConfig(BaseCollectorConfig cfg) {
 		Type t = cfg.getPrometheusType();
 		Collector c = null;
 		
 		try {
 			if(t.equals(Type.COUNTER)) {
-				c = CollectorConfig.newCounter(cfg);
+				c = BaseCollectorConfig.newCounter(cfg);
 				
 			}else if(t.equals(Type.SUMMARY)) {
-				c = CollectorConfig.newSummary(cfg);
+				c = BaseCollectorConfig.newSummary(cfg);
 				
 			}else if(t.equals(Type.HISTOGRAM)) {
-				c = CollectorConfig.newHistogram(cfg);
+				c = BaseCollectorConfig.newHistogram(cfg);
 			}else if(t.equals(Type.GAUGE)) {
-				c = CollectorConfig.newHistogram(cfg);
+				c = BaseCollectorConfig.newHistogram(cfg);
 			}
 		} catch(Exception e) {
 			log.error(String.format("Didn't create collector from definition %s because of an error", cfg), e);
@@ -316,6 +334,8 @@ public class CollectorConfig extends AbstractTestElement {
 		
 		
 	}
+
+
 
 }
 

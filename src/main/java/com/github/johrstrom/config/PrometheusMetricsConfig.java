@@ -18,7 +18,7 @@ import org.apache.jmeter.threads.JMeterVariables;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.johrstrom.collector.CollectorConfig;
+import com.github.johrstrom.collector.BaseCollectorConfig;
 
 import io.prometheus.client.Collector;
 import io.prometheus.client.CollectorRegistry;
@@ -39,7 +39,7 @@ public class PrometheusMetricsConfig extends AbstractTestElement
 		JMeterProperty collectorDefinitions = this.getProperty(COLLECTOR_DEF);
 		
 		if(collectorDefinitions == null || collectorDefinitions instanceof NullProperty) {
-			collectorDefinitions = new CollectionProperty(COLLECTOR_DEF, new ArrayList<CollectorConfig>());
+			collectorDefinitions = new CollectionProperty(COLLECTOR_DEF, new ArrayList<BaseCollectorConfig>());
 			collectorDefinitions.setName(COLLECTOR_DEF);
 		}
 		
@@ -47,7 +47,7 @@ public class PrometheusMetricsConfig extends AbstractTestElement
 		 
 	}
 	
-	public void setCollectorDefinitions(List<CollectorConfig> collectors) {
+	public void setCollectorDefinitions(List<BaseCollectorConfig> collectors) {
 		this.setProperty(new CollectionProperty(COLLECTOR_DEF, collectors));
 		this.makeNewCollectors();
 	}
@@ -64,8 +64,8 @@ public class PrometheusMetricsConfig extends AbstractTestElement
 		PropertyIterator iter = collectorDefs.iterator();
 		
 		while(iter.hasNext()) {
-			CollectorConfig definition = (CollectorConfig) iter.next().getObjectValue();
-			Collector collector = CollectorConfig.fromDefinition(definition);
+			BaseCollectorConfig definition = (BaseCollectorConfig) iter.next().getObjectValue();
+			Collector collector = BaseCollectorConfig.fromConfig(definition);
 			try {
 				collector.register(CollectorRegistry.defaultRegistry);
 				this.collectors.put(definition.getMetricName(), collector);

@@ -1,0 +1,88 @@
+package com.github.johrstrom.collector;
+
+import javax.swing.ComboBoxEditor;
+import javax.swing.JComboBox;
+import org.apache.jorphan.reflect.Functor;
+
+import io.prometheus.client.Collector.Type;
+
+/**
+ * A GUI helper class so that the {@link BaseColletorConfig} class doesn't have to know or care
+ * about how it gets flattened into a table.
+ * 
+ * @author Jeff Ohrstrom
+ *
+ */
+public class BaseCollectorGuiHelper implements Flatten {
+	
+	public static JComboBox<String> typeComboBox; 
+	
+	public static int METRIC_NAME_INDEX = 0;
+	public static int HELP_INDEX = 1;
+	public static int LABEL_NAME_INDEX = 2;
+	public static int TYPE_INDEX = 3;
+	public static int QUANTILE_OR_BUCKET_INDEX = 4;
+	public static int BASE_COLUMN_SIZE = 5;
+	
+	
+	static {
+		typeComboBox = new JComboBox<>();
+		typeComboBox.addItem(Type.COUNTER.name());
+		typeComboBox.addItem(Type.SUMMARY.name());
+		typeComboBox.addItem(Type.HISTOGRAM.name());
+		typeComboBox.addItem(Type.GAUGE.name());
+	}
+	
+	@Override
+	public Functor[] getReadFunctors() {
+		Functor[] functors = new Functor[BASE_COLUMN_SIZE];
+		
+		functors[METRIC_NAME_INDEX] = new Functor("getMetricName");
+		functors[HELP_INDEX] = new Functor("getHelp");
+		functors[LABEL_NAME_INDEX] = new Functor("getLabelsAsString");
+		functors[TYPE_INDEX] = new Functor("getType");
+		functors[QUANTILE_OR_BUCKET_INDEX] = new Functor("getQuantileOrBucket");
+			
+		return functors;
+	}
+
+	@Override
+	public Functor[] getWriteFunctors() {
+		Functor[] functors = new Functor[BASE_COLUMN_SIZE];
+		
+		functors[METRIC_NAME_INDEX] = new Functor("setMetricName");
+		functors[HELP_INDEX] = new Functor("setHelp");
+		functors[LABEL_NAME_INDEX] = new Functor("setLabels");
+		functors[TYPE_INDEX] = new Functor("setType");
+		functors[QUANTILE_OR_BUCKET_INDEX] = new Functor("setQuantileOrBucket");
+		
+		return functors;
+	}
+
+	@Override
+	public String[] getHeaders() {
+		String[] headers = new String[BASE_COLUMN_SIZE];
+		
+		headers[METRIC_NAME_INDEX] = "Name";
+		headers[HELP_INDEX] = "Help";
+		headers[LABEL_NAME_INDEX] = "Labels";
+		headers[TYPE_INDEX] = "Type";
+		headers[QUANTILE_OR_BUCKET_INDEX] = "Buckets or Quantiles";
+		
+		return headers;
+	}
+
+	@Override
+	public Class<?>[] getEditorClasses() {
+		Class<?>[] clazzes = new Class<?>[BASE_COLUMN_SIZE];
+		
+		clazzes[METRIC_NAME_INDEX] = String.class;
+		clazzes[HELP_INDEX] = String.class;
+		clazzes[LABEL_NAME_INDEX] = String.class;
+		clazzes[TYPE_INDEX] = ComboBoxEditor.class;
+		clazzes[QUANTILE_OR_BUCKET_INDEX] = String.class;
+		
+		return clazzes;
+	}
+	
+}
