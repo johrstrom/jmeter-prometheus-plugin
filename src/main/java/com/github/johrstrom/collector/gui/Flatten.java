@@ -1,4 +1,4 @@
-package com.github.johrstrom.collector;
+package com.github.johrstrom.collector.gui;
 
 import org.apache.jorphan.reflect.Functor;
 

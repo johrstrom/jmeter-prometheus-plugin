@@ -1,4 +1,4 @@
-package com.gitub.johrstrom.config.gui;
+package com.github.johrstrom.collector.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -7,14 +7,12 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.table.TableColumn;
 
-import org.apache.jmeter.config.gui.AbstractConfigGui;
+import org.apache.jmeter.gui.AbstractJMeterGuiComponent;
 import org.apache.jmeter.gui.util.HorizontalPanel;
 import org.apache.jmeter.gui.util.VerticalPanel;
 import org.apache.jmeter.testelement.TestElement;
@@ -25,87 +23,84 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.johrstrom.collector.BaseCollectorConfig;
-import com.github.johrstrom.collector.BaseCollectorGuiHelper;
-import com.github.johrstrom.config.PrometheusMetricsConfig;
+import com.github.johrstrom.collector.CollectorElement;
 
+public abstract class AbstractCollectorGui<C extends BaseCollectorConfig> 
+	extends AbstractJMeterGuiComponent implements ActionListener {
 
-public class PrometheusMetricsConfigGui extends AbstractConfigGui implements ActionListener {
+	public static final String ADD = "Add";
+	public static final String DELETE = "Delete";
 	
-	private static final long serialVersionUID = 6741986237897976082L;
-	private JTable table;
-	private ObjectTableModel model;
+	protected JTable table;
+	protected ObjectTableModel model;
+	protected JButton add,delete;
+	protected CollectorElement<C> collector;
 	
-	private Logger log = LoggerFactory.getLogger(PrometheusMetricsConfigGui.class);
-
+	private final Class<C> clazzType;
+	private static final long serialVersionUID = 2027712606129940455L;
+	private Logger log = LoggerFactory.getLogger(AbstractCollectorGui.class);
 	
-	private JButton add,delete;
 	
-	private static final String ADD = "Add";
-	private static final String DELETE = "Delete";
-
-	public PrometheusMetricsConfigGui(){
-		super();
-		this.createGUI();
-		
+	
+	/**
+	 * @return
+	 */
+	public abstract Flatten getGuiHelper();
+	
+	
+	/**
+	 * 
+	 */
+	public abstract void modifyColumns();
+	
+	
+	public AbstractCollectorGui(Class<C> collectorType) {
+		clazzType = collectorType;
+		this.init();
+		this.modifyColumns();
 	}
 	
-	@Override
-	public TestElement createTestElement() {
-		PrometheusMetricsConfig config = new PrometheusMetricsConfig();
-		
-		config.setProperty(TestElement.GUI_CLASS, PrometheusMetricsConfigGui.class.getName());
-		config.setProperty(TestElement.TEST_CLASS, PrometheusMetricsConfig.class.getName());
-		this.modifyTestElement(config);
-		
-		return config;
-	}
-
-	@Override
-	public String getLabelResource() {
-		return getClass().getCanonicalName();
-	}
-
 	@Override
 	public void modifyTestElement(TestElement ele) {
-		if(!(ele instanceof PrometheusMetricsConfig)) {
+		
+		if(!(ele instanceof CollectorElement)) {
 			return;
 		}
 		
 		int rows = this.model.getRowCount();
-		ArrayList<BaseCollectorConfig> collectors = new ArrayList<>();
-		PrometheusMetricsConfig config = (PrometheusMetricsConfig) ele;
+		ArrayList<C> collectors = new ArrayList<>();
+		
+		@SuppressWarnings("unchecked")
+		CollectorElement<C> config = (CollectorElement<C>) ele;
 
 		log.debug("modifying test element " + ele.toString() + ". row count in model is " + rows);
 		
 		@SuppressWarnings("unchecked")
-		Iterator<BaseCollectorConfig> iter = (Iterator<BaseCollectorConfig>) model.iterator();
+		Iterator<C> iter = (Iterator<C>) model.iterator();
 		
 		while(iter.hasNext()) {
-			BaseCollectorConfig cfg = iter.next();
+			C cfg = this.clazzType.cast(iter.next());
 			collectors.add(cfg);
 			log.debug("populated config: " + cfg.toString() + " from table.");
 		}
 		
 		config.setCollectorDefinitions(collectors);
+		this.collector = config;
 	}
-	
-	public String getValueAt(int row, int column) {
-		String value = this.model.getValueAt(row, column).toString();
-		log.debug(String.format("retrieved %s from table from position (%d,%d)", value,row,column));
-		return value;
-	}
-	
 	
 	
 	@Override
 	public void configure(TestElement element) {
 		super.configure(element);
 		
-		if(!(element instanceof PrometheusMetricsConfig)) {
+		if(!(element instanceof CollectorElement)) {
 			return;
 		}
-		PrometheusMetricsConfig config = (PrometheusMetricsConfig) element;
-		CollectionProperty collectors = config.getCollectorDefinitions();
+		
+		@SuppressWarnings("unchecked")
+		CollectorElement<C> config = (CollectorElement<C>) element;
+		
+		CollectionProperty collectors = config.getCollectorConfigs();
 		log.debug("Configuring GUI with " + collectors.size() + " collectors.");
 		
 		this.model.clearData();
@@ -118,35 +113,11 @@ public class PrometheusMetricsConfigGui extends AbstractConfigGui implements Act
 		}
 		
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.apache.jmeter.gui.AbstractJMeterGuiComponent#getStaticLabel()
-	 */
-	@Override
-	public String getStaticLabel() {
-		return "Prometheus Metrics";
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.apache.jmeter.gui.AbstractJMeterGuiComponent#getName()
-	 */
-	@Override
-	public String getName() {
-		if (super.getName() == null) {
-			return this.getStaticLabel();
-		} else {
-			return super.getName();
-		}
-	}
 	
 	/**
 	 * Private helper function to initialize all the Swing components.
 	 */
-	protected void createGUI() {
+	protected void init() {
 		this.setLayout(new BorderLayout(0, 5));
 		this.setBorder(makeBorder());
 		
@@ -164,27 +135,26 @@ public class PrometheusMetricsConfigGui extends AbstractConfigGui implements Act
 		return panel;
 	}
 	
+	
 	protected Component makeTablePanel() {
-		BaseCollectorGuiHelper helper = new BaseCollectorGuiHelper();
+		Flatten helper = this.getGuiHelper();
+		
 		this.model = new ObjectTableModel(
 				helper.getHeaders(),
-				BaseCollectorConfig.class,
+				this.clazzType,
 				helper.getReadFunctors(),
 				helper.getWriteFunctors(),
 				helper.getEditorClasses()
 		);
-		//model.add
-		this.table = new JTable(this.model);
 		
-		TableColumn typeColumn = table.getColumnModel().getColumn(BaseCollectorGuiHelper.TYPE_INDEX);
-		typeColumn.setCellEditor(new DefaultCellEditor(BaseCollectorGuiHelper.typeComboBox));
+		this.table = new JTable(this.model);
 		
 		JScrollPane scrollPane = new JScrollPane(this.table);
 		table.setFillsViewportHeight(true);
 		
 		return scrollPane;
 	}
-	
+
 	protected JPanel makeButtonPanel() {
 		
 		add = new JButton(ADD); 
@@ -203,12 +173,16 @@ public class PrometheusMetricsConfigGui extends AbstractConfigGui implements Act
 		
 		return panel;
 	}
-
+	
 	@Override
 	public void actionPerformed(ActionEvent event) {
 		switch (event.getActionCommand()) {
 		case ADD:
-			this.model.addRow(new BaseCollectorConfig());
+			try {
+				this.model.addRow(this.clazzType.newInstance());
+			} catch (InstantiationException | IllegalAccessException e) {
+				log.error("Couldn't add to model becuase of error. ", e);
+			}
 			break;
 		case DELETE:
 			deleteSelectedRows();
@@ -226,12 +200,4 @@ public class PrometheusMetricsConfigGui extends AbstractConfigGui implements Act
 		}
 	}
 	
-
 }
-
-
-
-
-
-
-

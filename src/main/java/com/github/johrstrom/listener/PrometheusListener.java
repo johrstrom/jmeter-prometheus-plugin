@@ -19,19 +19,17 @@
 package com.github.johrstrom.listener;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.apache.jmeter.engine.util.NoThreadClone;
-import org.apache.jmeter.reporters.AbstractListenerElement;
 import org.apache.jmeter.samplers.SampleEvent;
 import org.apache.jmeter.samplers.SampleListener;
 import org.apache.jmeter.testelement.TestStateListener;
-import org.apache.jmeter.testelement.property.ObjectProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.prometheus.client.Collector.Type;
+import com.github.johrstrom.collector.CollectorElement;
+import com.github.johrstrom.collector.SampleCollectorConfig;
+
 
 
 /**
@@ -45,11 +43,8 @@ import io.prometheus.client.Collector.Type;
  * @author Jeff Ohrstrom
  *
  */
-public class PrometheusListener extends AbstractListenerElement
+public class PrometheusListener extends CollectorElement<SampleCollectorConfig>
 		implements SampleListener, Serializable, TestStateListener, NoThreadClone {
-
-	public static final String SAMPLER_SAVE_CONFIG = "johrstrom.prometheus.sampler_save_config";
-	public static final String ASSERTION_SAVE_CONFIG = "johrstrom.prometheus.assertion_save_config";
 
 	private static final long serialVersionUID = -4833646252357876746L;
 
@@ -57,40 +52,7 @@ public class PrometheusListener extends AbstractListenerElement
 
 	private transient PrometheusServer server = PrometheusServer.getInstance();
 
-	private transient List<JMeterCollector> sampleCollectors = new ArrayList<JMeterCollector>();
-	private transient List<JMeterCollector> assertionCollectors = new ArrayList<JMeterCollector>();
-
-	/**
-	 * Default Constructor.
-	 */
-	public PrometheusListener() {
-		this(new PrometheusSaveConfig(PrometheusSaveConfig.DEFAULT_SAMPLE_PREFIX), 
-				new PrometheusSaveConfig(PrometheusSaveConfig.DEFAULT_ASSERTION_PREFIX));
-	}
-
-	/**
-	 * Constructor with a configuration argument.
-	 * 
-	 * @param config
-	 *            - the configuration to use.
-	 */
-	public PrometheusListener(PrometheusSaveConfig sampleSave, PrometheusSaveConfig assertionSave) {
-		super();
-		log.debug("Creating new prometheus listener " + this.toString());
-		
-		this.setSamplerSaveConfig(sampleSave);
-		// TODO save assertion config
-		
-	}
 	
-	
-
-	@Override
-	public Object clone() {
-		// TODO Auto-generated method stub
-		return super.clone();
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -99,13 +61,13 @@ public class PrometheusListener extends AbstractListenerElement
 	 */
 	public void sampleOccurred(SampleEvent event) {
 		
-		for(JMeterCollector collector : this.sampleCollectors) {
-			collector.update(event);
-		}
-		
-		for(JMeterCollector collector : this.assertionCollectors) {
-			collector.update(event);
-		}
+//		for(JMeterCollector collector : this.sampleCollectors) {
+//			collector.update(event);
+//		}
+//		
+//		for(JMeterCollector collector : this.assertionCollectors) {
+//			collector.update(event);
+//		}
 	}
 
 	/*
@@ -160,8 +122,7 @@ public class PrometheusListener extends AbstractListenerElement
 	 */
 	public void testStarted() {
 		// update the configuration
-		this.reconfigure();
-		this.registerAllCollectors();
+		this.makeNewCollectors();
 		
 		try {
 			server.start();
@@ -169,29 +130,6 @@ public class PrometheusListener extends AbstractListenerElement
 			log.error("Couldn't start http server", e);
 		}
 
-	}
-
-	/**
-	 * Set a new Save configuration. Note that this function reconfigures this
-	 * object and one should not set the save config directly through
-	 * {@link #setProperty(org.apache.jmeter.testelement.property.JMeterProperty)}
-	 * functions.
-	 * 
-	 * @param config
-	 *            - the configuration object
-	 */
-	public void setSamplerSaveConfig(PrometheusSaveConfig config) {
-		this.setProperty(new ObjectProperty(SAMPLER_SAVE_CONFIG, config));
-		this.reconfigure();
-	}
-
-	/**
-	 * Get the current Save configuration
-	 * 
-	 * @return
-	 */
-	public PrometheusSaveConfig getSamplerSaveConfig() {
-		return (PrometheusSaveConfig) this.getProperty(SAMPLER_SAVE_CONFIG).getObjectValue();
 	}
 
 	/*
@@ -206,75 +144,7 @@ public class PrometheusListener extends AbstractListenerElement
 	}
 
 
-	/**
-	 * Helper function to modify private member collectors and collector
-	 * configurations. Any invocation of this method will modify them, even if
-	 * configuration fails due to reflection errors, default configurations are
-	 * applied and new collectors created.
-	 */
-	protected synchronized void reconfigure() {
-		this.deleteCollectors();
-		this.createSamplerCollectors();
-	}
-	
-	protected synchronized void deleteCollectors() {
 
-		for (JMeterCollector collector : this.sampleCollectors) {
-			collector.unregister();
-		}
-		
-		for (JMeterCollector collector : this.assertionCollectors) {
-			collector.unregister();
-		}
-		
-		this.sampleCollectors.clear();
-		this.assertionCollectors.clear();
-		
-	}
-	
-	protected synchronized void registerAllCollectors() {
-		for (JMeterCollector collector : this.sampleCollectors) {
-			collector.register();
-		}
-		
-		for (JMeterCollector collector : this.assertionCollectors) {
-			collector.register();
-		}
-	}
-	
-	@Override
-	protected void finalize() throws Throwable {
-		super.finalize();
-		this.deleteCollectors();
-	}
 
-	protected void createSamplerCollectors() {
-		PrometheusSaveConfig config = this.getSamplerSaveConfig();
-		
-		if(config.isCounter()) {
-			JMeterCollector collector = 
-					new JMeterCollector(this.getSamplerSaveConfig(), Type.COUNTER, config.getMetricPrefix() + "_total");
-			this.sampleCollectors.add(collector);
-		}
-		
-		if(config.isFailureCounter()) {
-			JMeterCollector collector = 
-					new JMeterCollector(this.getSamplerSaveConfig(), Type.COUNTER, config.getMetricPrefix() + "_failures_total");
-			this.sampleCollectors.add(collector);
-		}
-		
-		if(config.isSummary()) {
-			JMeterCollector collector = 
-					new JMeterCollector(this.getSamplerSaveConfig(), Type.SUMMARY, config.getMetricPrefix() + "_summary");
-			this.sampleCollectors.add(collector);
-		}
-		
-		if(config.isHistogram()) {
-			JMeterCollector collector = 
-					new JMeterCollector(this.getSamplerSaveConfig(), Type.HISTOGRAM, config.getMetricPrefix() + "_histogram");
-			this.sampleCollectors.add(collector);
-		}
-		
-	}
 		
 }

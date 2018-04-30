@@ -1,4 +1,4 @@
-package com.github.johrstrom.collector;
+package com.github.johrstrom.collector.gui;
 
 import javax.swing.ComboBoxEditor;
 import javax.swing.JComboBox;
