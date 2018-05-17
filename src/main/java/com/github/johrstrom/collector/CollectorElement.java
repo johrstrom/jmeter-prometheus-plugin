@@ -27,7 +27,7 @@ public abstract class CollectorElement<C extends BaseCollectorConfig> extends Ab
 	private static final long serialVersionUID = 963612021269632269L;
 	
 	public CollectorElement() {
-		this.setCollectorDefinitions(new ArrayList<C>());
+		this.setCollectorConfigs(new ArrayList<C>());
 	}
 	
 	public CollectionProperty getCollectorConfigs() {
@@ -42,17 +42,31 @@ public abstract class CollectorElement<C extends BaseCollectorConfig> extends Ab
 		
 	}
 	
-	public void setCollectorDefinitions(List<C> collectors) {
-		this.setProperty(new CollectionProperty(COLLECTOR_DEF, collectors));
+	public void setCollectorConfigs(List<C> collectors) {
+		this.setCollectorConfigs(new CollectionProperty(COLLECTOR_DEF, collectors));
+	}
+	
+	public void setCollectorConfigs(CollectionProperty collectors) {
+		this.setProperty(collectors);
 		this.makeNewCollectors();
 	}
 	
-	protected void makeNewCollectors() {
+	protected void unregisterAndClearCollectors() {
 		for (Entry<String, Collector> entry : this.collectors.entrySet()) {
 			CollectorRegistry.defaultRegistry.unregister(entry.getValue());
 		}
 		
 		this.collectors.clear();
+	}
+	
+	protected void registerAllCollectors() {
+		for (Entry<String, Collector> entry : this.collectors.entrySet()) {
+			entry.getValue().register(CollectorRegistry.defaultRegistry);
+		}
+	}
+	
+	protected void makeNewCollectors() {
+		this.unregisterAndClearCollectors();
 		
 		CollectionProperty collectorDefs = this.getCollectorConfigs();
 		PropertyIterator iter = collectorDefs.iterator();
@@ -64,7 +78,6 @@ public abstract class CollectorElement<C extends BaseCollectorConfig> extends Ab
 				C config = (C) iter.next().getObjectValue();
 				Collector collector = BaseCollectorConfig.fromConfig(config);
 				
-				collector.register(CollectorRegistry.defaultRegistry);
 				this.collectors.put(config.getMetricName(), collector);
 			}catch(Exception e) {
 				log.error("Didn't register collector because of error",e);

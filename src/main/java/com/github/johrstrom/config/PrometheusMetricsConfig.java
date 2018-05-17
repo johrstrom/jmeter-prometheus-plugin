@@ -1,5 +1,4 @@
-package com.github.johrstrom.config; //com.github.johrstrom.config.PrometheusMetricsConfig
-
+package com.github.johrstrom.config;
 
 import java.util.Map.Entry;
 
@@ -30,6 +29,8 @@ public class PrometheusMetricsConfig extends CollectorElement<BaseCollectorConfi
 			variables.remove(entry.getKey());
 		}
 		
+		this.unregisterAndClearCollectors();
+		
 	}
 
 	@Override
@@ -41,7 +42,7 @@ public class PrometheusMetricsConfig extends CollectorElement<BaseCollectorConfi
 	public void testStarted() {
 		this.setRunningVersion(true);
 		JMeterVariables variables = getThreadContext().getVariables();
-		this.makeNewCollectors();
+		this.registerAllCollectors();
 		
 		log.debug("Test started, adding {} collectors to variables", this.collectors.size());
 		

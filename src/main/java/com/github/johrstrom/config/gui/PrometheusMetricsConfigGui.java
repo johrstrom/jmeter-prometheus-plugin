@@ -7,6 +7,7 @@ import javax.swing.DefaultCellEditor;
 import javax.swing.JPopupMenu;
 import javax.swing.table.TableColumn;
 
+import org.apache.jmeter.config.ConfigElement;
 import org.apache.jmeter.config.gui.AbstractConfigGui;
 import org.apache.jmeter.gui.GUIFactory;
 import org.apache.jmeter.gui.util.MenuFactory;
@@ -26,6 +27,7 @@ public class PrometheusMetricsConfigGui extends AbstractCollectorGui<BaseCollect
 	
 	static {
 		GUIFactory.registerIcon(PrometheusMetricsConfigGui.class.getName(),GUIFactory.getIcon(AbstractConfigGui.class));
+		GUIFactory.registerIcon(PrometheusMetricsConfig.class.getName(),GUIFactory.getIcon(AbstractConfigGui.class));
 	}
 	
 	public PrometheusMetricsConfigGui(){
@@ -34,14 +36,14 @@ public class PrometheusMetricsConfigGui extends AbstractCollectorGui<BaseCollect
 	
 	@Override
 	public TestElement createTestElement() {
-		if(this.collector == null)
-			this.collector = new PrometheusMetricsConfig();
+		if(this.getCollector() == null)
+			this.setCollector(new PrometheusMetricsConfig());
 		
-		this.collector.setProperty(TestElement.GUI_CLASS, PrometheusMetricsConfigGui.class.getName());
-		this.collector.setProperty(TestElement.TEST_CLASS, PrometheusMetricsConfig.class.getName());
-		this.modifyTestElement(collector);
+		this.getCollector().setProperty(TestElement.GUI_CLASS, PrometheusMetricsConfigGui.class.getName());
+		this.getCollector().setProperty(TestElement.TEST_CLASS, PrometheusMetricsConfig.class.getName());
+		this.modifyTestElement(getCollector());
 		
-		return (TestElement) collector.clone();
+		return (TestElement) getCollector();
 	}
 
 	@Override

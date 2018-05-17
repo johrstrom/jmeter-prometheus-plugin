@@ -27,6 +27,7 @@ import javax.swing.table.TableColumn;
 
 import org.apache.jmeter.gui.GUIFactory;
 import org.apache.jmeter.gui.util.MenuFactory;
+import org.apache.jmeter.reporters.AbstractListenerElement;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.visualizers.gui.AbstractListenerGui;
 
@@ -52,6 +53,7 @@ public class PrometheusListenerGui extends AbstractCollectorGui<SampleCollectorC
 	
 	static {
 		GUIFactory.registerIcon(PrometheusListenerGui.class.getName(),GUIFactory.getIcon(AbstractListenerGui.class));
+		GUIFactory.registerIcon(PrometheusListener.class.getName(),GUIFactory.getIcon(AbstractListenerGui.class));
 	}
 	
 	
@@ -99,15 +101,15 @@ public class PrometheusListenerGui extends AbstractCollectorGui<SampleCollectorC
 
 	@Override
 	public TestElement createTestElement() {
-		if(this.collector == null) {
-			this.collector = new PrometheusListener();
+		if(this.getCollector() == null) {
+			this.setCollector(new PrometheusListener());
 		}
 		
-		this.collector.setProperty(TestElement.GUI_CLASS, PrometheusListenerGui.class.getName());
-		this.collector.setProperty(TestElement.TEST_CLASS, PrometheusListener.class.getName());
-		this.modifyTestElement(collector);
+		this.getCollector().setProperty(TestElement.GUI_CLASS, PrometheusListenerGui.class.getName());
+		this.getCollector().setProperty(TestElement.TEST_CLASS, PrometheusListener.class.getName());
+		this.modifyTestElement(getCollector());
 		
-		return (TestElement) collector.clone();
+		return (TestElement) getCollector().clone();
 	}
 
 	@Override

@@ -34,12 +34,12 @@ public abstract class AbstractCollectorGui<C extends BaseCollectorConfig>
 	protected JTable table;
 	protected ObjectTableModel model;
 	protected JButton add,delete;
-	protected CollectorElement<C> collector;
+	
 	
 	private final Class<C> clazzType;
 	private static final long serialVersionUID = 2027712606129940455L;
 	private Logger log = LoggerFactory.getLogger(AbstractCollectorGui.class);
-	
+	private CollectorElement<C> collector;
 	
 	
 	/**
@@ -84,8 +84,8 @@ public abstract class AbstractCollectorGui<C extends BaseCollectorConfig>
 			log.debug("populated config: " + cfg.toString() + " from table.");
 		}
 		
-		config.setCollectorDefinitions(collectors);
-		this.collector = config;
+		config.setCollectorConfigs(collectors);
+		this.setCollector(config);
 	}
 	
 	
@@ -112,6 +112,21 @@ public abstract class AbstractCollectorGui<C extends BaseCollectorConfig>
 			log.debug("added row into table: " + cfg.toString());
 		}
 		
+		this.getCollector().setCollectorConfigs(collectors);
+	}
+	
+
+	@SuppressWarnings("unchecked")
+	public CollectorElement<C> getCollector() {
+		if(this.collector != null)
+			return (CollectorElement<C>) collector.clone();
+		else
+			return null;
+	}
+
+
+	public void setCollector(CollectorElement<C> collector) {
+		this.collector = collector;
 	}
 	
 	/**
