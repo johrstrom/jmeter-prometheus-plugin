@@ -29,7 +29,7 @@ public class PrometheusMetricsConfig extends CollectorElement<BaseCollectorConfi
 			variables.remove(entry.getKey());
 		}
 		
-		this.unregisterAndClearCollectors();
+		this.unRegisterAllCollectors();
 		
 	}
 

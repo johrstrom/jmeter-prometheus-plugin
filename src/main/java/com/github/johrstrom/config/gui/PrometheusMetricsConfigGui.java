@@ -1,49 +1,41 @@
 package com.github.johrstrom.config.gui;
 
-import java.util.Arrays;
-import java.util.Collection;
+import java.awt.BorderLayout;
+import java.util.List;
 
-import javax.swing.DefaultCellEditor;
-import javax.swing.JPopupMenu;
-import javax.swing.table.TableColumn;
-
-import org.apache.jmeter.config.ConfigElement;
 import org.apache.jmeter.config.gui.AbstractConfigGui;
-import org.apache.jmeter.gui.GUIFactory;
-import org.apache.jmeter.gui.util.MenuFactory;
 import org.apache.jmeter.testelement.TestElement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.github.johrstrom.collector.BaseCollectorConfig;
-import com.github.johrstrom.collector.gui.AbstractCollectorGui;
-import com.github.johrstrom.collector.gui.BaseCollectorGuiHelper;
-import com.github.johrstrom.collector.gui.Flatten;
-import com.github.johrstrom.collector.gui.SampleCollectorGuiHelper;
+import com.github.johrstrom.collector.CollectorElement;
 import com.github.johrstrom.config.PrometheusMetricsConfig;
 
 
-public class PrometheusMetricsConfigGui extends AbstractCollectorGui<BaseCollectorConfig>  {
+public class PrometheusMetricsConfigGui<C> extends AbstractConfigGui {
 	
 	private static final long serialVersionUID = 6741986237897976082L;
-	
-	static {
-		GUIFactory.registerIcon(PrometheusMetricsConfigGui.class.getName(),GUIFactory.getIcon(AbstractConfigGui.class));
-		GUIFactory.registerIcon(PrometheusMetricsConfig.class.getName(),GUIFactory.getIcon(AbstractConfigGui.class));
-	}
+//	private PrometheusMetricsConfig config;
+	private ConfigCollectorTable table = new ConfigCollectorTable();
+
+	private Logger log = LoggerFactory.getLogger(PrometheusMetricsConfigGui.class);
 	
 	public PrometheusMetricsConfigGui(){
-		super(BaseCollectorConfig.class);
+		super();
+		log.debug("making a new config gui: {}", this.toString());
+		init();
 	}
 	
 	@Override
 	public TestElement createTestElement() {
-		if(this.getCollector() == null)
-			this.setCollector(new PrometheusMetricsConfig());
+		PrometheusMetricsConfig cfg = new PrometheusMetricsConfig();
 		
-		this.getCollector().setProperty(TestElement.GUI_CLASS, PrometheusMetricsConfigGui.class.getName());
-		this.getCollector().setProperty(TestElement.TEST_CLASS, PrometheusMetricsConfig.class.getName());
-		this.modifyTestElement(getCollector());
+		cfg.setProperty(TestElement.GUI_CLASS, PrometheusMetricsConfigGui.class.getName());
+		cfg.setProperty(TestElement.TEST_CLASS, PrometheusMetricsConfig.class.getName());
+		this.modifyTestElement(cfg);
 		
-		return (TestElement) getCollector();
+		return cfg;
 	}
 
 	@Override
@@ -75,30 +67,51 @@ public class PrometheusMetricsConfigGui extends AbstractCollectorGui<BaseCollect
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public JPopupMenu createPopupMenu() {
-		return MenuFactory.getDefaultConfigElementMenu();
+	public void modifyTestElement(TestElement ele) {
+		
+		if(!(ele instanceof CollectorElement)) {
+			return;
+		}
+		
+		CollectorElement<BaseCollectorConfig> config = (CollectorElement<BaseCollectorConfig>) ele;
+		
+		List<BaseCollectorConfig> collectors = this.table.getRowsAsCollectors();
+		config.setCollectorConfigs(collectors);	
 	}
 
-	@Override
-	public Collection<String> getMenuCategories() {
-		 return Arrays.asList(MenuFactory.CONFIG_ELEMENTS);
+	private void init() {
+		this.setLayout(new BorderLayout(0, 5));
+		
+		this.add(makeTitlePanel(), BorderLayout.NORTH);
+		this.add(this.table, BorderLayout.CENTER);
 	}
-
-	@Override
-	public Flatten getGuiHelper() {
-		return new BaseCollectorGuiHelper();
-	}
-
-	@Override
-	public void modifyColumns() {
-		TableColumn column = table.getColumnModel().getColumn(SampleCollectorGuiHelper.TYPE_INDEX);
-		column.setCellEditor(new DefaultCellEditor(SampleCollectorGuiHelper.typeComboBox));
-	}
-
-
+	
 	
 
+	@SuppressWarnings("unchecked")
+	@Override
+	public void configure(TestElement ele) {
+		super.configure(ele);
+		
+		if(ele instanceof CollectorElement<?>) {
+			try {
+				this.table.populateTable((CollectorElement<BaseCollectorConfig>) ele);
+			} catch(Exception e) {
+				log.error("didn't modify test element because {}:{}", e.getClass(), e.getMessage());
+			}
+		}
+	}
+
+	@Override
+	public void clearGui() {
+		super.clearGui();
+		this.table.clearModelData();
+	}
+	
+	
+	
 }
 
 

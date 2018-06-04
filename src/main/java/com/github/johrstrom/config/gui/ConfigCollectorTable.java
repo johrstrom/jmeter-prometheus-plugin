@@ -1,20 +1,21 @@
-package com.github.johrstrom.collector.gui;
+package com.github.johrstrom.config.gui;
 
 import javax.swing.ComboBoxEditor;
+import javax.swing.DefaultCellEditor;
 import javax.swing.JComboBox;
+import javax.swing.table.TableColumn;
+
 import org.apache.jorphan.reflect.Functor;
+
+import com.github.johrstrom.collector.BaseCollectorConfig;
+import com.github.johrstrom.collector.gui.AbstractCollectorTable;
+import com.github.johrstrom.collector.gui.Flatten;
 
 import io.prometheus.client.Collector.Type;
 
-/**
- * A GUI helper class so that the {@link BaseColletorConfig} class doesn't have to know or care
- * about how it gets flattened into a table.
- * 
- * @author Jeff Ohrstrom
- *
- */
-public class BaseCollectorGuiHelper implements Flatten {
-	
+public class ConfigCollectorTable extends AbstractCollectorTable<BaseCollectorConfig>  
+	implements Flatten {
+
 	public static JComboBox<String> typeComboBox; 
 	
 	public static int METRIC_NAME_INDEX = 0;
@@ -24,6 +25,7 @@ public class BaseCollectorGuiHelper implements Flatten {
 	public static int QUANTILE_OR_BUCKET_INDEX = 4;
 	public static int BASE_COLUMN_SIZE = 5;
 	
+	private static final long serialVersionUID = 8675797078488652676L;
 	
 	static {
 		typeComboBox = new JComboBox<>();
@@ -33,6 +35,21 @@ public class BaseCollectorGuiHelper implements Flatten {
 		typeComboBox.addItem(Type.GAUGE.name());
 	}
 	
+	public ConfigCollectorTable() {
+		super(BaseCollectorConfig.class);
+	}
+
+	@Override
+	public Flatten getGuiHelper() {
+		return this;
+	}
+
+	@Override
+	public void modifyColumns() {
+		TableColumn column = this.table.getColumnModel().getColumn(TYPE_INDEX);
+		column.setCellEditor(new DefaultCellEditor(typeComboBox));
+	}
+		
 	@Override
 	public Functor[] getReadFunctors() {
 		Functor[] functors = new Functor[BASE_COLUMN_SIZE];
@@ -84,5 +101,5 @@ public class BaseCollectorGuiHelper implements Flatten {
 		
 		return clazzes;
 	}
-	
+
 }

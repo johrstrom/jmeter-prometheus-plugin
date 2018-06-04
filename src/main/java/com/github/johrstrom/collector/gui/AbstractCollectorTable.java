@@ -6,16 +6,15 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 
-import org.apache.jmeter.gui.AbstractJMeterGuiComponent;
 import org.apache.jmeter.gui.util.HorizontalPanel;
 import org.apache.jmeter.gui.util.VerticalPanel;
-import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.testelement.property.CollectionProperty;
 import org.apache.jmeter.testelement.property.PropertyIterator;
 import org.apache.jorphan.gui.ObjectTableModel;
@@ -25,21 +24,21 @@ import org.slf4j.LoggerFactory;
 import com.github.johrstrom.collector.BaseCollectorConfig;
 import com.github.johrstrom.collector.CollectorElement;
 
-public abstract class AbstractCollectorGui<C extends BaseCollectorConfig> 
-	extends AbstractJMeterGuiComponent implements ActionListener {
+public abstract class AbstractCollectorTable<C extends BaseCollectorConfig> 
+	extends JPanel implements ActionListener {
 
 	public static final String ADD = "Add";
 	public static final String DELETE = "Delete";
 	
-	protected JTable table;
-	protected ObjectTableModel model;
+	protected transient JTable table;
+	protected transient ObjectTableModel model;
 	protected JButton add,delete;
 	
 	
 	private final Class<C> clazzType;
 	private static final long serialVersionUID = 2027712606129940455L;
-	private Logger log = LoggerFactory.getLogger(AbstractCollectorGui.class);
-	private CollectorElement<C> collector;
+	private Logger log = LoggerFactory.getLogger(AbstractCollectorTable.class);
+	
 	
 	
 	/**
@@ -54,29 +53,17 @@ public abstract class AbstractCollectorGui<C extends BaseCollectorConfig>
 	public abstract void modifyColumns();
 	
 	
-	public AbstractCollectorGui(Class<C> collectorType) {
+	public AbstractCollectorTable(Class<C> collectorType) {
 		clazzType = collectorType;
 		this.init();
 		this.modifyColumns();
 	}
 	
-	@Override
-	public void modifyTestElement(TestElement ele) {
-		
-		if(!(ele instanceof CollectorElement)) {
-			return;
-		}
-		
-		int rows = this.model.getRowCount();
+	public List<C> getRowsAsCollectors(){
 		ArrayList<C> collectors = new ArrayList<>();
 		
 		@SuppressWarnings("unchecked")
-		CollectorElement<C> config = (CollectorElement<C>) ele;
-
-		log.debug("modifying test element " + ele.toString() + ". row count in model is " + rows);
-		
-		@SuppressWarnings("unchecked")
-		Iterator<C> iter = (Iterator<C>) model.iterator();
+		Iterator<C> iter = (Iterator<C>) this.model.iterator();
 		
 		while(iter.hasNext()) {
 			C cfg = this.clazzType.cast(iter.next());
@@ -84,24 +71,45 @@ public abstract class AbstractCollectorGui<C extends BaseCollectorConfig>
 			log.debug("populated config: " + cfg.toString() + " from table.");
 		}
 		
-		config.setCollectorConfigs(collectors);
-		this.setCollector(config);
+		return collectors;
 	}
 	
+	public void clearModelData() {
+		this.model.clearData();
+	}
 	
-	@Override
-	public void configure(TestElement element) {
-		super.configure(element);
-		
-		if(!(element instanceof CollectorElement)) {
-			return;
-		}
-		
-		@SuppressWarnings("unchecked")
-		CollectorElement<C> config = (CollectorElement<C>) element;
+//	public void modifyTestElement(CollectorElement<C> ele) {
+//		
+//		if(!(ele instanceof CollectorElement)) {
+//			return;
+//		}
+//		
+//		int rows = this.model.getRowCount();
+//		ArrayList<C> collectors = new ArrayList<>();
+//		
+//		@SuppressWarnings("unchecked")
+//		CollectorElement<C> config = (CollectorElement<C>) ele;
+//
+//		log.debug("modifying test element " + ele.toString() + ". row count in model is " + rows);
+//		
+//		@SuppressWarnings("unchecked")
+//		Iterator<C> iter = (Iterator<C>) model.iterator();
+//		
+//		while(iter.hasNext()) {
+//			C cfg = this.clazzType.cast(iter.next());
+//			collectors.add(cfg);
+//			log.debug("populated config: " + cfg.toString() + " from table.");
+//		}
+//		
+//		config.setCollectorConfigs(collectors);
+//		this.setCollector(config);
+//	}
+	
+	
+	public void populateTable(CollectorElement<C> config) {
 		
 		CollectionProperty collectors = config.getCollectorConfigs();
-		log.debug("Configuring GUI with " + collectors.size() + " collectors.");
+		log.debug("Configuring table with " + collectors.size() + " collectors.");
 		
 		this.model.clearData();
 		
@@ -112,42 +120,20 @@ public abstract class AbstractCollectorGui<C extends BaseCollectorConfig>
 			log.debug("added row into table: " + cfg.toString());
 		}
 		
-		this.getCollector().setCollectorConfigs(collectors);
 	}
 	
-
-	@SuppressWarnings("unchecked")
-	public CollectorElement<C> getCollector() {
-		if(this.collector != null)
-			return (CollectorElement<C>) collector.clone();
-		else
-			return null;
-	}
-
-
-	public void setCollector(CollectorElement<C> collector) {
-		this.collector = collector;
-	}
 	
 	/**
 	 * Private helper function to initialize all the Swing components.
 	 */
 	protected void init() {
 		this.setLayout(new BorderLayout(0, 5));
-		this.setBorder(makeBorder());
 		
-		this.add(makeTitlePanel(), BorderLayout.NORTH);
-		this.add(makeMainPanel(), BorderLayout.CENTER);
-	}
-	
-
-	protected JPanel makeMainPanel() {
 		VerticalPanel panel = new VerticalPanel();
-		
 		panel.add(makeTablePanel());
 		panel.add(makeButtonPanel());
 		
-		return panel;
+		this.add(panel, BorderLayout.CENTER);
 	}
 	
 	

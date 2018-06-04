@@ -27,6 +27,7 @@ public abstract class CollectorElement<C extends BaseCollectorConfig> extends Ab
 	private static final long serialVersionUID = 963612021269632269L;
 	
 	public CollectorElement() {
+		log.debug("making a new config element: " + this.toString());
 		this.setCollectorConfigs(new ArrayList<C>());
 	}
 	
@@ -43,6 +44,7 @@ public abstract class CollectorElement<C extends BaseCollectorConfig> extends Ab
 	}
 	
 	public void setCollectorConfigs(List<C> collectors) {
+		log.debug("setting new colletors. size is: " + collectors.size());
 		this.setCollectorConfigs(new CollectionProperty(COLLECTOR_DEF, collectors));
 	}
 	
@@ -51,22 +53,20 @@ public abstract class CollectorElement<C extends BaseCollectorConfig> extends Ab
 		this.makeNewCollectors();
 	}
 	
-	protected void unregisterAndClearCollectors() {
-		for (Entry<String, Collector> entry : this.collectors.entrySet()) {
-			CollectorRegistry.defaultRegistry.unregister(entry.getValue());
-		}
-		
-		this.collectors.clear();
-	}
-	
 	protected void registerAllCollectors() {
 		for (Entry<String, Collector> entry : this.collectors.entrySet()) {
 			entry.getValue().register(CollectorRegistry.defaultRegistry);
 		}
 	}
 	
+	protected void unRegisterAllCollectors() {
+		for (Entry<String, Collector> entry : this.collectors.entrySet()) {
+			CollectorRegistry.defaultRegistry.unregister(entry.getValue());
+		}
+	}
+	
 	protected void makeNewCollectors() {
-		this.unregisterAndClearCollectors();
+		this.collectors.clear();
 		
 		CollectionProperty collectorDefs = this.getCollectorConfigs();
 		PropertyIterator iter = collectorDefs.iterator();
@@ -79,8 +79,9 @@ public abstract class CollectorElement<C extends BaseCollectorConfig> extends Ab
 				Collector collector = BaseCollectorConfig.fromConfig(config);
 				
 				this.collectors.put(config.getMetricName(), collector);
+				log.debug("added " + config.getMetricName() + " to list of collectors");
 			}catch(Exception e) {
-				log.error("Didn't register collector because of error",e);
+				log.error("Didn't create new collectore because of error, ",e);
 			}
 			
 		}
