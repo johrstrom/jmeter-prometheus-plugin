@@ -28,7 +28,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.johrstrom.collector.CollectorElement;
-import com.github.johrstrom.collector.SampleCollectorConfig;
 
 
 
@@ -43,7 +42,7 @@ import com.github.johrstrom.collector.SampleCollectorConfig;
  * @author Jeff Ohrstrom
  *
  */
-public class PrometheusListener extends CollectorElement<SampleCollectorConfig>
+public class PrometheusListener extends CollectorElement<ListenerCollectorConfig>
 		implements SampleListener, Serializable, TestStateListener, NoThreadClone {
 
 	private static final long serialVersionUID = -4833646252357876746L;

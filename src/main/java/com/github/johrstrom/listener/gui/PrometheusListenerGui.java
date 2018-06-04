@@ -18,24 +18,19 @@
  */
 package com.github.johrstrom.listener.gui;
 
-import java.util.Arrays;
-import java.util.Collection;
 
-import javax.swing.DefaultCellEditor;
-import javax.swing.JPopupMenu;
-import javax.swing.table.TableColumn;
+import java.awt.BorderLayout;
+import java.util.List;
 
-import org.apache.jmeter.gui.GUIFactory;
-import org.apache.jmeter.gui.util.MenuFactory;
-import org.apache.jmeter.reporters.AbstractListenerElement;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.visualizers.gui.AbstractListenerGui;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import com.github.johrstrom.collector.SampleCollectorConfig;
-import com.github.johrstrom.collector.gui.AbstractCollectorGui;
-import com.github.johrstrom.collector.gui.Flatten;
-import com.github.johrstrom.collector.gui.SampleCollectorGuiHelper;
+import com.github.johrstrom.collector.CollectorElement;
+import com.github.johrstrom.listener.ListenerCollectorConfig;
 import com.github.johrstrom.listener.PrometheusListener;
+
 
 /**
  * The GUI class for the Prometheus Listener.
@@ -46,19 +41,18 @@ import com.github.johrstrom.listener.PrometheusListener;
  * @author Jeff Ohrstrom
  *
  */
-public class PrometheusListenerGui extends AbstractCollectorGui<SampleCollectorConfig>  {
+public class PrometheusListenerGui extends AbstractListenerGui {
 
 
 	private static final long serialVersionUID = 4984653136457108054L;
 	
-	static {
-		GUIFactory.registerIcon(PrometheusListenerGui.class.getName(),GUIFactory.getIcon(AbstractListenerGui.class));
-		GUIFactory.registerIcon(PrometheusListener.class.getName(),GUIFactory.getIcon(AbstractListenerGui.class));
-	}
-	
+	private ListenerCollectorTable table = new ListenerCollectorTable();
+	private Logger log = LoggerFactory.getLogger(PrometheusListenerGui.class);
 	
 	public PrometheusListenerGui() {
-		super(SampleCollectorConfig.class);
+		super();
+		log.debug("making a new listener gui: {}", this.toString());
+		init();
 	}
 	
 	/*
@@ -94,44 +88,51 @@ public class PrometheusListenerGui extends AbstractCollectorGui<SampleCollectorC
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public JPopupMenu createPopupMenu() {
-		return MenuFactory.getDefaultVisualizerMenu();
+	public void configure(TestElement ele) {
+		super.configure(ele);
+		
+		if(ele instanceof CollectorElement<?>) {
+			try {
+				this.table.populateTable((CollectorElement<ListenerCollectorConfig>) ele);
+			} catch(Exception e) {
+				log.error("didn't modify test element because {}:{}", e.getClass(), e.getMessage());
+			}
+		}
 	}
 
 	@Override
 	public TestElement createTestElement() {
-		if(this.getCollector() == null) {
-			this.setCollector(new PrometheusListener());
+		PrometheusListener listener = new PrometheusListener();
+		
+		listener.setProperty(TestElement.GUI_CLASS, PrometheusListenerGui.class.getName());
+		listener.setProperty(TestElement.TEST_CLASS, PrometheusListener.class.getName());
+		this.modifyTestElement(listener);
+		
+		return listener;
+	}
+
+	private void init() {
+		this.setLayout(new BorderLayout(0, 5));
+		
+		this.add(makeTitlePanel(), BorderLayout.NORTH);
+		this.add(this.table, BorderLayout.CENTER);
+	}
+
+	@Override
+	public void modifyTestElement(TestElement ele) {
+		if(!(ele instanceof CollectorElement)) {
+			return;
 		}
 		
-		this.getCollector().setProperty(TestElement.GUI_CLASS, PrometheusListenerGui.class.getName());
-		this.getCollector().setProperty(TestElement.TEST_CLASS, PrometheusListener.class.getName());
-		this.modifyTestElement(getCollector());
+		@SuppressWarnings("unchecked")
+		CollectorElement<ListenerCollectorConfig> config = (CollectorElement<ListenerCollectorConfig>) ele;
 		
-		return (TestElement) getCollector().clone();
-	}
-
-	@Override
-	public Collection<String> getMenuCategories() {
-		 return Arrays.asList(MenuFactory.LISTENERS);
-	}
-
-	@Override
-	public Flatten getGuiHelper() {
-		return new SampleCollectorGuiHelper();
-	}
-
-	@Override
-	public void modifyColumns() {
-		TableColumn column = table.getColumnModel().getColumn(SampleCollectorGuiHelper.TYPE_INDEX);
-		column.setCellEditor(new DefaultCellEditor(SampleCollectorGuiHelper.typeComboBox));
+		List<ListenerCollectorConfig> collectors = this.table.getRowsAsCollectors();
+		config.setCollectorConfigs(collectors);	
 		
-		column = table.getColumnModel().getColumn(SampleCollectorGuiHelper.LISTEN_TO_INDEX);
-		column.setCellEditor(new DefaultCellEditor(SampleCollectorGuiHelper.listenToComboBox));
 	}
-
-
 	
 
 }
