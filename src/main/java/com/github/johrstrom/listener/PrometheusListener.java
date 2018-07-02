@@ -114,16 +114,18 @@ public class PrometheusListener extends AbstractListenerElement
 			// build the label values from the event and observe the sampler
 			// metrics
 			String[] samplerLabelValues = this.labelValues(event);
-			if (collectSamples)
+			if (collectSamples) {
 				samplerCollector.labels(samplerLabelValues).observe(event.getResult().getTime());
 				// Prometheus metrics naming, base unit is Seconds
-				samplerElaspedTimeCollector.labels(samplerLabelValues).observe(event.getResult().getTime() / 1000);
-				samplerLatencyCollector.labels(samplerLabelValues).observe(event.getResult().getLatency() / 1000);
-				samplerIdleTimeCollector.labels(samplerLabelValues).observe(event.getResult().getIdleTime() / 1000);
-				samplerConnectTimeCollector.labels(samplerLabelValues).observe(event.getResult().getConnectTime() / 1000);
+				samplerElaspedTimeCollector.labels(samplerLabelValues).observe(event.getResult().getTime() / 1000.0);
+				samplerLatencyCollector.labels(samplerLabelValues).observe(event.getResult().getLatency() / 1000.0);
+				samplerIdleTimeCollector.labels(samplerLabelValues).observe(event.getResult().getIdleTime() / 1000.0);
+				samplerConnectTimeCollector.labels(samplerLabelValues).observe(event.getResult().getConnectTime() / 1000.0);
+			}
 
-			if (collectThreads)
+			if (collectThreads) {
 				threadCollector.set(JMeterContextService.getContext().getThreadGroup().getNumberOfThreads());
+			}
 
 			// if there are any assertions to
 			if (collectAssertions) {
@@ -463,7 +465,7 @@ public class PrometheusListener extends AbstractListenerElement
 			
 			if (SampleEvent.getVarCount() > 0) {
 				labelNames = this.combineConfigLabelsWithSampleVars();
-			}else {
+			} else {
 				labelNames = this.samplerConfig.getLabels();
 			}
 			
