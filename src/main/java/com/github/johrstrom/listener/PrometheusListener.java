@@ -69,6 +69,7 @@ public class PrometheusListener extends AbstractListenerElement
 
 	// Samplers
 	private transient Summary samplerCollector;
+	private transient Summary samplerElaspedTimeCollector, samplerLatencyCollector, samplerIdleTimeCollector, samplerConnectTimeCollector;
 	private CollectorConfig samplerConfig = new CollectorConfig();
 	private boolean collectSamples = true;
 
@@ -113,11 +114,18 @@ public class PrometheusListener extends AbstractListenerElement
 			// build the label values from the event and observe the sampler
 			// metrics
 			String[] samplerLabelValues = this.labelValues(event);
-			if (collectSamples)
+			if (collectSamples) {
 				samplerCollector.labels(samplerLabelValues).observe(event.getResult().getTime());
+				// Prometheus metrics naming, base unit is Seconds
+				samplerElaspedTimeCollector.labels(samplerLabelValues).observe(event.getResult().getTime() / 1000.0);
+				samplerLatencyCollector.labels(samplerLabelValues).observe(event.getResult().getLatency() / 1000.0);
+				samplerIdleTimeCollector.labels(samplerLabelValues).observe(event.getResult().getIdleTime() / 1000.0);
+				samplerConnectTimeCollector.labels(samplerLabelValues).observe(event.getResult().getConnectTime() / 1000.0);
+			}
 
-			if (collectThreads)
+			if (collectThreads) {
 				threadCollector.set(JMeterContextService.getContext().getThreadGroup().getNumberOfThreads());
+			}
 
 			// if there are any assertions to
 			if (collectAssertions) {
@@ -457,13 +465,49 @@ public class PrometheusListener extends AbstractListenerElement
 			
 			if (SampleEvent.getVarCount() > 0) {
 				labelNames = this.combineConfigLabelsWithSampleVars();
-			}else {
+			} else {
 				labelNames = this.samplerConfig.getLabels();
 			}
 			
 			this.samplerCollector = Summary.build()
 					.name("jmeter_samples_latency")
 					.help("Summary for Sample Latency")
+					.labelNames(labelNames)
+					.quantile(0.5, 0.1)
+					.quantile(0.99, 0.1)
+					.create()
+					.register(CollectorRegistry.defaultRegistry);
+
+			// @TODO: This metrics is not same as 'jmeter_samples_latency', need to discuss this.
+			// Metric name is confusing, current 'jmeter_samples_latency' metrics is returning 'elapsed time' instead of actual 'latency' value
+			// In jmeter terms 'latency' is time to first byte(TTFB)
+			this.samplerLatencyCollector = Summary.build()
+					.name("jmeter_samples_ttfb_seconds")
+					.help("Summary for sample latency(TTFB) in seconds")
+					.labelNames(labelNames)
+					.quantile(0.5, 0.1)
+					.quantile(0.99, 0.1)
+					.create()
+					.register(CollectorRegistry.defaultRegistry);
+			this.samplerElaspedTimeCollector = Summary.build()
+					.name("jmeter_samples_duration_seconds")
+					.help("Summary for sample duration in seconds")
+					.labelNames(labelNames)
+					.quantile(0.5, 0.1)
+					.quantile(0.99, 0.1)
+					.create()
+					.register(CollectorRegistry.defaultRegistry);
+			this.samplerIdleTimeCollector = Summary.build()
+					.name("jmeter_samples_idle_time_seconds")
+					.help("Summary for sample idle time in seconds")
+					.labelNames(labelNames)
+					.quantile(0.5, 0.1)
+					.quantile(0.99, 0.1)
+					.create()
+					.register(CollectorRegistry.defaultRegistry);
+			this.samplerConnectTimeCollector = Summary.build()
+					.name("jmeter_samples_connect_time_seconds")
+					.help("Summary for sample connect time in seconds")
 					.labelNames(labelNames)
 					.quantile(0.5, 0.1)
 					.quantile(0.99, 0.1)
