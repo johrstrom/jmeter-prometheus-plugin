@@ -9,6 +9,14 @@ public class ListenerCollectorConfig extends BaseCollectorConfig {
 	public static String LISTEN_TO = "listener.collector.listen_to";
 	public static String MEASURING = "listener.collector.measuring";
 	
+	public enum Measurable {
+		ResponseTime,
+		ResponseSize,
+		SuccessTotal,
+		FailureTotal,
+		CountTotal;
+	}
+	
 	public void setListenTo(String listenTo) {
 		this.setProperty(LISTEN_TO, listenTo);
 	}
@@ -22,8 +30,11 @@ public class ListenerCollectorConfig extends BaseCollectorConfig {
 	}
 	
 	public String getMeasuring() {
-		return this.getPropertyAsString(MEASURING, "response time");
+		return this.getPropertyAsString(MEASURING, Measurable.ResponseTime.toString());
 	}
 	
+	public Measurable getMeasuringAsEnum() {		
+		return Measurable.valueOf(this.getMeasuring());
+	}
 	
 }

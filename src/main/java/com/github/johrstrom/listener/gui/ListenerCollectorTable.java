@@ -15,6 +15,7 @@ import com.github.johrstrom.collector.gui.AbstractCollectorTable;
 import com.github.johrstrom.collector.gui.Flatten;
 import com.github.johrstrom.config.gui.ConfigCollectorTable;
 import com.github.johrstrom.listener.ListenerCollectorConfig;
+import com.github.johrstrom.listener.ListenerCollectorConfig.Measurable;
 
 public class ListenerCollectorTable extends AbstractCollectorTable<ListenerCollectorConfig> 
 	implements Flatten {
@@ -35,11 +36,11 @@ public class ListenerCollectorTable extends AbstractCollectorTable<ListenerColle
 		listenToComboBox.addItem("assertions");
 		
 		measuringComboBox = new JComboBox<>();
-		measuringComboBox.addItem("response time");
-		measuringComboBox.addItem("response size");
-		measuringComboBox.addItem("success total");
-		measuringComboBox.addItem("failure total");
-		measuringComboBox.addItem("count total");
+		measuringComboBox.addItem(Measurable.ResponseTime.toString());
+		measuringComboBox.addItem(Measurable.ResponseSize.toString());
+		measuringComboBox.addItem(Measurable.SuccessTotal.toString());
+		measuringComboBox.addItem(Measurable.FailureTotal.toString());
+		measuringComboBox.addItem(Measurable.CountTotal.toString());
 	}
 	
 	public ListenerCollectorTable() {

@@ -19,7 +19,7 @@ import io.prometheus.client.CollectorRegistry;
 
 public abstract class CollectorElement<C extends BaseCollectorConfig> extends AbstractTestElement {
 
-	public static final String COLLECTOR_DEF = "johrstrom.collector_definitions";
+	public static final String COLLECTOR_DEF = "prometheus.collector_definitions";
 	
 	protected Map<String,Collector> collectors = new HashMap<String,Collector>();
 	
@@ -81,7 +81,7 @@ public abstract class CollectorElement<C extends BaseCollectorConfig> extends Ab
 				this.collectors.put(config.getMetricName(), collector);
 				log.debug("added " + config.getMetricName() + " to list of collectors");
 			}catch(Exception e) {
-				log.error("Didn't create new collectore because of error, ",e);
+				log.error("Didn't create new collector because of error, ",e);
 			}
 			
 		}

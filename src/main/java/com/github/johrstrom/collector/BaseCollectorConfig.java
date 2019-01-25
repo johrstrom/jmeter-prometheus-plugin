@@ -237,7 +237,6 @@ public class BaseCollectorConfig extends AbstractTestElement  {
 	public static Collector fromConfig(BaseCollectorConfig cfg) {
 		Type t = cfg.getPrometheusType();
 		Collector c = null;
-		if(cfg.getHelp().isEmpty())
 		
 		try {
 			if(t.equals(Type.COUNTER)) {
