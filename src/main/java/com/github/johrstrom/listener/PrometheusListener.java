@@ -21,8 +21,6 @@ package com.github.johrstrom.listener;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import org.apache.jmeter.engine.util.NoThreadClone;
 import org.apache.jmeter.samplers.SampleEvent;
@@ -35,7 +33,6 @@ import org.slf4j.LoggerFactory;
 
 import com.github.johrstrom.collector.BaseCollectorConfig;
 import com.github.johrstrom.collector.CollectorElement;
-import com.github.johrstrom.listener.ListenerCollectorConfig.Measurable;
 import com.github.johrstrom.listener.updater.AbstractUpdater;
 import com.github.johrstrom.listener.updater.ResponseTimeUpdater;
 
@@ -191,10 +188,10 @@ public class PrometheusListener extends CollectorElement<ListenerCollectorConfig
 				case SuccessTotal:
 					break;
 				default:
-					break;
-				
-			
-					
+					// improbable because you get a sort of class cast exception on Enum
+					// because you're casting null*
+					// *unless we've missed a case, like more enums than switch cases
+					break;		
 				}
 				
 				this.collectors.put(config.getMetricName(), collector);

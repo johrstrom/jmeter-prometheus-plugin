@@ -10,6 +10,12 @@ import io.prometheus.client.Collector;
 import io.prometheus.client.Histogram;
 import io.prometheus.client.Summary;
 
+/**
+ * The Updater class that records Response Time.  Only Supports Summary and Histogram type Collectors.
+ * 
+ * @author Jeff Ohrstrom
+ *
+ */
 public class ResponseTimeUpdater extends AbstractUpdater {
 	
 	private static final Logger log = LoggerFactory.getLogger(ResponseTimeUpdater.class);
