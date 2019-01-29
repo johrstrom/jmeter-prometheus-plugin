@@ -180,8 +180,8 @@ public abstract class AbstractCollectorTable<C extends BaseCollectorConfig>
 		switch (event.getActionCommand()) {
 		case ADD:
 			try {
-				this.model.addRow(this.clazzType.newInstance());
-			} catch (InstantiationException | IllegalAccessException e) {
+				this.model.addRow(this.clazzType.getDeclaredConstructor().newInstance());
+			} catch (Exception e) {
 				log.error("Couldn't add to model becuase of error. ", e);
 			}
 			break;

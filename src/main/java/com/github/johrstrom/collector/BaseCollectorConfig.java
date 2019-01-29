@@ -22,11 +22,25 @@ import io.prometheus.client.Histogram;
 import io.prometheus.client.Summary;
 import io.prometheus.client.Collector.Type;
 
+/**
+ * The base class for turning text/strings (from the JMeter GUI, or a .jmx file, etc.) into Prometheus Collector
+ * objects.  Along with being a TestElement so that it can be serialized (for the .jmx file) it also handles all 
+ * the logic of parsing strings into double arrays. 
+ * 
+ * There are also static utility functions to actually instantiate a Collector of a given type from a configuration.
+ * 
+ * 
+ * buckets are comma seperated list of decimals. An example:
+ * 		100,200,300,400.3
+ * quantiles are comma seperated pair of decimals seperated by |. The first decimal being the quantile and the second being the 
+ * error rating. An example:
+ * 		0.999,0.1|0.99,0.2|0.75,0.3
+ * 
+ * @author Jeff Ohrstrom
+ *
+ */
 public class BaseCollectorConfig extends AbstractTestElement  {
 	
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1520731432941268549L;
 	
 	public static String HELP = "collector.help";
@@ -48,8 +62,8 @@ public class BaseCollectorConfig extends AbstractTestElement  {
 	private static Logger log = LoggerFactory.getLogger(BaseCollectorConfig.class);
 	
 	public BaseCollectorConfig(){
-		this.setHelp("");
-		this.setMetricName("");
+		this.setHelp(DEFAULT_HELP_STRING);
+		this.setMetricName(METRIC_NAME_BASE);
 		this.setType(Type.COUNTER.name());
 		this.setLabels(new String[0]);
 		this.setQuantileOrBucket("");
@@ -364,13 +378,13 @@ public class BaseCollectorConfig extends AbstractTestElement  {
 					QuantileDefinition q = new QuantileDefinition(quantile.split(QUANTILE_ERROR_SEPERATOR));
 					quantiles.add(q);
 				}catch(Exception e) {
-//					log.warn("couldn't parse {} because of error {}:{}. It wont be included in quantiles for the metric {}",
-//							quantile, e.getClass().toString(), e.getMessage(), this.getMetricName());
+					log.warn("couldn't parse {} because of error {}:{}. It wont be included in quantiles for the metric",
+							quantile, e.getClass().toString(), e.getMessage());
 				}
 			}
 			
 			if(quantiles.isEmpty()) {
-				//log.warn("Did not parse any quantiles for metric {}. Returning defaults", this.getMetricName());
+				log.warn("Did not parse any quantiles, returning defaults.");
 				return DEFAULT_QUANTILES;
 			}else {
 				return quantiles.toArray(new QuantileDefinition[quantiles.size()]);

@@ -27,36 +27,4 @@ public class PrometheusListenerTest {
 		
 	}
 	
-	
-//	@Test
-//	public void multipleDefaultInstancesOK() {
-//		PrometheusListener listener1 = new PrometheusListener();
-//		
-//		PrometheusSaveConfig sampleConfig = new PrometheusSaveConfig(false, "second_instance");
-//		PrometheusSaveConfig assertionConfig = new PrometheusSaveConfig(false, "second_instance");
-//		
-//		PrometheusListener listener2 = new PrometheusListener(sampleConfig, assertionConfig);
-//		
-//		Assert.assertTrue(listener1 != listener2);
-//		
-//		listener1.deleteCollectors();
-//		listener2.deleteCollectors();
-//	}
-//
-//	
-//	@Test
-//	public void multipleWithSaveInstancesOK() {
-//		PrometheusListener listener1 = new PrometheusListener();
-//		
-//		PrometheusSaveConfig sampleConfig = new PrometheusSaveConfig(true, "second_instance");
-//		PrometheusSaveConfig assertionConfig = new PrometheusSaveConfig(true, "second_instance");
-//		
-//		PrometheusListener listener2 = new PrometheusListener(sampleConfig, assertionConfig);
-//		
-//		Assert.assertTrue(listener1 != listener2);
-//		
-//		listener1.deleteCollectors();
-//		listener2.deleteCollectors();
-//	}
-	
 }

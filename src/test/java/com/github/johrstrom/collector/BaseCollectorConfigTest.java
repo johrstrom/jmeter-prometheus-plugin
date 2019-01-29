@@ -5,16 +5,16 @@ import org.junit.Test;
 
 import com.github.johrstrom.collector.BaseCollectorConfig;
 import com.github.johrstrom.collector.BaseCollectorConfig.QuantileDefinition;
+import com.github.johrstrom.test.TestUtilities;
 
 import io.prometheus.client.Collector;
-import io.prometheus.client.Collector.Type;
 
 
 public class BaseCollectorConfigTest {
 	
 	@Test
 	public void emptyLabelsOK() {
-		BaseCollectorConfig cfg = simpleCountercfg();
+		BaseCollectorConfig cfg = TestUtilities.simpleCounterCfg();
 		
 		// first try with a brand new String array 
 		cfg.setLabels(new String[]{});  
@@ -36,7 +36,7 @@ public class BaseCollectorConfigTest {
 	
 	@Test
 	public void parseSingleQuantilesCorrectly() {
-		BaseCollectorConfig cfg = this.simpleSummarycfg();
+		BaseCollectorConfig cfg = TestUtilities.simpleSummaryCfg();
 		cfg.setQuantileOrBucket("0.95,0.1");
 		
 		
@@ -48,7 +48,7 @@ public class BaseCollectorConfigTest {
 	
 	@Test
 	public void parseMultipleQuantilesCorrectly() {
-		BaseCollectorConfig cfg = this.simpleSummarycfg();
+		BaseCollectorConfig cfg = TestUtilities.simpleSummaryCfg();
 		cfg.setQuantileOrBucket("0.95,0.1|0.99,0.1|0.999,0.1");
 		
 		
@@ -64,7 +64,7 @@ public class BaseCollectorConfigTest {
 	
 	@Test
 	public void parseQauntileFailsAndGivesDEFAULTs() {
-		BaseCollectorConfig cfg = this.simpleSummarycfg();
+		BaseCollectorConfig cfg = TestUtilities.simpleSummaryCfg();
 		cfg.setQuantileOrBucket("skdn fsdfu|,nsf");
 		
 		QuantileDefinition[] quantiles = cfg.getQuantiles();
@@ -79,7 +79,7 @@ public class BaseCollectorConfigTest {
 	
 	@Test
 	public void parseReturnsPartialForQuantiles() {
-		BaseCollectorConfig cfg = this.simpleSummarycfg();
+		BaseCollectorConfig cfg = TestUtilities.simpleSummaryCfg();
 		cfg.setQuantileOrBucket("skdnfs dfuns	f|0.5|0.75,0.1"); //only 1 good at the end
 		
 		QuantileDefinition[] quantiles = cfg.getQuantiles();
@@ -99,7 +99,7 @@ public class BaseCollectorConfigTest {
 	
 	@Test
 	public void parseBucketsCorrectly() {
-		BaseCollectorConfig cfg = this.simpleHistogramcfg();
+		BaseCollectorConfig cfg = TestUtilities.simpleHistogramCfg();
 		cfg.setQuantileOrBucket("100,500,1000,2500,5000");
 		double[] expected = new double[] {100, 500, 1000, 2500, 5000};
 		
@@ -110,7 +110,7 @@ public class BaseCollectorConfigTest {
 	
 	@Test
 	public void parseBucketFailureReturnsDefaults() {
-		BaseCollectorConfig cfg = this.simpleHistogramcfg();
+		BaseCollectorConfig cfg = TestUtilities.simpleHistogramCfg();
 		cfg.setQuantileOrBucket("akldjand| sfpoa	sdnf");
 		
 		double[] buckets = cfg.getBuckets();
@@ -126,7 +126,7 @@ public class BaseCollectorConfigTest {
 	
 	@Test
 	public void parseBucketsWithPartialSuccess() {
-		BaseCollectorConfig cfg = this.simpleHistogramcfg();
+		BaseCollectorConfig cfg = TestUtilities.simpleHistogramCfg();
 		cfg.setQuantileOrBucket("akldjand,17,lakj	asdf,123no,48");
 		
 		double[] buckets = cfg.getBuckets();
@@ -137,40 +137,6 @@ public class BaseCollectorConfigTest {
 		
 	}
 	
-	private BaseCollectorConfig simpleCountercfg() {
-		BaseCollectorConfig cfg = new BaseCollectorConfig();
-		cfg.setMetricName("simple_counter");
-		cfg.setType(Type.COUNTER.name());
-		cfg.setHelp("some helpe message");
-		
-		return cfg;
-	}
-	
-	private BaseCollectorConfig simpleSummarycfg() {
-		BaseCollectorConfig cfg = new BaseCollectorConfig();
-		cfg.setMetricName("simple_summary");
-		cfg.setType(Type.SUMMARY.name());
-		cfg.setHelp("some helpe message");
-		
-		return cfg;
-	}
-	
-	private BaseCollectorConfig simpleHistogramcfg() {
-		BaseCollectorConfig cfg = new BaseCollectorConfig();
-		cfg.setMetricName("simple_histogram");
-		cfg.setType(Type.HISTOGRAM.name());
-		cfg.setHelp("some helpe message");
-		
-		return cfg;
-	}
-	
-	private BaseCollectorConfig simpleGaugecfg() {
-		BaseCollectorConfig cfg = new BaseCollectorConfig();
-		cfg.setMetricName("simple_gauge");
-		cfg.setType(Type.GAUGE.name());
-		cfg.setHelp("some helpe message");
-		
-		return cfg;
-	}
+
 
 }
