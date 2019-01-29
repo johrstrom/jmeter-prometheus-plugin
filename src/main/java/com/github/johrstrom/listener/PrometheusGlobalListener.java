@@ -3,6 +3,7 @@ package com.github.johrstrom.listener;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.jmeter.threads.JMeterContextService;
+import org.apache.jmeter.threads.JMeterContextService.ThreadCounts;
 import org.apache.jmeter.util.JMeterUtils;
 
 import io.prometheus.client.CollectorRegistry;
@@ -13,18 +14,23 @@ public class PrometheusGlobalListener {
 	public static final String COLLECT_THREADS = "prometheus.save.threads";
 	public static final boolean COLLECT_THREADS_DEFAULT = true;
 	
+	public static final String COLLECT_THREADS_NAME = "prometheus.save.threads.name";
+	public static final String COLLECT_THREADS_NAME_DEFAULT = "jmeter_threads";
+	
 	private static PrometheusGlobalListener listener;
 	private static AtomicInteger metricPrefixNumber = new AtomicInteger(0);
-	
-	// Thread counter
+
 	private transient Gauge threadCollector;
 	
 	private PrometheusGlobalListener() {
-		if (collectThreads())
-			this.threadCollector = Gauge.build().name("jmeter_running_threads").help("Counter for running threds")
-					.create().register(CollectorRegistry.defaultRegistry);
-		
-		
+		if (collectThreads()) {
+			this.threadCollector = Gauge.build()
+					.name(this.threadMetricName())
+					.help("Guage for jmeter threads")
+					.labelNames("state")
+					.create()
+					.register(CollectorRegistry.defaultRegistry);
+		}		
 	}
 	
 	public static PrometheusGlobalListener getInstance() {
@@ -37,9 +43,15 @@ public class PrometheusGlobalListener {
 	
 
 	public void update() {
-		if (collectThreads())
-			threadCollector.set(JMeterContextService.getContext().getThreadGroup().getNumberOfThreads());
-		
+		if (collectThreads()) {
+			
+			ThreadCounts tc = JMeterContextService.getThreadCounts();
+			
+			threadCollector.labels("active").set(tc.activeThreads);
+			threadCollector.labels("finished").set(tc.finishedThreads);
+			threadCollector.labels("started").set(tc.startedThreads);
+			
+		}
 		
 	}
 	
@@ -55,8 +67,12 @@ public class PrometheusGlobalListener {
 		metricPrefixNumber.decrementAndGet();
 	}
 	
-	protected boolean collectThreads() {
+	public boolean collectThreads() {
 		return JMeterUtils.getPropDefault(COLLECT_THREADS, COLLECT_THREADS_DEFAULT);
+	}
+	
+	public String threadMetricName() {
+		return JMeterUtils.getPropDefault(COLLECT_THREADS_NAME, COLLECT_THREADS_NAME_DEFAULT);
 	}
 
 }
