@@ -190,7 +190,7 @@ public class PrometheusListener extends CollectorElement<ListenerCollectorConfig
 				default:
 					// improbable because you get a sort of class cast exception on Enum
 					// because you're casting null*
-					// *unless we've missed a case, like more enums than switch cases
+					// *unless we've missed a case, i.e., more enums defined than switch cases coded here
 					break;		
 				}
 				

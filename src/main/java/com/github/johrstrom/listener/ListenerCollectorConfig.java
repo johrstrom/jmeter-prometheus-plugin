@@ -9,6 +9,10 @@ public class ListenerCollectorConfig extends BaseCollectorConfig {
 	public static String LISTEN_TO = "listener.collector.listen_to";
 	public static String MEASURING = "listener.collector.measuring";
 	
+	public ListenerCollectorConfig() {
+		this(new BaseCollectorConfig());
+	}
+	
 	public ListenerCollectorConfig(BaseCollectorConfig base) {
 		this.setMetricName(base.getMetricName());
 		this.setType(base.getType());

@@ -63,6 +63,13 @@ public class PrometheusListenerGui extends AbstractListenerGui {
 	public String getLabelResource() {
 		return getClass().getCanonicalName();
 	}
+	
+	
+
+	@Override
+	protected PrometheusListenerGui clone() throws CloneNotSupportedException {
+		return new PrometheusListenerGui();
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -97,7 +104,7 @@ public class PrometheusListenerGui extends AbstractListenerGui {
 			try {
 				this.table.populateTable((CollectorElement<ListenerCollectorConfig>) ele);
 			} catch(Exception e) {
-				log.error("didn't modify test element because {}:{}", e.getClass(), e.getMessage());
+				log.error("didn't modify test element because {}. {}", e.getClass(), e.getMessage());
 			}
 		}
 	}
@@ -132,6 +139,12 @@ public class PrometheusListenerGui extends AbstractListenerGui {
 		List<ListenerCollectorConfig> collectors = this.table.getRowsAsCollectors();
 		config.setCollectorConfigs(collectors);	
 		
+	}
+	
+	@Override
+	public void clearGui() {
+		super.clearGui();
+		this.table.clearModelData();
 	}
 	
 
