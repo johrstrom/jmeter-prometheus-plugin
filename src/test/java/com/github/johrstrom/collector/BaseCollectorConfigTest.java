@@ -1,5 +1,8 @@
 package com.github.johrstrom.collector;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -8,6 +11,7 @@ import com.github.johrstrom.collector.BaseCollectorConfig.QuantileDefinition;
 import com.github.johrstrom.test.TestUtilities;
 
 import io.prometheus.client.Collector;
+import io.prometheus.client.Collector.Type;
 
 
 public class BaseCollectorConfigTest {
@@ -133,10 +137,25 @@ public class BaseCollectorConfigTest {
 		Assert.assertTrue(buckets.length == 2);
 		Assert.assertEquals(17, buckets[0], 0.001);
 		Assert.assertEquals(48, buckets[1], 0.001);
-		
-		
 	}
 	
+	
+	@Test
+	public void initCorrectly() {
+		BaseCollectorConfig init = new BaseCollectorConfig();
+		
+		Assert.assertEquals(init.getHelp(), BaseCollectorConfig.DEFAULT_HELP_STRING);
+		Assert.assertArrayEquals(new String[0], init.getLabels());
+		Assert.assertTrue(init.getLabelsAsString().isEmpty());
+		Assert.assertEquals(init.getType(), Type.COUNTER.name());
+		
+		Assert.assertTrue(
+			init.getMetricName() + " does not match the expected pattern.",
+			Pattern.matches(BaseCollectorConfig.METRIC_NAME_BASE + "\\p{Alnum}{8}", 
+			init.getMetricName()));
+		 
+		 
+	}
 
 
 }

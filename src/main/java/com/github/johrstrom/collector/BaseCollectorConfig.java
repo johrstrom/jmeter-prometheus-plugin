@@ -63,7 +63,7 @@ public class BaseCollectorConfig extends AbstractTestElement  {
 	
 	public BaseCollectorConfig(){
 		this.setHelp(DEFAULT_HELP_STRING);
-		this.setMetricName(METRIC_NAME_BASE);
+		this.setMetricName(this.getRandomMetricName());
 		this.setType(Type.COUNTER.name());
 		this.setLabels(new String[0]);
 		this.setQuantileOrBucket("");
