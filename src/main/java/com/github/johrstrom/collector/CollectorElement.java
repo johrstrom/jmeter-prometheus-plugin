@@ -44,7 +44,7 @@ public abstract class CollectorElement<C extends BaseCollectorConfig> extends Ab
 	}
 	
 	public void setCollectorConfigs(List<C> collectors) {
-		log.debug("setting new colletors. size is: " + collectors.size());
+		log.debug("setting new collectors. size is: " + collectors.size());
 		this.setCollectorConfigs(new CollectionProperty(COLLECTOR_DEF, collectors));
 	}
 	

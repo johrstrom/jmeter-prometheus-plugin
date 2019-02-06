@@ -56,5 +56,13 @@ public class PrometheusMetricsConfig extends CollectorElement<BaseCollectorConfi
 	public void testStarted(String arg0) {
 		this.testStarted();		
 	}
+	
+	@Override
+	public PrometheusMetricsConfig clone() {
+		PrometheusMetricsConfig clone = new PrometheusMetricsConfig();
+		clone.setCollectorConfigs(this.getCollectorConfigs());
+				
+		return clone;
+	}
 
 }

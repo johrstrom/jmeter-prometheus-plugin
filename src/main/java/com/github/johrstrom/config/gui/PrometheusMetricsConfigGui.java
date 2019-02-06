@@ -110,6 +110,11 @@ public class PrometheusMetricsConfigGui<C> extends AbstractConfigGui {
 		this.table.clearModelData();
 	}
 	
+	@Override
+	protected PrometheusMetricsConfigGui<C> clone() throws CloneNotSupportedException {
+		return new PrometheusMetricsConfigGui<C>();
+	}
+	
 	
 	
 }
