@@ -1,6 +1,5 @@
 package com.github.johrstrom.collector;
 
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.junit.Assert;
@@ -153,8 +152,7 @@ public class BaseCollectorConfigTest {
 			init.getMetricName() + " does not match the expected pattern.",
 			Pattern.matches(BaseCollectorConfig.METRIC_NAME_BASE + "\\p{Alnum}{8}", 
 			init.getMetricName()));
-		 
-		 
+		
 	}
 
 
