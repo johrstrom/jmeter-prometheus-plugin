@@ -4,6 +4,9 @@ import java.util.Map.Entry;
 
 import org.apache.jmeter.engine.util.NoThreadClone;
 import org.apache.jmeter.testelement.TestStateListener;
+import org.apache.jmeter.testelement.property.CollectionProperty;
+import org.apache.jmeter.testelement.property.JMeterProperty;
+import org.apache.jmeter.testelement.property.PropertyIterator;
 import org.apache.jmeter.threads.JMeterVariables;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,6 +66,30 @@ public class PrometheusMetricsConfig extends CollectorElement<BaseCollectorConfi
 		clone.setCollectorConfigs(this.getCollectorConfigs());
 				
 		return clone;
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if (o instanceof PrometheusMetricsConfig) {
+			PrometheusMetricsConfig other = (PrometheusMetricsConfig) o;
+			
+			CollectionProperty thisConfig = this.getCollectorConfigs();
+			CollectionProperty otherConfig = other.getCollectorConfigs();
+			boolean sameSize = thisConfig.size() == otherConfig.size();
+			
+			for (int i = 0; i < thisConfig.size(); i++) {
+				JMeterProperty left = thisConfig.get(i);
+				JMeterProperty right = otherConfig.get(i);
+				
+				if(!left.equals(right)) {
+					return false;
+				}
+			}
+			
+			return true && sameSize;
+		}
+		
+		return false;
 	}
 
 }
