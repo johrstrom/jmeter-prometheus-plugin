@@ -7,7 +7,7 @@ This JMeter plugin is highly configurable listener (and config element) to allow
 Full documentation can be found on [this project's wiki](https://github.com/johrstrom/jmeter-prometheus-plugin/wiki).
 
 # Listener QuickDoc
-Here's a simple example to get us started.  This example [can be found here](https://github.com/johrstrom/jmeter-prometheus-plugin/).
+Here's a simple example to get us started.  This example [can be found here](https://github.com/johrstrom/jmeter-prometheus-plugin/blob/master/docs/examples/simple_prometheus_example.jmx).
 
 ![JMeter testplan](/docs/imgs/simple_testplan.png?raw=true)
 
