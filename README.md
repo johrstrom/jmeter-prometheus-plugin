@@ -43,7 +43,18 @@ Which will expose a counter with all the appropriate labels.
 
 ![JMeter testplan](/docs/imgs/prom_cfg_output.png?raw=true)
 
-## Building
+# Properties you can override
+
+|Property | default | description|
+|:----------:|:-----------:|:-------------------------------:|
+|prometheus.port|9270|The port the http server will bind to |
+|prometheus.thread.min|5|The minimum number of worker threads for the http server **likely to be deprecated**|
+|prometheus.thread.max|5|he minimum number of worker threads for the http server **likely to be deprecated**|
+|prometheus.save.threads|true|True or false value to save and collect jmeter thread metrics|
+|prometheus.save.threads.name|jmeter_threads|The name of the metric describing jmeter threads|
+
+
+# Building
 
 To build, simply maven package:
 ```
