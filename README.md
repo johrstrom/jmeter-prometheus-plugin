@@ -17,6 +17,30 @@ jmeter_samples_latency{sampler_name="local-metrics",code="200",success="true",qu
 jmeter_samples_latency{sampler_name="local-metrics",code="200",success="true",quantile="0.99",} 11.0
 jmeter_samples_latency_count{sampler_name="local-metrics",code="200",success="true",} 9.0
 jmeter_samples_latency_sum{sampler_name="local-metrics",code="200",success="true",} 132.0
+# HELP jmeter_samples_ttfb_seconds Summary for sample latency(TTFB) in seconds
+# TYPE jmeter_samples_ttfb_seconds summary
+jmeter_samples_ttfb_seconds{sampler_name="local-metrics",code="200",success="true",quantile="0.5",} 4.0
+jmeter_samples_ttfb_seconds{sampler_name="local-metrics",code="200",success="true",quantile="0.99",} 5.0
+jmeter_samples_ttfb_seconds_count{sampler_name="local-metrics",code="200",success="true",} 18.0
+jmeter_samples_ttfb_seconds_sum{sampler_name="local-metrics",code="200",success="true",} 73.0
+# HELP jmeter_samples_duration_seconds Summary for sample duration in seconds
+# TYPE jmeter_samples_duration_seconds summary
+jmeter_samples_duration_seconds{sampler_name="local-metrics",code="200",success="true",quantile="0.5",} 4.0
+jmeter_samples_duration_seconds{sampler_name="local-metrics",code="200",success="true",quantile="0.99",} 5.0
+jmeter_samples_duration_seconds_count{sampler_name="local-metrics",code="200",success="true",} 18.0
+jmeter_samples_duration_seconds_sum{sampler_name="local-metrics",code="200",success="true",} 74.0
+# HELP jmeter_samples_idle_time_seconds Summary for sample idle time in seconds
+# TYPE jmeter_samples_idle_time_seconds summary
+jmeter_samples_idle_time_seconds{sampler_name="local-metrics",code="200",success="true",quantile="0.5",} 0.0
+jmeter_samples_idle_time_seconds{sampler_name="local-metrics",code="200",success="true",quantile="0.99",} 0.0
+jmeter_samples_idle_time_seconds_count{sampler_name="local-metrics",code="200",success="true",} 18.0
+jmeter_samples_idle_time_seconds_sum{sampler_name="local-metrics",code="200",success="true",} 0.0
+# HELP jmeter_samples_connect_time_seconds Summary for sample connect time in seconds
+# TYPE jmeter_samples_connect_time_seconds summary
+jmeter_samples_connect_time_seconds{sampler_name="local-metrics",code="200",success="true",quantile="0.5",} 0.0
+jmeter_samples_connect_time_seconds{sampler_name="local-metrics",code="200",success="true",quantile="0.99",} 0.0
+jmeter_samples_connect_time_seconds_count{sampler_name="local-metrics",code="200",success="true",} 18.0
+jmeter_samples_connect_time_seconds_sum{sampler_name="local-metrics",code="200",success="true",} 0.0
 ```
 
 ## Examples in Grafana
