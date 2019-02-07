@@ -19,31 +19,29 @@
 package com.github.johrstrom.listener;
 
 import java.io.Serializable;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.apache.jmeter.assertions.AssertionResult;
 import org.apache.jmeter.engine.util.NoThreadClone;
-import org.apache.jmeter.reporters.AbstractListenerElement;
 import org.apache.jmeter.samplers.SampleEvent;
 import org.apache.jmeter.samplers.SampleListener;
 import org.apache.jmeter.testelement.TestStateListener;
-import org.apache.jmeter.testelement.property.ObjectProperty;
-import org.apache.jmeter.threads.JMeterContextService;
-import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.servlet.ServletContextHandler;
-import org.eclipse.jetty.servlet.ServletHolder;
+import org.apache.jmeter.testelement.property.CollectionProperty;
+import org.apache.jmeter.testelement.property.PropertyIterator;
+import org.apache.jmeter.util.JMeterUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.johrstrom.util.CollectorConfig;
+import com.github.johrstrom.collector.BaseCollectorConfig;
+import com.github.johrstrom.collector.CollectorElement;
+import com.github.johrstrom.collector.ThreadCollector;
+import com.github.johrstrom.listener.updater.AbstractUpdater;
+import com.github.johrstrom.listener.updater.ResponseTimeUpdater;
 
 import io.prometheus.client.Collector;
 import io.prometheus.client.CollectorRegistry;
-import io.prometheus.client.Counter;
-import io.prometheus.client.Gauge;
-import io.prometheus.client.Summary;
-import io.prometheus.client.exporter.MetricsServlet;
+
+
 
 /**
  * The main test element listener class of this library. Jmeter updates this
@@ -56,50 +54,20 @@ import io.prometheus.client.exporter.MetricsServlet;
  * @author Jeff Ohrstrom
  *
  */
-public class PrometheusListener extends AbstractListenerElement
+public class PrometheusListener extends CollectorElement<ListenerCollectorConfig>
 		implements SampleListener, Serializable, TestStateListener, NoThreadClone {
-
-	public static final String SAVE_CONFIG = "johrstrom.save_config";
 
 	private static final long serialVersionUID = -4833646252357876746L;
 
 	private static final Logger log = LoggerFactory.getLogger(PrometheusListener.class);
 
-	private transient Server server;
+	private transient PrometheusServer server = PrometheusServer.getInstance();
+	
+	private List<AbstractUpdater> updaters;
+	
 
-	// Samplers
-	private transient Summary samplerCollector;
-	private transient Summary samplerElaspedTimeCollector, samplerLatencyCollector, samplerIdleTimeCollector, samplerConnectTimeCollector;
-	private CollectorConfig samplerConfig = new CollectorConfig();
-	private boolean collectSamples = true;
-
-	// Thread counter
-	private transient Gauge threadCollector;
-	private boolean collectThreads = true;
-
-	// Assertions
-	private transient Collector assertionsCollector;
-	private CollectorConfig assertionConfig = new CollectorConfig();
-	private boolean collectAssertions = true;
-
-	/**
-	 * Default Constructor.
-	 */
-	public PrometheusListener() {
-		this(new PrometheusSaveConfig());
-	}
-
-	/**
-	 * Constructor with a configuration argument.
-	 * 
-	 * @param config
-	 *            - the configuration to use.
-	 */
-	public PrometheusListener(PrometheusSaveConfig config) {
-		super();
-		this.setSaveConfig(config);
-		log.debug("Creating new prometheus listener.");
-	}
+	@SuppressWarnings("unused")	//only need to get an instance to init things
+	private transient final ThreadCollector tc = ThreadCollector.getInstance();
 
 	/*
 	 * (non-Javadoc)
@@ -109,41 +77,10 @@ public class PrometheusListener extends AbstractListenerElement
 	 */
 	public void sampleOccurred(SampleEvent event) {
 
-		try {
-
-			// build the label values from the event and observe the sampler
-			// metrics
-			String[] samplerLabelValues = this.labelValues(event);
-			if (collectSamples) {
-				samplerCollector.labels(samplerLabelValues).observe(event.getResult().getTime());
-				// Prometheus metrics naming, base unit is Seconds
-				samplerElaspedTimeCollector.labels(samplerLabelValues).observe(event.getResult().getTime() / 1000.0);
-				samplerLatencyCollector.labels(samplerLabelValues).observe(event.getResult().getLatency() / 1000.0);
-				samplerIdleTimeCollector.labels(samplerLabelValues).observe(event.getResult().getIdleTime() / 1000.0);
-				samplerConnectTimeCollector.labels(samplerLabelValues).observe(event.getResult().getConnectTime() / 1000.0);
-			}
-
-			if (collectThreads) {
-				threadCollector.set(JMeterContextService.getContext().getThreadGroup().getNumberOfThreads());
-			}
-
-			// if there are any assertions to
-			if (collectAssertions) {
-				if (event.getResult().getAssertionResults().length > 0) {
-					for (AssertionResult assertionResult : event.getResult().getAssertionResults()) {
-						String[] assertionsLabelValues = this.labelValues(event, assertionResult);
-						
-						if(assertionsCollector instanceof Summary)
-							((Summary) assertionsCollector).labels(assertionsLabelValues).observe(event.getResult().getTime());
-						else if (assertionsCollector instanceof Counter)
-							((Counter) assertionsCollector).labels(assertionsLabelValues).inc();
-					}
-				}
-			}
-
-		} catch (Exception e) {
-			log.error("Didn't update metric because of exception. Message was: {}", e.getMessage());
+		for(AbstractUpdater updater : this.updaters) {
+			updater.update(event);
 		}
+
 	}
 
 	/*
@@ -174,6 +111,8 @@ public class PrometheusListener extends AbstractListenerElement
 	 * @see org.apache.jmeter.testelement.TestStateListener#testEnded()
 	 */
 	public void testEnded() {
+		this.unRegisterAllCollectors();
+		
 		try {
 			this.server.stop();
 		} catch (Exception e) {
@@ -198,43 +137,15 @@ public class PrometheusListener extends AbstractListenerElement
 	 */
 	public void testStarted() {
 		// update the configuration
-		this.reconfigure();
-		this.server = new Server(this.getSaveConfig().getPort());
-
-		ServletContextHandler context = new ServletContextHandler();
-		context.setContextPath("/");
-		server.setHandler(context);
-		context.addServlet(new ServletHolder(new MetricsServlet()), "/metrics");
-
+		this.makeNewCollectors();
+		this.registerAllCollectors();
+		
 		try {
 			server.start();
 		} catch (Exception e) {
 			log.error("Couldn't start http server", e);
 		}
 
-	}
-
-	/**
-	 * Set a new Save configuration. Note that this function reconfigures this
-	 * object and one should not set the save config directly through
-	 * {@link #setProperty(org.apache.jmeter.testelement.property.JMeterProperty)}
-	 * functions.
-	 * 
-	 * @param config
-	 *            - the configuration object
-	 */
-	public void setSaveConfig(PrometheusSaveConfig config) {
-		this.setProperty(new ObjectProperty(SAVE_CONFIG, config));
-		this.reconfigure();
-	}
-
-	/**
-	 * Get the current Save configuration
-	 * 
-	 * @return
-	 */
-	public PrometheusSaveConfig getSaveConfig() {
-		return (PrometheusSaveConfig) this.getProperty(SAVE_CONFIG).getObjectValue();
 	}
 
 	/*
@@ -248,316 +159,53 @@ public class PrometheusListener extends AbstractListenerElement
 		this.testStarted();
 	}
 
-	/**
-	 * For a given SampleEvent, get all the label values as determined by the
-	 * configuration. Can return reflection related errors because this invokes
-	 * SampleEvent accessor methods like getResponseCode or getSuccess.
-	 * 
-	 * @param event
-	 *            - the event that occurred
-	 * @return
-	 * @throws IllegalAccessException
-	 * @throws IllegalArgumentException
-	 * @throws InvocationTargetException
-	 */
-	protected String[] labelValues(SampleEvent event)
-			throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+	@Override
+	protected void makeNewCollectors() {
+		this.collectors.clear();
+		this.updaters = new ArrayList<AbstractUpdater>();
 		
-		String[] sampleVarArr = this.sampleVariableValues(event);
-		int configLabelLength = this.samplerConfig.getLabels().length;
-		int totalLength = configLabelLength + sampleVarArr.length;
+		CollectionProperty collectorDefs = this.getCollectorConfigs();
+		PropertyIterator iter = collectorDefs.iterator();
 		
-		String[] values = new String[totalLength];
-		int valuesIndex = -1;	//start at -1 so you can ++ when referencing it
-
-		for (int i = 0; i < configLabelLength; i++) {
-			Method m = this.samplerConfig.getMethods()[i];
-			values[++valuesIndex] = m.invoke(event.getResult()).toString();
-		}
-		
-		System.arraycopy(sampleVarArr, 0, values, configLabelLength, sampleVarArr.length);
-
-		return values;
-
-	}
-
-	/**
-	 * For a given SampleEvent and AssertionResult, get all the label values as
-	 * determined by the configuration. Can return reflection related errors
-	 * because this invokes SampleEvent accessor methods like getResponseCode or
-	 * getSuccess.
-	 * 
-	 * @param event
-	 *            - the event that occurred
-	 * @param assertionResult
-	 *            - the assertion results associated to the event
-	 * @return
-	 * @throws IllegalAccessException
-	 * @throws IllegalArgumentException
-	 * @throws InvocationTargetException
-	 */
-	protected String[] labelValues(SampleEvent event, AssertionResult assertionResult)
-			throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-
-		String[] sampleVarArr = this.sampleVariableValues(event);
-		int assertionLabelLength = this.assertionConfig.getLabels().length;
-		int sampleVariableLength = sampleVarArr.length;
-		int combinedLength = assertionLabelLength + sampleVariableLength;
-		
-		String[] values = new String[combinedLength];
-
-		for (int i = 0; i < assertionLabelLength; i++) {
-			Method m = this.assertionConfig.getMethods()[i];
-			if (m.getDeclaringClass().equals(AssertionResult.class))
-				values[i] = m.invoke(assertionResult).toString();
-			else
-				values[i] = m.invoke(event.getResult()).toString();
-		}
-		
-		System.arraycopy(sampleVarArr, 0, values, assertionLabelLength, sampleVariableLength);
-
-		log.info("assertion values: {}", (Object) values);
-		
-		return values;
-
-	}
-	
-	private String[] sampleVariableValues(SampleEvent event) {
-		int sampleVariableLength = SampleEvent.getVarCount();
-		String[] values = new String[sampleVariableLength];
-		
-		for(int i = 0; i < sampleVariableLength; i++) {
-			String varValue =  event.getVarValue(i);
-			values[i] = (varValue == null) ?  "" : varValue;
-		}
-		
-		return values;
-	}
-
-	/**
-	 * Helper function to modify private member collectors and collector
-	 * configurations. Any invocation of this method will modify them, even if
-	 * configuration fails due to reflection errors, default configurations are
-	 * applied and new collectors created.
-	 */
-	protected void reconfigure() {
-
-		CollectorConfig tmpAssertConfig = new CollectorConfig();
-		CollectorConfig tmpSamplerConfig = new CollectorConfig();
-
-		// activate collections
-		collectSamples = this.getSaveConfig().saveSuccess() || this.getSaveConfig().saveCode()
-				|| this.getSaveConfig().saveLabel();
-		collectThreads = this.getSaveConfig().saveThreads();
-		collectAssertions = this.getSaveConfig().saveAssertions();
-
-		try {
-			// try to build new config objects
-			tmpAssertConfig = this.newAssertionCollectorConfig();
-			tmpSamplerConfig = this.newSamplerCollectorConfig();
-
-		} catch (NoSuchMethodException | SecurityException e) {
-			log.error("Only partial reconfigure due to exception.", e);
-		}
-
-		// remove old collectors and reassign member variables
-		CollectorRegistry.defaultRegistry.clear();
-		this.assertionConfig = tmpAssertConfig;
-		this.samplerConfig = tmpSamplerConfig;
-
-		// register new collectors
-		this.createSamplerCollector();
-		this.createAssertionCollector();
-
-		if (collectThreads)
-			this.threadCollector = Gauge.build().name("jmeter_running_threads").help("Counter for running threds")
-					.create().register(CollectorRegistry.defaultRegistry);
-
-		
-
-		log.info("Reconfigure complete.");
-
-		if (log.isDebugEnabled()) {
-			log.debug("Assertion Configuration: " + this.assertionConfig.toString());
-			log.debug("Sampler Configuration: " + this.samplerConfig.toString());
-		}
-
-	}
-
-	/**
-	 * Create a new CollectorConfig for Samplers. Due to reflection this throws
-	 * errors based on security and absence of method definitions.
-	 * 
-	 * @return the new CollectorConfig
-	 * @throws SecurityException
-	 * @throws NoSuchMethodException
-	 */
-	protected CollectorConfig newSamplerCollectorConfig() throws NoSuchMethodException, SecurityException {
-		PrometheusSaveConfig saveConfig = this.getSaveConfig();
-		CollectorConfig collectorConfig = new CollectorConfig();
-
-		if (saveConfig.saveLabel()) {
-			collectorConfig.saveSamplerLabel();
-		}
-
-		if (saveConfig.saveCode()) {
-			collectorConfig.saveSamlerCode();
-		}
-
-		if (saveConfig.saveSuccess()) {
-			collectorConfig.saveSamplerSuccess();
-		}
-
-		return collectorConfig;
-	}
-
-	/**
-	 * Create a new CollectorConfig for Assertions. Due to reflection this
-	 * throws errors based on security and absence of method definitions.
-	 * 
-	 * @return
-	 * @throws NoSuchMethodException
-	 * @throws SecurityException
-	 */
-	protected CollectorConfig newAssertionCollectorConfig() throws NoSuchMethodException, SecurityException {
-		PrometheusSaveConfig saveConfig = this.getSaveConfig();
-		CollectorConfig collectorConfig = new CollectorConfig();
-
-		if (saveConfig.saveAssertions()) {
-			// TODO configure assertions more granularly
-			collectorConfig.saveSamplerLabel();
-			collectorConfig.saveAssertionFailure();
-			collectorConfig.saveAssertionName();
-		}
-
-		return collectorConfig;
-	}
-	
-	
-	protected void createAssertionCollector(){
-		if (!collectAssertions){
-			return;
-		}
-		
-		String[] labelNames = new String[]{};
-		
-		if (SampleEvent.getVarCount() > 0) {
-			labelNames = this.combineAssertionLabelsWithSampleVars();
-		}else {
-			labelNames = this.assertionConfig.getLabels();
-		}
-		
-		if(this.getSaveConfig().getAssertionClass().equals(Summary.class))
-			this.assertionsCollector = Summary.build().name("jmeter_assertions_total").help("Counter for assertions")
-				.labelNames(labelNames).quantile(0.5, 0.1).quantile(0.99, 0.1)
-				.create().register(CollectorRegistry.defaultRegistry);
-		
-		else if(this.getSaveConfig().getAssertionClass().equals(Counter.class))
-			this.assertionsCollector = Counter.build().name("jmeter_assertions_total").help("Counter for assertions")
-			.labelNames(labelNames).create().register(CollectorRegistry.defaultRegistry);
+		while(iter.hasNext()) {
 			
-	}
-
-	
-	protected void createSamplerCollector(){
-		if (collectSamples) {
-			String[] labelNames = new String[]{};
-			
-			if (SampleEvent.getVarCount() > 0) {
-				labelNames = this.combineConfigLabelsWithSampleVars();
-			} else {
-				labelNames = this.samplerConfig.getLabels();
+			try {
+				ListenerCollectorConfig config = (ListenerCollectorConfig) iter.next().getObjectValue();
+				Collector collector = BaseCollectorConfig.fromConfig(config);
+				AbstractUpdater updater = null;
+				
+				switch (config.getMeasuringAsEnum()) {
+				case CountTotal:
+					break;
+				case FailureTotal:
+					break;
+				case ResponseSize:
+					break;
+				case ResponseTime:
+					updater = new ResponseTimeUpdater(collector, config);
+					break;
+				case SuccessTotal:
+					break;
+				default:
+					// improbable because you get a sort of class cast exception on Enum
+					// because you're casting null*
+					// *unless we've missed a case, i.e., more enums defined than switch cases coded here
+					break;		
+				}
+				
+				this.collectors.put(config.getMetricName(), collector);
+				this.updaters.add(updater);
+				
+				log.debug("added " + config.getMetricName() + " to list of collectors");
+			}catch(Exception e) {
+				log.error("Didn't create new collector because of error, ",e);
 			}
 			
-			this.samplerCollector = Summary.build()
-					.name("jmeter_samples_latency")
-					.help("Summary for Sample Latency")
-					.labelNames(labelNames)
-					.quantile(0.5, 0.1)
-					.quantile(0.99, 0.1)
-					.create()
-					.register(CollectorRegistry.defaultRegistry);
+		}
+		
+	}
 
-			// @TODO: This metrics is not same as 'jmeter_samples_latency', need to discuss this.
-			// Metric name is confusing, current 'jmeter_samples_latency' metrics is returning 'elapsed time' instead of actual 'latency' value
-			// In jmeter terms 'latency' is time to first byte(TTFB)
-			this.samplerLatencyCollector = Summary.build()
-					.name("jmeter_samples_ttfb_seconds")
-					.help("Summary for sample latency(TTFB) in seconds")
-					.labelNames(labelNames)
-					.quantile(0.5, 0.1)
-					.quantile(0.99, 0.1)
-					.create()
-					.register(CollectorRegistry.defaultRegistry);
-			this.samplerElaspedTimeCollector = Summary.build()
-					.name("jmeter_samples_duration_seconds")
-					.help("Summary for sample duration in seconds")
-					.labelNames(labelNames)
-					.quantile(0.5, 0.1)
-					.quantile(0.99, 0.1)
-					.create()
-					.register(CollectorRegistry.defaultRegistry);
-			this.samplerIdleTimeCollector = Summary.build()
-					.name("jmeter_samples_idle_time_seconds")
-					.help("Summary for sample idle time in seconds")
-					.labelNames(labelNames)
-					.quantile(0.5, 0.1)
-					.quantile(0.99, 0.1)
-					.create()
-					.register(CollectorRegistry.defaultRegistry);
-			this.samplerConnectTimeCollector = Summary.build()
-					.name("jmeter_samples_connect_time_seconds")
-					.help("Summary for sample connect time in seconds")
-					.labelNames(labelNames)
-					.quantile(0.5, 0.1)
-					.quantile(0.99, 0.1)
-					.create()
-					.register(CollectorRegistry.defaultRegistry);
-		}
-	}
-	
-	private String[] combineAssertionLabelsWithSampleVars() {
-		int assertionLabelLength = this.assertionConfig.getLabels().length;
-		int sampleVariableLength = SampleEvent.getVarCount();
-		int combinedLength = assertionLabelLength + sampleVariableLength;
+
+
 		
-		String[] returnArray = new String[combinedLength];
-		int returnArrayIndex = -1;	//start at -1 so you can ++ when referencing it
-		
-		//add config first
-		String[] configuredLabels = this.assertionConfig.getLabels();
-		for (int i = 0; i < assertionLabelLength; i++) {
-			returnArray[++returnArrayIndex] = configuredLabels[i];
-		}
-		
-		//now add sample variables
-		for (int i = 0; i < sampleVariableLength; i++) {
-			returnArray[++returnArrayIndex] = SampleEvent.getVarName(i);
-		}
-		
-		return returnArray;
-	}
-	
-	private String[] combineConfigLabelsWithSampleVars() {
-		int configLabelLength = this.samplerConfig.getLabels().length;
-		int sampleVariableLength = SampleEvent.getVarCount();
-		int combinedLength = configLabelLength + sampleVariableLength;
-		
-		String[] returnArray = new String[combinedLength];
-		int returnArrayIndex = -1;	//start at -1 so you can ++ when referencing it
-		
-		//add config first
-		String[] configuredLabels = this.samplerConfig.getLabels();
-		for (int i = 0; i < configLabelLength; i++) {
-			returnArray[++returnArrayIndex] = configuredLabels[i];
-		}
-		
-		//now add sample variables
-		for (int i = 0; i < sampleVariableLength; i++) {
-			returnArray[++returnArrayIndex] = SampleEvent.getVarName(i);
-		}
-		
-		return returnArray;
-	}
-	
 }
