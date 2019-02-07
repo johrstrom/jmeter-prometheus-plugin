@@ -1,5 +1,7 @@
 package com.github.johrstrom.test;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 import org.apache.jmeter.control.LoopController;
@@ -82,7 +84,17 @@ public class TestUtilities {
         ThreadGroup tg1 = new ThreadGroup();
         tg1.setName("tg1");
         JMeterContextService.getContext().setThreadGroup(tg1);
-
         
+    }
+    
+    public static List<BaseCollectorConfig> simpleListConfig() {
+    	List<BaseCollectorConfig> list = new ArrayList<BaseCollectorConfig>(); 
+    	
+    	list.add(simpleGaugeCfg());
+    	list.add(simpleHistogramCfg());
+    	list.add(simpleSummaryCfg());
+    	list.add(simpleCounterCfg());
+    	
+    	return list;
     }
 }

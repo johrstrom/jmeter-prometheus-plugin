@@ -6,7 +6,6 @@ import org.apache.jmeter.engine.util.NoThreadClone;
 import org.apache.jmeter.testelement.TestStateListener;
 import org.apache.jmeter.testelement.property.CollectionProperty;
 import org.apache.jmeter.testelement.property.JMeterProperty;
-import org.apache.jmeter.testelement.property.PropertyIterator;
 import org.apache.jmeter.threads.JMeterVariables;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,6 +43,7 @@ public class PrometheusMetricsConfig extends CollectorElement<BaseCollectorConfi
 	@Override
 	public void testStarted() {
 		this.setRunningVersion(true);
+		this.makeNewCollectors();
 		JMeterVariables variables = getThreadContext().getVariables();
 		this.registerAllCollectors();
 		

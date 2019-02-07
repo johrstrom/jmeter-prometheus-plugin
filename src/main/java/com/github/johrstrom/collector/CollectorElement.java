@@ -50,7 +50,6 @@ public abstract class CollectorElement<C extends BaseCollectorConfig> extends Ab
 	
 	public void setCollectorConfigs(CollectionProperty collectors) {
 		this.setProperty(collectors);
-		this.makeNewCollectors();
 	}
 	
 	protected void registerAllCollectors() {
