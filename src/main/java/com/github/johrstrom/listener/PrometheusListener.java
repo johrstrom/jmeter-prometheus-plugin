@@ -28,15 +28,18 @@ import org.apache.jmeter.samplers.SampleListener;
 import org.apache.jmeter.testelement.TestStateListener;
 import org.apache.jmeter.testelement.property.CollectionProperty;
 import org.apache.jmeter.testelement.property.PropertyIterator;
+import org.apache.jmeter.util.JMeterUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.johrstrom.collector.BaseCollectorConfig;
 import com.github.johrstrom.collector.CollectorElement;
+import com.github.johrstrom.collector.ThreadCollector;
 import com.github.johrstrom.listener.updater.AbstractUpdater;
 import com.github.johrstrom.listener.updater.ResponseTimeUpdater;
 
 import io.prometheus.client.Collector;
+import io.prometheus.client.CollectorRegistry;
 
 
 
@@ -61,8 +64,11 @@ public class PrometheusListener extends CollectorElement<ListenerCollectorConfig
 	private transient PrometheusServer server = PrometheusServer.getInstance();
 	
 	private List<AbstractUpdater> updaters;
-
 	
+
+	@SuppressWarnings("unused")	//only need to get an instance to init things
+	private transient final ThreadCollector tc = ThreadCollector.getInstance();
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -74,14 +80,7 @@ public class PrometheusListener extends CollectorElement<ListenerCollectorConfig
 		for(AbstractUpdater updater : this.updaters) {
 			updater.update(event);
 		}
-		
-//		for(JMeterCollector collector : this.sampleCollectors) {
-//			collector.update(event);
-//		}
-//		
-//		for(JMeterCollector collector : this.assertionCollectors) {
-//			collector.update(event);
-//		}
+
 	}
 
 	/*
@@ -205,6 +204,7 @@ public class PrometheusListener extends CollectorElement<ListenerCollectorConfig
 		}
 		
 	}
+
 
 
 		
