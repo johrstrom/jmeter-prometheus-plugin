@@ -8,6 +8,8 @@ import org.apache.jmeter.util.JMeterUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.github.johrstrom.test.TestUtilities;
+
 public class PrometheusListenerTest {
 	
 	static {
@@ -24,6 +26,25 @@ public class PrometheusListenerTest {
 		
 		Assert.assertTrue(listener != null);
 		Assert.assertTrue(objectBuffer.size() > 0);
+		
+	}
+	
+	@Test
+	public void canHaveDuplicateMetrics() {
+		PrometheusListener first = new PrometheusListener();
+		PrometheusListener second = new PrometheusListener();
+		
+		first.setCollectorConfigs(TestUtilities.simpleListListener());
+		second.setCollectorConfigs(TestUtilities.simpleListListener());
+		
+		first = (PrometheusListener) first.clone();
+		second = (PrometheusListener) second.clone();
+		
+		first.testStarted();
+		second.testStarted();
+		
+		first.testEnded();
+		second.testEnded();
 		
 	}
 	

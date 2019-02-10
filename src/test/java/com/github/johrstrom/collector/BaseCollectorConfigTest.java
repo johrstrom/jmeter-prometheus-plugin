@@ -11,6 +11,10 @@ import com.github.johrstrom.test.TestUtilities;
 
 import io.prometheus.client.Collector;
 import io.prometheus.client.Collector.Type;
+import io.prometheus.client.Counter;
+import io.prometheus.client.Gauge;
+import io.prometheus.client.Histogram;
+import io.prometheus.client.Summary;
 
 
 public class BaseCollectorConfigTest {
@@ -155,5 +159,38 @@ public class BaseCollectorConfigTest {
 		
 	}
 
+
+	@Test
+	public void createCorrectType() {
+		BaseCollectorConfig cfg = TestUtilities.simpleCounterCfg();
+		Collector c = BaseCollectorConfig.fromConfig(cfg);
+		Assert.assertTrue(c instanceof Counter);
+		
+		cfg = TestUtilities.simpleGaugeCfg();
+		c = BaseCollectorConfig.fromConfig(cfg);
+		Assert.assertTrue(c instanceof Gauge);
+		
+		cfg = TestUtilities.simpleHistogramCfg();
+		c = BaseCollectorConfig.fromConfig(cfg);
+		Assert.assertTrue(c instanceof Histogram);
+		
+		cfg = TestUtilities.simpleSummaryCfg();
+		c = BaseCollectorConfig.fromConfig(cfg);
+		Assert.assertTrue(c instanceof Summary);
+	}
+	
+	@Test
+	public void setOfElementsTest() {
+		BaseCollectorConfig left = TestUtilities.simpleCounterCfg();
+		BaseCollectorConfig right = TestUtilities.simpleCounterCfg();
+		
+		Assert.assertTrue(left != right);
+		Assert.assertTrue(left.equals(right));
+		
+		int leftHash = left.hashCode();
+		int rightHash = right.hashCode();
+		
+		Assert.assertTrue(leftHash == rightHash);
+	}
 
 }

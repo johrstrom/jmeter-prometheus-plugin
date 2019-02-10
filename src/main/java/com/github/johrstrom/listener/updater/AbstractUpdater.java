@@ -7,9 +7,8 @@ import org.apache.jmeter.samplers.SampleEvent;
 import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.threads.JMeterVariables;
 
+import com.github.johrstrom.collector.JMeterCollectorRegistry;
 import com.github.johrstrom.listener.ListenerCollectorConfig;
-
-import io.prometheus.client.Collector;
 
 /**
  * The Updater family of classes are meant to update the actual Collectors given the configuration. The main problem
@@ -25,9 +24,9 @@ import io.prometheus.client.Collector;
 public abstract class AbstractUpdater {
 	
 	public static String NULL = "null";
-	
-	protected Collector collector;
+
 	protected ListenerCollectorConfig config;
+	protected JMeterCollectorRegistry registry = JMeterCollectorRegistry.getInstance();
 	
 	// helper lookup table for sample variables, so we don't loop over arrays every update.
 	private Map<String,Integer> varIndexLookup;
@@ -38,8 +37,8 @@ public abstract class AbstractUpdater {
 	 * @param c the collector to update
 	 * @param cfg the configuration of the collector
 	 */
-	public AbstractUpdater(Collector c, ListenerCollectorConfig cfg) {
-		this.collector = c;
+	public AbstractUpdater(ListenerCollectorConfig cfg) {
+		//this.collector = c;
 		this.config = cfg;
 		this.buildVarLookup();
 	}

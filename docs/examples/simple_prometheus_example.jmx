@@ -123,6 +123,128 @@ counter.labels(color,size,mammal).inc();
           <hashTree/>
         </hashTree>
       </hashTree>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="skip tg" enabled="true">
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+          <intProp name="LoopController.loops">-1</intProp>
+        </elementProp>
+        <stringProp name="ThreadGroup.num_threads">1</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">1</stringProp>
+        <boolProp name="ThreadGroup.scheduler">false</boolProp>
+        <stringProp name="ThreadGroup.duration"></stringProp>
+        <stringProp name="ThreadGroup.delay"></stringProp>
+      </ThreadGroup>
+      <hashTree>
+        <JSR223Sampler guiclass="TestBeanGUI" testclass="JSR223Sampler" testname="first_random_sampler" enabled="true">
+          <stringProp name="TestPlan.comments">This sampler just does something to generate data for the prometheus listener.
+
+Note that just by calling the function in the parameters section assigns the variable &apos;category&apos; which the PrometheusListener plugin will pick up on.</stringProp>
+          <stringProp name="cacheKey">true</stringProp>
+          <stringProp name="filename"></stringProp>
+          <stringProp name="parameters">${__RandomString(1,ABC,category)}</stringProp>
+          <stringProp name="script">import java.util.Random;
+
+Random rand = new Random();
+int wait = rand.nextInt(3500);
+
+log.info(&quot;sleeping for {} ms&quot;, wait);
+
+Thread.currentThread().sleep(wait);</stringProp>
+          <stringProp name="scriptLanguage">groovy</stringProp>
+        </JSR223Sampler>
+        <hashTree>
+          <com.github.johrstrom.listener.PrometheusListener guiclass="com.github.johrstrom.listener.gui.PrometheusListenerGui" testclass="com.github.johrstrom.listener.PrometheusListener" testname="PrometheusListener" enabled="true">
+            <collectionProp name="prometheus.collector_definitions">
+              <elementProp name="" elementType="com.github.johrstrom.listener.ListenerCollectorConfig">
+                <stringProp name="collector.help">the response time for a jsr223 sampler</stringProp>
+                <stringProp name="collector.metric_name">jsr223:rt_as_hist</stringProp>
+                <stringProp name="collector.type">HISTOGRAM</stringProp>
+                <collectionProp name="collector.labels">
+                  <stringProp name="102727412">label</stringProp>
+                </collectionProp>
+                <stringProp name="collector.quantiles_or_buckets">100,500,1000,3000</stringProp>
+                <stringProp name="listener.collector.listen_to">samples</stringProp>
+                <stringProp name="listener.collector.measuring">ResponseTime</stringProp>
+              </elementProp>
+              <elementProp name="" elementType="com.github.johrstrom.listener.ListenerCollectorConfig">
+                <stringProp name="collector.help">the response time for a jsr223 sampler</stringProp>
+                <stringProp name="collector.metric_name">jsr223:rt_as_summary</stringProp>
+                <stringProp name="collector.type">SUMMARY</stringProp>
+                <collectionProp name="collector.labels">
+                  <stringProp name="50511102">category</stringProp>
+                </collectionProp>
+                <stringProp name="collector.quantiles_or_buckets">0.75,0.5|0.95,0.1|0.99,0.01</stringProp>
+                <stringProp name="listener.collector.measuring">ResponseTime</stringProp>
+              </elementProp>
+            </collectionProp>
+          </com.github.johrstrom.listener.PrometheusListener>
+          <hashTree/>
+        </hashTree>
+        <JSR223Sampler guiclass="TestBeanGUI" testclass="JSR223Sampler" testname="want_to_skp" enabled="true">
+          <stringProp name="TestPlan.comments">This sampler just does something to generate data for the prometheus listener.
+
+Note that just by calling the function in the parameters section assigns the variable &apos;category&apos; which the PrometheusListener plugin will pick up on.</stringProp>
+          <stringProp name="cacheKey">true</stringProp>
+          <stringProp name="filename"></stringProp>
+          <stringProp name="parameters">${__RandomString(1,ABC,category)}</stringProp>
+          <stringProp name="script">import java.util.Random;
+
+Random rand = new Random();
+int wait = rand.nextInt(3500);
+
+log.info(&quot;sleeping for {} ms&quot;, wait);
+
+Thread.currentThread().sleep(wait);</stringProp>
+          <stringProp name="scriptLanguage">groovy</stringProp>
+        </JSR223Sampler>
+        <hashTree/>
+        <JSR223Sampler guiclass="TestBeanGUI" testclass="JSR223Sampler" testname="second_random_sampler" enabled="true">
+          <stringProp name="TestPlan.comments">This sampler just does something to generate data for the prometheus listener.
+
+Note that just by calling the function in the parameters section assigns the variable &apos;category&apos; which the PrometheusListener plugin will pick up on.</stringProp>
+          <stringProp name="cacheKey">true</stringProp>
+          <stringProp name="filename"></stringProp>
+          <stringProp name="parameters">${__RandomString(1,ABC,category)}</stringProp>
+          <stringProp name="script">import java.util.Random;
+
+Random rand = new Random();
+int wait = rand.nextInt(3500);
+
+log.info(&quot;sleeping for {} ms&quot;, wait);
+
+Thread.currentThread().sleep(wait);</stringProp>
+          <stringProp name="scriptLanguage">groovy</stringProp>
+        </JSR223Sampler>
+        <hashTree>
+          <com.github.johrstrom.listener.PrometheusListener guiclass="com.github.johrstrom.listener.gui.PrometheusListenerGui" testclass="com.github.johrstrom.listener.PrometheusListener" testname="PrometheusListener" enabled="true">
+            <collectionProp name="prometheus.collector_definitions">
+              <elementProp name="" elementType="com.github.johrstrom.listener.ListenerCollectorConfig">
+                <stringProp name="collector.help">the response time for a jsr223 sampler</stringProp>
+                <stringProp name="collector.metric_name">jsr223:rt_as_hist</stringProp>
+                <stringProp name="collector.type">HISTOGRAM</stringProp>
+                <collectionProp name="collector.labels">
+                  <stringProp name="102727412">label</stringProp>
+                </collectionProp>
+                <stringProp name="collector.quantiles_or_buckets">100,500,1000,3000</stringProp>
+                <stringProp name="listener.collector.listen_to">samples</stringProp>
+                <stringProp name="listener.collector.measuring">ResponseTime</stringProp>
+              </elementProp>
+              <elementProp name="" elementType="com.github.johrstrom.listener.ListenerCollectorConfig">
+                <stringProp name="collector.help">the response time for a jsr223 sampler</stringProp>
+                <stringProp name="collector.metric_name">jsr223:rt_as_summary</stringProp>
+                <stringProp name="collector.type">SUMMARY</stringProp>
+                <collectionProp name="collector.labels">
+                  <stringProp name="50511102">category</stringProp>
+                </collectionProp>
+                <stringProp name="collector.quantiles_or_buckets">0.75,0.5|0.95,0.1|0.99,0.01</stringProp>
+                <stringProp name="listener.collector.measuring">ResponseTime</stringProp>
+              </elementProp>
+            </collectionProp>
+          </com.github.johrstrom.listener.PrometheusListener>
+          <hashTree/>
+        </hashTree>
+      </hashTree>
       <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree" enabled="true">
         <boolProp name="ResultCollector.error_logging">false</boolProp>
         <objProp>

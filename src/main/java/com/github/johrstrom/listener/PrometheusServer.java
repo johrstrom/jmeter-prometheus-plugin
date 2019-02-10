@@ -2,7 +2,6 @@ package com.github.johrstrom.listener;
 
 import io.prometheus.client.CollectorRegistry;
 import io.prometheus.client.exporter.common.TextFormat;
-import io.prometheus.client.hotspot.DefaultExports;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -21,6 +20,7 @@ import org.apache.jmeter.util.JMeterUtils;
 
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
+import com.github.johrstrom.collector.JMeterCollectorRegistry;
 import com.sun.net.httpserver.HttpExchange;
 
 /**
@@ -123,7 +123,7 @@ public class PrometheusServer {
     private int port = JMeterUtils.getPropDefault(PROMETHEUS_PORT, PROMETHEUS_PORT_DEFAULT);
     private int delay = JMeterUtils.getPropDefault(PROMETHEUS_DELAY, PROMETHEUS_DELAY_DEFAULT);
     
-    protected static final HTTPMetricHandler metricHandler = new HTTPMetricHandler(CollectorRegistry.defaultRegistry);
+    protected static final HTTPMetricHandler metricHandler = new HTTPMetricHandler(JMeterCollectorRegistry.getInstance());
 
     public synchronized static PrometheusServer getInstance() {
     	if(instance == null) {
@@ -133,12 +133,7 @@ public class PrometheusServer {
     	return instance;
     }
 
-    /**
-     * Start a HTTP server serving Prometheus metrics from the given registry.
-     */
-    private PrometheusServer() {
-    	DefaultExports.initialize();
-    }
+    private PrometheusServer() { }
     
     public void start() throws IOException {
     	if(server != null){

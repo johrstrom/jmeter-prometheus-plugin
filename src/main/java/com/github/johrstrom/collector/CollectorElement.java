@@ -2,6 +2,7 @@ package com.github.johrstrom.collector;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -15,13 +16,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.prometheus.client.Collector;
-import io.prometheus.client.CollectorRegistry;
 
 public abstract class CollectorElement<C extends BaseCollectorConfig> extends AbstractTestElement {
 
 	public static final String COLLECTOR_DEF = "prometheus.collector_definitions";
 	
-	protected Map<String,Collector> collectors = new HashMap<String,Collector>();
+	protected Map<C,Collector> collectors = new HashMap<C,Collector>();
+	protected transient JMeterCollectorRegistry registry = JMeterCollectorRegistry.getInstance();
+	
 	
 	private static Logger log = LoggerFactory.getLogger(CollectorElement.class);
 	private static final long serialVersionUID = 963612021269632269L;
@@ -52,20 +54,17 @@ public abstract class CollectorElement<C extends BaseCollectorConfig> extends Ab
 		this.setProperty(collectors);
 	}
 	
-	protected void registerAllCollectors() {
-		for (Entry<String, Collector> entry : this.collectors.entrySet()) {
-			entry.getValue().register(CollectorRegistry.defaultRegistry);
-		}
-	}
-	
-	protected void unRegisterAllCollectors() {
-		for (Entry<String, Collector> entry : this.collectors.entrySet()) {
-			CollectorRegistry.defaultRegistry.unregister(entry.getValue());
+	protected void  clearCollectors() {
+		Iterator<Entry<C, Collector>> iter = this.collectors.entrySet().iterator();
+		while(iter.hasNext()) {
+			Entry<C, Collector> entry = iter.next();
+			this.registry.unregister(entry.getKey());
+			iter.remove();
 		}
 	}
 	
 	protected void makeNewCollectors() {
-		this.collectors.clear();
+		this.clearCollectors();
 		
 		CollectionProperty collectorDefs = this.getCollectorConfigs();
 		PropertyIterator iter = collectorDefs.iterator();
@@ -75,9 +74,9 @@ public abstract class CollectorElement<C extends BaseCollectorConfig> extends Ab
 			try {
 				@SuppressWarnings("unchecked")
 				C config = (C) iter.next().getObjectValue();
-				Collector collector = BaseCollectorConfig.fromConfig(config);
+				Collector collector = registry.getOrCreateAndRegister(config);
 				
-				this.collectors.put(config.getMetricName(), collector);
+				this.collectors.put(config, collector);
 				log.debug("added " + config.getMetricName() + " to list of collectors");
 			}catch(Exception e) {
 				log.error("Didn't create new collector because of error, ",e);

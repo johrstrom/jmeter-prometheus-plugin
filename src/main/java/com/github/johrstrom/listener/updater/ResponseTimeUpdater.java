@@ -20,22 +20,24 @@ public class ResponseTimeUpdater extends AbstractUpdater {
 	
 	private static final Logger log = LoggerFactory.getLogger(ResponseTimeUpdater.class);
 
-	public ResponseTimeUpdater(Collector c, ListenerCollectorConfig cfg) {
-		super(c, cfg);
+	public ResponseTimeUpdater(ListenerCollectorConfig cfg) {
+		super(cfg);
 	}
 
 	@Override
 	public void update(SampleEvent event) {
 		try {
+			Collector collector = this.registry.getOrCreateAndRegister(this.config);
+			
 			long rt = event.getResult().getTime();
 			String[] labels = this.labelValues(event);
 			
-			if(this.collector instanceof Histogram) {
-				Histogram hist = (Histogram) this.collector;
+			if(collector instanceof Histogram) {
+				Histogram hist = (Histogram) collector;
 				hist.labels(labels).observe(rt);
 				
-			}else if(this.collector instanceof Summary) {
-				Summary sum = (Summary) this.collector;
+			}else if(collector instanceof Summary) {
+				Summary sum = (Summary) collector;
 				sum.labels(labels).observe(rt);
 			}
 			

@@ -17,6 +17,7 @@ import org.apache.jmeter.util.JMeterUtils;
 import org.apache.jorphan.collections.HashTree;
 
 import com.github.johrstrom.collector.BaseCollectorConfig;
+import com.github.johrstrom.listener.ListenerCollectorConfig;
 
 import io.prometheus.client.Collector.Type;
 
@@ -94,6 +95,17 @@ public class TestUtilities {
     	list.add(simpleHistogramCfg());
     	list.add(simpleSummaryCfg());
     	list.add(simpleCounterCfg());
+    	
+    	return list;
+    }
+    
+    public static List<ListenerCollectorConfig> simpleListListener() {
+    	List<ListenerCollectorConfig> list = new ArrayList<ListenerCollectorConfig>(); 
+    	
+    	list.add(new ListenerCollectorConfig(simpleGaugeCfg()));
+    	list.add(new ListenerCollectorConfig(simpleHistogramCfg()));
+    	list.add(new ListenerCollectorConfig(simpleSummaryCfg()));
+    	list.add(new ListenerCollectorConfig(simpleCounterCfg()));
     	
     	return list;
     }

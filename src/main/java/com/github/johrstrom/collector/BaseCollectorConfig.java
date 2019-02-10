@@ -262,7 +262,7 @@ public class BaseCollectorConfig extends AbstractTestElement  {
 			}else if(t.equals(Type.HISTOGRAM)) {
 				c = BaseCollectorConfig.newHistogram(cfg);
 			}else if(t.equals(Type.GAUGE)) {
-				c = BaseCollectorConfig.newHistogram(cfg);
+				c = BaseCollectorConfig.newGauge(cfg);
 			}
 		} catch(Exception e) {
 			log.error(String.format("Didn't create collector from definition %s because of an error", cfg), e);
@@ -272,6 +272,39 @@ public class BaseCollectorConfig extends AbstractTestElement  {
 	}
 	
 	
+	
+	
+	
+	@Override
+	public boolean equals(Object o) {
+		if(o instanceof BaseCollectorConfig) {
+			BaseCollectorConfig other = (BaseCollectorConfig) o;
+			boolean sameName = this.getName().equals(other.getName());
+			boolean sameHelp = this.getHelp().equals(other.getHelp());
+			boolean sameType = this.getType().equals(other.getType());
+			boolean sameQB = this.getQuantileOrBucket().equals(other.getQuantileOrBucket());
+			boolean sameLabels = this.getLabelsAsString().equalsIgnoreCase(other.getLabelsAsString());
+			
+			return sameName && sameHelp && sameType && sameQB & sameLabels;
+		}
+		
+		return false;
+	}
+	
+	@Override
+	public int hashCode() {
+		
+	    final int prime = 31;
+	    int result = 1;
+	    result = prime * result + this.getName().hashCode();
+	    result = prime * result + this.getHelp().hashCode();
+	    result = prime * result + this.getType().hashCode();
+	    result = prime * result + this.getQuantileOrBucket().hashCode();
+	    result = prime * result + this.getLabelsAsString().hashCode();
+	   
+	    return result;
+	}
+
 	@Override
 	public String toString() {
 		PropertyIterator it = this.propertyIterator();
@@ -394,6 +427,7 @@ public class BaseCollectorConfig extends AbstractTestElement  {
 
 	}
 
+	
 
 
 }

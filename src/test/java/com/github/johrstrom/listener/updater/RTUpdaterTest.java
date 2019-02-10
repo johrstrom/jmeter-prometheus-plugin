@@ -9,6 +9,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.github.johrstrom.collector.BaseCollectorConfig;
+import com.github.johrstrom.collector.JMeterCollectorRegistry;
 import com.github.johrstrom.listener.ListenerCollectorConfig;
 import com.github.johrstrom.test.TestUtilities;
 
@@ -22,18 +23,19 @@ import io.prometheus.client.Summary;
  *
  */
 public class RTUpdaterTest {
+	
+	private static final JMeterCollectorRegistry reg = JMeterCollectorRegistry.getInstance();
 
 	@Test
 	public void testHistogram() throws Exception {
 		JMeterUtils.loadJMeterProperties("src/test/resources/user.properties");
 		
-		
 		BaseCollectorConfig base = TestUtilities.simpleHistogramCfg();
 		base.setLabels(new String[] {"foo_label","label"});
 		ListenerCollectorConfig cfg = new ListenerCollectorConfig(base);
 
-		Histogram collector = BaseCollectorConfig.newHistogram(base);
-		ResponseTimeUpdater u = new ResponseTimeUpdater(collector, cfg);
+		Histogram collector = (Histogram) reg.getOrCreateAndRegister(base);
+		ResponseTimeUpdater u = new ResponseTimeUpdater(cfg);
 		
 		SampleResult res = new SampleResult();
 		res.setSampleLabel("myLabelz");
@@ -69,8 +71,8 @@ public class RTUpdaterTest {
 		base.setLabels(new String[] {"foo_label","label"});
 		ListenerCollectorConfig cfg = new ListenerCollectorConfig(base);
 
-		Summary collector = BaseCollectorConfig.newSummary(base);
-		ResponseTimeUpdater u = new ResponseTimeUpdater(collector, cfg);
+		Summary collector = (Summary) reg.getOrCreateAndRegister(base);
+		ResponseTimeUpdater u = new ResponseTimeUpdater(cfg);
 		
 		SampleResult res = new SampleResult();
 		res.setSampleLabel("myLabelz");

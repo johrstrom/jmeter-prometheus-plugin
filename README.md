@@ -4,10 +4,10 @@
 This JMeter plugin is highly configurable listener (and config element) to allow users define they're own metrics (names, types etc.) and expose them through a Prometheus /metrics API to be scraped by a Prometheus server.
 
 # Documentation
-Full documentation can be found on [this project's wiki](https://github.com/johrstrom/jmeter-prometheus-plugin/wiki).
+More documentation can be found on [this project's wiki](https://github.com/johrstrom/jmeter-prometheus-plugin/wiki).
 
 # Listener QuickDoc
-Here's a simple example to get us started.  This example [can be found here](https://github.com/johrstrom/jmeter-prometheus-plugin/blob/master/docs/examples/simple_prometheus_example.jmx).
+Here's a simple example to get us started.  This example [can be found here](https://github.com/johrstrom/jmeter-prometheus-plugin/blob/master/docs/examples/simple_prometheus_example.jmx).  All the documentation on this README is from this jmx file.
 
 ![JMeter testplan](/docs/imgs/simple_testplan.png?raw=true)
 
@@ -42,6 +42,14 @@ So I then access the object I've created above like so.  This is an absolutely t
 Which will expose a counter with all the appropriate labels.
 
 ![JMeter testplan](/docs/imgs/prom_cfg_output.png?raw=true)
+
+# Usage Tips
+
+### Skipping samplers or other elements
+
+You can use the same metric in multiple listeners so long as they're defined in the **exact** same way. There will be undefined behavior if two or more listeners have the same metric (the same metric name) with different configurations.
+
+![JMeter testplan](/docs/imgs/skip_middle.png?raw=true)
 
 # Properties you can override
 

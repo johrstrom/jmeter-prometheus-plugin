@@ -28,19 +28,14 @@ import org.apache.jmeter.samplers.SampleListener;
 import org.apache.jmeter.testelement.TestStateListener;
 import org.apache.jmeter.testelement.property.CollectionProperty;
 import org.apache.jmeter.testelement.property.PropertyIterator;
-import org.apache.jmeter.util.JMeterUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.johrstrom.collector.BaseCollectorConfig;
 import com.github.johrstrom.collector.CollectorElement;
-import com.github.johrstrom.collector.ThreadCollector;
 import com.github.johrstrom.listener.updater.AbstractUpdater;
 import com.github.johrstrom.listener.updater.ResponseTimeUpdater;
 
 import io.prometheus.client.Collector;
-import io.prometheus.client.CollectorRegistry;
-
 
 
 /**
@@ -65,10 +60,6 @@ public class PrometheusListener extends CollectorElement<ListenerCollectorConfig
 	
 	private List<AbstractUpdater> updaters;
 	
-
-	@SuppressWarnings("unused")	//only need to get an instance to init things
-	private transient final ThreadCollector tc = ThreadCollector.getInstance();
-
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -111,7 +102,7 @@ public class PrometheusListener extends CollectorElement<ListenerCollectorConfig
 	 * @see org.apache.jmeter.testelement.TestStateListener#testEnded()
 	 */
 	public void testEnded() {
-		this.unRegisterAllCollectors();
+		this.clearCollectors();
 		
 		try {
 			this.server.stop();
@@ -138,7 +129,7 @@ public class PrometheusListener extends CollectorElement<ListenerCollectorConfig
 	public void testStarted() {
 		// update the configuration
 		this.makeNewCollectors();
-		this.registerAllCollectors();
+		//this.registerAllCollectors();
 		
 		try {
 			server.start();
@@ -161,7 +152,7 @@ public class PrometheusListener extends CollectorElement<ListenerCollectorConfig
 
 	@Override
 	protected void makeNewCollectors() {
-		this.collectors.clear();
+		//this.clearCollectors();
 		this.updaters = new ArrayList<AbstractUpdater>();
 		
 		CollectionProperty collectorDefs = this.getCollectorConfigs();
@@ -171,7 +162,8 @@ public class PrometheusListener extends CollectorElement<ListenerCollectorConfig
 			
 			try {
 				ListenerCollectorConfig config = (ListenerCollectorConfig) iter.next().getObjectValue();
-				Collector collector = BaseCollectorConfig.fromConfig(config);
+				//Collector collector = BaseCollectorConfig.fromConfig(config);
+				Collector collector = this.registry.getOrCreateAndRegister(config);
 				AbstractUpdater updater = null;
 				
 				switch (config.getMeasuringAsEnum()) {
@@ -182,7 +174,7 @@ public class PrometheusListener extends CollectorElement<ListenerCollectorConfig
 				case ResponseSize:
 					break;
 				case ResponseTime:
-					updater = new ResponseTimeUpdater(collector, config);
+					updater = new ResponseTimeUpdater(config);
 					break;
 				case SuccessTotal:
 					break;
@@ -193,7 +185,7 @@ public class PrometheusListener extends CollectorElement<ListenerCollectorConfig
 					break;		
 				}
 				
-				this.collectors.put(config.getMetricName(), collector);
+				this.collectors.put(config, collector);
 				this.updaters.add(updater);
 				
 				log.debug("added " + config.getMetricName() + " to list of collectors");

@@ -27,12 +27,12 @@ public class PrometheusMetricsConfig extends CollectorElement<BaseCollectorConfi
 		this.setRunningVersion(false);
 		JMeterVariables variables = getThreadContext().getVariables();
 		
-		for (Entry<String, Collector> entry : this.collectors.entrySet()) {
-			variables.remove(entry.getKey());
+		for (Entry<BaseCollectorConfig, Collector> entry : this.collectors.entrySet()) {
+			BaseCollectorConfig cfg = entry.getKey();
+			variables.remove(cfg.getMetricName());
 		}
-		
-		this.unRegisterAllCollectors();
-		
+	
+		this.clearCollectors();	
 	}
 
 	@Override
@@ -45,12 +45,13 @@ public class PrometheusMetricsConfig extends CollectorElement<BaseCollectorConfi
 		this.setRunningVersion(true);
 		this.makeNewCollectors();
 		JMeterVariables variables = getThreadContext().getVariables();
-		this.registerAllCollectors();
+
 		
 		log.debug("Test started, adding {} collectors to variables", this.collectors.size());
 		
-		for (Entry<String, Collector> entry : this.collectors.entrySet()) {
-			variables.putObject(entry.getKey(), entry.getValue());
+		for (Entry<BaseCollectorConfig, Collector> entry : this.collectors.entrySet()) {
+			BaseCollectorConfig cfg = entry.getKey(); 
+			variables.putObject(cfg.getMetricName(), entry.getValue());
 			log.debug("Added ({},{}) to variables.", entry.getKey(), entry.getValue().toString());
 		}
  	}

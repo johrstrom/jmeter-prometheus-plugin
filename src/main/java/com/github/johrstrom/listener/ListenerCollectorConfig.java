@@ -48,4 +48,37 @@ public class ListenerCollectorConfig extends BaseCollectorConfig {
 		return Measurable.valueOf(this.getMeasuring());
 	}
 	
+//	@Override
+//	public boolean equals(Object o) {
+//		if(o instanceof ListenerCollectorConfig) {
+//			boolean base = super.equals(o);
+//			ListenerCollectorConfig other = (ListenerCollectorConfig) o;
+//			
+//			boolean measuring = this.getMeasuring().equals(other.getMeasuring());
+//			boolean listenTo = this.getListenTo().equals(other.getListenTo());
+//			
+//			return base && measuring && listenTo;
+//		} 
+//		
+//		return false;
+//	}
+//
+//	@Override
+//	public int hashCode() {
+//		
+//	    final int prime = 31;
+//	    int result = 1;
+//	    result = prime * result + this.getName().hashCode();
+//	    result = prime * result + this.getHelp().hashCode();
+//	    result = prime * result + this.getType().hashCode();
+//	    result = prime * result + this.getQuantileOrBucket().hashCode();
+//	    result = prime * result + this.getLabelsAsString().hashCode();
+//	    result = prime * result + this.getListenTo().hashCode();
+//	    result = prime * result + this.getMeasuring().hashCode();
+//	   
+//	    return result;
+//	}
+	
+	
+	
 }
