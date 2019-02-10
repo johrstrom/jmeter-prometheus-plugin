@@ -49,6 +49,9 @@ Which will expose a counter with all the appropriate labels.
 
 You can use the same metric in multiple listeners so long as they're defined in the **exact** same way. There will be undefined behavior if two or more listeners have the same metric (the same metric name) with different configurations.
 
+
+Here you see `first_random_sampler` and `second_random_sampler` in the labels of this metric, but you do not see `want_to_skip`, the thing that we're trying to skip.
+
 ![JMeter testplan](/docs/imgs/skip_middle.png?raw=true)
 
 # Properties you can override
