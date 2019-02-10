@@ -32,8 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.johrstrom.collector.CollectorElement;
-import com.github.johrstrom.listener.updater.AbstractUpdater;
-import com.github.johrstrom.listener.updater.ResponseTimeUpdater;
+import com.github.johrstrom.listener.updater.*;
 
 import io.prometheus.client.Collector;
 
@@ -162,12 +161,12 @@ public class PrometheusListener extends CollectorElement<ListenerCollectorConfig
 			
 			try {
 				ListenerCollectorConfig config = (ListenerCollectorConfig) iter.next().getObjectValue();
-				//Collector collector = BaseCollectorConfig.fromConfig(config);
 				Collector collector = this.registry.getOrCreateAndRegister(config);
 				AbstractUpdater updater = null;
 				
 				switch (config.getMeasuringAsEnum()) {
 				case CountTotal:
+					updater = new CountTotalUpdater(config);
 					break;
 				case FailureTotal:
 					break;
