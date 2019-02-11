@@ -27,7 +27,7 @@ public class ResponseTimeUpdater extends AbstractUpdater {
 	@Override
 	public void update(SampleEvent event) {
 		try {
-			Collector collector = this.registry.getOrCreateAndRegister(this.config);
+			Collector collector = registry.getOrCreateAndRegister(this.config);
 			
 			long rt = event.getResult().getTime();
 			String[] labels = this.labelValues(event);

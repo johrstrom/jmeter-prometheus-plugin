@@ -20,7 +20,7 @@ public class FailureTotalUpdater extends AbstractUpdater {
 	@Override
 	public void update(SampleEvent event) {
 		try {
-			Collector collector = this.registry.getOrCreateAndRegister(this.config);
+			Collector collector = registry.getOrCreateAndRegister(this.config);
 			
 			Counter c = (Counter) collector;
 			String[] labels = this.labelValues(event);

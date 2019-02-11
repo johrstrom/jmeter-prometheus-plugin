@@ -23,6 +23,7 @@ public class CounterTests {
 		BaseCollectorConfig base = TestUtilities.simpleCounterCfg();
 		base.setLabels(new String[] {"foo_label","label"});
 		ListenerCollectorConfig cfg = new ListenerCollectorConfig(base);
+		cfg.setMetricName("count_test_total");
 		
 		Counter c = (Counter) reg.getOrCreateAndRegister(cfg);
 		CountTotalUpdater u = new CountTotalUpdater(cfg);
@@ -30,6 +31,7 @@ public class CounterTests {
 		SampleResult res = new SampleResult();
 		res.setSampleLabel("myLabelz");
 		res.setStampAndTime(System.currentTimeMillis(), 10000);
+		
 		
 		JMeterVariables vars = new JMeterVariables();
 		vars.put("foo_label", "bar_value");
@@ -58,15 +60,14 @@ public class CounterTests {
 		
 		Assert.assertEquals(3, shouldBeThree, 0.1);
 		Assert.assertEquals(0, stillZero, 0.1);
-		
-		reg.unregister(cfg);
 	}
 	
 	@Test
-	public void failureCountTotalTest() {
+	public void failureCountTotalTest() {		
 		BaseCollectorConfig base = TestUtilities.simpleCounterCfg();
 		base.setLabels(new String[] {"foo_label","label"});
 		ListenerCollectorConfig cfg = new ListenerCollectorConfig(base);
+		cfg.setMetricName("count_test_failure_total");
 		
 		Counter c = (Counter) reg.getOrCreateAndRegister(cfg);
 		FailureTotalUpdater u = new FailureTotalUpdater(cfg);
@@ -74,7 +75,7 @@ public class CounterTests {
 		SampleResult res = new SampleResult();
 		res.setSampleLabel("myLabelz");
 		res.setStampAndTime(System.currentTimeMillis(), 10000);
-		res.setSuccessful(false);
+		res.setSuccessful(false); //	#1
 		
 		JMeterVariables vars = new JMeterVariables();
 		vars.put("foo_label", "bar_value");
@@ -82,7 +83,50 @@ public class CounterTests {
 		SampleEvent e = new SampleEvent(res,"tg1", vars);
 		
 		
-		String[] labels = u.labelValues(e); // #1
+		String[] labels = u.labelValues(e);
+		u.update(e);
+		
+		Assert.assertTrue(labels.length == 2);
+		Assert.assertArrayEquals(new String[] {"bar_value", "myLabelz"}, labels);
+		
+		double shouldBeOne = c.labels("bar_value","myLabelz").get();		
+		
+		Assert.assertEquals(1, shouldBeOne, 0.1);
+		
+		u.update(e);	// #2
+		
+		res.setSuccessful(true);
+		e = new SampleEvent(res,"tg1", vars);
+		
+		u.update(e);	// could be #3, but shouldn't update
+		
+		double shouldBeTwo = c.labels("bar_value","myLabelz").get();
+		
+		Assert.assertEquals(2, shouldBeTwo, 0.1);
+	}
+
+	@Test
+	public void successTotalCount() {		
+		BaseCollectorConfig base = TestUtilities.simpleCounterCfg();
+		base.setLabels(new String[] {"foo_label","label"});
+		ListenerCollectorConfig cfg = new ListenerCollectorConfig(base);
+		cfg.setMetricName("count_test_success_total");
+		
+		Counter c = (Counter) reg.getOrCreateAndRegister(cfg);
+		SuccessTotalUpdater u = new SuccessTotalUpdater(cfg);
+		
+		SampleResult res = new SampleResult();
+		res.setSampleLabel("myLabelz");
+		res.setStampAndTime(System.currentTimeMillis(), 10000);
+		res.setSuccessful(true);	// #1
+		
+		JMeterVariables vars = new JMeterVariables();
+		vars.put("foo_label", "bar_value");
+		JMeterContextService.getContext().setVariables(vars);
+		SampleEvent e = new SampleEvent(res,"tg1", vars);
+		
+		
+		String[] labels = u.labelValues(e);
 		u.update(e);
 		
 		Assert.assertTrue(labels.length == 2);
@@ -97,18 +141,13 @@ public class CounterTests {
 		
 		u.update(e);	// #2
 		
-		res.setSuccessful(true);
+		res.setSuccessful(false);
 		e = new SampleEvent(res,"tg1", vars);
 		
-		u.update(e);	// shouldn't get this one, i.e., it's number 3 
+		u.update(e);	// could be #3, but shouldn't update
 		
 		double shouldBeTwo = c.labels("bar_value","myLabelz").get();
-		double stillZero = c.labels("asdfsfd","asdgfsdgs").get();
 		
 		Assert.assertEquals(2, shouldBeTwo, 0.1);
-		Assert.assertEquals(0, stillZero, 0.1);
-		
-		reg.unregister(cfg);
 	}
-
 }

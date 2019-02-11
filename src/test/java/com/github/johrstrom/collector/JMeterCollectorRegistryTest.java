@@ -5,6 +5,7 @@ import org.junit.Test;
 import com.github.johrstrom.test.TestUtilities;
 
 import io.prometheus.client.Collector;
+
 import org.junit.Assert;
 
 public class JMeterCollectorRegistryTest {

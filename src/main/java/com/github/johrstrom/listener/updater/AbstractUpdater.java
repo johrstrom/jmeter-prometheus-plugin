@@ -26,7 +26,7 @@ public abstract class AbstractUpdater {
 	public static String NULL = "null";
 
 	protected ListenerCollectorConfig config;
-	protected JMeterCollectorRegistry registry = JMeterCollectorRegistry.getInstance();
+	protected static final JMeterCollectorRegistry registry = JMeterCollectorRegistry.getInstance();
 	
 	// helper lookup table for sample variables, so we don't loop over arrays every update.
 	private Map<String,Integer> varIndexLookup;

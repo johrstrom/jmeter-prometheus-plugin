@@ -169,6 +169,7 @@ public class PrometheusListener extends CollectorElement<ListenerCollectorConfig
 					updater = new CountTotalUpdater(config);
 					break;
 				case FailureTotal:
+					updater = new FailureTotalUpdater(config);
 					break;
 				case ResponseSize:
 					break;
@@ -176,6 +177,7 @@ public class PrometheusListener extends CollectorElement<ListenerCollectorConfig
 					updater = new ResponseTimeUpdater(config);
 					break;
 				case SuccessTotal:
+					updater = new SuccessTotalUpdater(config);
 					break;
 				default:
 					// improbable because you get a sort of class cast exception on Enum
@@ -184,10 +186,16 @@ public class PrometheusListener extends CollectorElement<ListenerCollectorConfig
 					break;		
 				}
 				
-				this.collectors.put(config, collector);
-				this.updaters.add(updater);
+				if(updater != null) {
+					this.collectors.put(config, collector);
+					this.updaters.add(updater);
+					log.debug("added " + config.getMetricName() + " to list of collectors");
+					
+				} else {
+					log.warn("didn't find an updatetr for {}", config);
+				}
 				
-				log.debug("added " + config.getMetricName() + " to list of collectors");
+				
 			}catch(Exception e) {
 				log.error("Didn't create new collector because of error, ",e);
 			}

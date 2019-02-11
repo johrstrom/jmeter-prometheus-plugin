@@ -33,8 +33,9 @@ public class RTUpdaterTest {
 		BaseCollectorConfig base = TestUtilities.simpleHistogramCfg();
 		base.setLabels(new String[] {"foo_label","label"});
 		ListenerCollectorConfig cfg = new ListenerCollectorConfig(base);
+		cfg.setMetricName("rt_updater_test_hist");
 
-		Histogram collector = (Histogram) reg.getOrCreateAndRegister(base);
+		Histogram collector = (Histogram) reg.getOrCreateAndRegister(cfg);
 		ResponseTimeUpdater u = new ResponseTimeUpdater(cfg);
 		
 		SampleResult res = new SampleResult();
@@ -70,8 +71,9 @@ public class RTUpdaterTest {
 		BaseCollectorConfig base = TestUtilities.simpleSummaryCfg();
 		base.setLabels(new String[] {"foo_label","label"});
 		ListenerCollectorConfig cfg = new ListenerCollectorConfig(base);
+		cfg.setMetricName("rt_updater_test_summ");
 
-		Summary collector = (Summary) reg.getOrCreateAndRegister(base);
+		Summary collector = (Summary) reg.getOrCreateAndRegister(cfg);
 		ResponseTimeUpdater u = new ResponseTimeUpdater(cfg);
 		
 		SampleResult res = new SampleResult();

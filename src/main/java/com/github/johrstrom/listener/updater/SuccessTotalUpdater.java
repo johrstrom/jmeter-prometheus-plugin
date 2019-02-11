@@ -9,11 +9,11 @@ import com.github.johrstrom.listener.ListenerCollectorConfig;
 import io.prometheus.client.Collector;
 import io.prometheus.client.Counter;
 
-public class CountTotalUpdater extends AbstractUpdater {
+public class SuccessTotalUpdater extends AbstractUpdater {
 	
-	private static final Logger log = LoggerFactory.getLogger(CountTotalUpdater.class);
+	private static final Logger log = LoggerFactory.getLogger(SuccessTotalUpdater.class);
 
-	public CountTotalUpdater(ListenerCollectorConfig cfg) {
+	public SuccessTotalUpdater(ListenerCollectorConfig cfg) {
 		super(cfg);
 	}
 
@@ -24,11 +24,14 @@ public class CountTotalUpdater extends AbstractUpdater {
 			
 			Counter c = (Counter) collector;
 			String[] labels = this.labelValues(event);
-			c.labels(labels).inc();
+			if(event.getResult().isSuccessful()) {
+				c.labels(labels).inc();
+			}
 			
 		} catch (Exception e) {
 			log.error("Did not update {} because of error: {}", this.config.getMetricName(), e.getMessage());
 			log.debug(e.getMessage(), e);
 		}
 	}
+
 }
