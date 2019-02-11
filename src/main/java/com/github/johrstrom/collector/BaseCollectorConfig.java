@@ -296,7 +296,7 @@ public class BaseCollectorConfig extends AbstractTestElement  {
 		
 	    final int prime = 31;
 	    int result = 1;
-	    result = prime * result + this.getName().hashCode();
+	    result = prime * result + this.getMetricName().hashCode();
 	    result = prime * result + this.getHelp().hashCode();
 	    result = prime * result + this.getType().hashCode();
 	    result = prime * result + this.getQuantileOrBucket().hashCode();
