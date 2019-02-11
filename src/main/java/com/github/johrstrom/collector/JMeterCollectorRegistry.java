@@ -20,7 +20,6 @@ public class JMeterCollectorRegistry extends CollectorRegistry {
 	private static Logger log = LoggerFactory.getLogger(JMeterCollectorRegistry.class);
 	private ConcurrentHashMap<BaseCollectorConfig,Collector> registered = new ConcurrentHashMap<>();
 	
-
 	private static final boolean saveThreads = 
 			JMeterUtils.getPropDefault(ThreadCollector.COLLECT_THREADS, ThreadCollector.COLLECT_THREADS_DEFAULT);
 			
@@ -63,7 +62,6 @@ public class JMeterCollectorRegistry extends CollectorRegistry {
 		log.debug("unregistering {}", cfg.getMetricName());
 		if(registered.containsKey(cfg)) {
 			Collector collector = registered.get(cfg);
-			//this.clear();
 			
 			try {
 				this.unregister(collector);
@@ -87,6 +85,11 @@ public class JMeterCollectorRegistry extends CollectorRegistry {
 			log.debug("created and registered {}", cfg);
 			return c;
 		}
+	}
+	
+	public synchronized void clear() {
+		super.clear();
+		this.registered.clear();
 	}
 	
 	private static class ThreadCollector extends Collector {
