@@ -32,7 +32,7 @@
     </Root>
 
     <Logger name="org.apache.jmeter.junit" level="debug" />
-    <Logger name="com.github.johrstrom.listener.PrometheusListener" level="debug" />
+    <Logger name="com.github.johrstrom" level="debug" />
     <!--
     <Logger name="org.apache.jmeter.control" level="debug" />
     <Logger name="org.apache.jmeter.testbeans" level="debug" />

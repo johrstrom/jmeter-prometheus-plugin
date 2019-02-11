@@ -4,3 +4,4 @@ target/
 bin/
 package_and_mv.sh
 dependency-reduced-pom.xml
+jmeter.log
