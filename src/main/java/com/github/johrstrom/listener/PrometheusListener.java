@@ -65,6 +65,7 @@ public class PrometheusListener extends CollectorElement<ListenerCollectorConfig
 	 * @see org.apache.jmeter.samplers.SampleListener#sampleOccurred(org.apache.
 	 * jmeter.samplers.SampleEvent)
 	 */
+	@Override
 	public void sampleOccurred(SampleEvent event) {
 
 		for(AbstractUpdater updater : this.updaters) {
@@ -80,6 +81,7 @@ public class PrometheusListener extends CollectorElement<ListenerCollectorConfig
 	 * org.apache.jmeter.samplers.SampleListener#sampleStarted(org.apache.jmeter
 	 * .samplers.SampleEvent)
 	 */
+	@Override
 	public void sampleStarted(SampleEvent arg0) {
 		// do nothing
 	}
@@ -91,6 +93,7 @@ public class PrometheusListener extends CollectorElement<ListenerCollectorConfig
 	 * org.apache.jmeter.samplers.SampleListener#sampleStopped(org.apache.jmeter
 	 * .samplers.SampleEvent)
 	 */
+	@Override
 	public void sampleStopped(SampleEvent arg0) {
 		// do nothing
 	}
@@ -100,6 +103,7 @@ public class PrometheusListener extends CollectorElement<ListenerCollectorConfig
 	 * 
 	 * @see org.apache.jmeter.testelement.TestStateListener#testEnded()
 	 */
+	@Override
 	public void testEnded() {
 		this.clearCollectors();
 		
@@ -116,6 +120,7 @@ public class PrometheusListener extends CollectorElement<ListenerCollectorConfig
 	 * @see org.apache.jmeter.testelement.TestStateListener#testEnded(java.lang.
 	 * String)
 	 */
+	@Override
 	public void testEnded(String arg0) {
 		this.testEnded();
 	}
@@ -125,6 +130,7 @@ public class PrometheusListener extends CollectorElement<ListenerCollectorConfig
 	 * 
 	 * @see org.apache.jmeter.testelement.TestStateListener#testStarted()
 	 */
+	@Override
 	public void testStarted() {
 		// update the configuration
 		this.makeNewCollectors();
@@ -145,6 +151,7 @@ public class PrometheusListener extends CollectorElement<ListenerCollectorConfig
 	 * org.apache.jmeter.testelement.TestStateListener#testStarted(java.lang.
 	 * String)
 	 */
+	@Override
 	public void testStarted(String arg0) {
 		this.testStarted();
 	}
@@ -172,6 +179,7 @@ public class PrometheusListener extends CollectorElement<ListenerCollectorConfig
 					updater = new FailureTotalUpdater(config);
 					break;
 				case ResponseSize:
+					updater = new ResponseSizeUpdater(config);
 					break;
 				case ResponseTime:
 					updater = new ResponseTimeUpdater(config);

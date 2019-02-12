@@ -372,6 +372,7 @@ public class BaseCollectorConfig extends AbstractTestElement  {
 			this.error = Double.parseDouble(definition[1]);
 		}
 		
+		@Override
 		public String toString() {
 			return new StringBuilder()
 					.append(this.quantile)

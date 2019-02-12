@@ -60,6 +60,7 @@ public class PrometheusListenerGui extends AbstractListenerGui {
 	 * 
 	 * @see org.apache.jmeter.gui.JMeterGUIComponent#getLabelResource()
 	 */
+	@Override
 	public String getLabelResource() {
 		return getClass().getCanonicalName();
 	}

@@ -87,6 +87,7 @@ public class JMeterCollectorRegistry extends CollectorRegistry {
 		}
 	}
 	
+	@Override
 	public synchronized void clear() {
 		super.clear();
 		this.registered.clear();

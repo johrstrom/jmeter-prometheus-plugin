@@ -14,35 +14,30 @@ import com.github.johrstrom.collector.JMeterCollectorRegistry;
 import com.github.johrstrom.listener.ListenerCollectorConfig;
 import com.github.johrstrom.test.TestUtilities;
 
-import io.prometheus.client.Histogram;
-import io.prometheus.client.Summary;
 import io.prometheus.client.Collector.MetricFamilySamples;
 import io.prometheus.client.Collector.MetricFamilySamples.Sample;
+import io.prometheus.client.Histogram;
+import io.prometheus.client.Summary;
 
-/**
- * ResponseTimeUpdater test class.
- * 
- * @author Jeff Ohrstrom
- *
- */
-public class RTUpdaterTest {
+public class SizeUpdaterTest {
 	
 	private static final JMeterCollectorRegistry reg = JMeterCollectorRegistry.getInstance();
-
+	
 	@Test
-	public void testHistogram() throws Exception {
+	public void testHistogram() throws Exception {		
 		BaseCollectorConfig base = TestUtilities.simpleHistogramCfg();
 		base.setLabels(new String[] {"foo_label","label"});
 		ListenerCollectorConfig cfg = new ListenerCollectorConfig(base);
-		cfg.setMetricName("rt_updater_test_hist");
+		cfg.setMetricName("size_updater_test_hist");
 
 		Histogram collector = (Histogram) reg.getOrCreateAndRegister(cfg);
-		ResponseTimeUpdater u = new ResponseTimeUpdater(cfg);
+		ResponseSizeUpdater u = new ResponseSizeUpdater(cfg);
 		
 		SampleResult res = new SampleResult();
 		res.setSampleLabel("myLabelz");
-		int responseTime = 650;
-		res.setStampAndTime(System.currentTimeMillis(), 650);
+		res.setStampAndTime(System.currentTimeMillis(), 10000);
+		int responseSize = 650;
+		res.setResponseData(new byte[responseSize]);
 		
 		JMeterVariables vars = new JMeterVariables();
 		vars.put("foo_label", "bar_value");
@@ -55,7 +50,8 @@ public class RTUpdaterTest {
 		Assert.assertArrayEquals(new String[] {"bar_value", "myLabelz"}, labels);
 		
 		u.update(e);
-
+		
+		
 		List<MetricFamilySamples> metrics = collector.collect();
 		Assert.assertTrue(metrics.size() == 1);
 		MetricFamilySamples family = metrics.get(0);
@@ -81,7 +77,7 @@ public class RTUpdaterTest {
 				if(sample.name.endsWith("count")) {
 					Assert.assertEquals(1, sample.value, 0.1);
 				}else {
-					Assert.assertEquals(responseTime, sample.value, 0.1);
+					Assert.assertEquals(responseSize, sample.value, 0.1);
 				}
 				
 			}else {
@@ -93,33 +89,33 @@ public class RTUpdaterTest {
 				
 				if(le == Double.MAX_VALUE) {
 					Assert.assertEquals(1, sample.value, 0.1);
-				} else if(le < responseTime) {
+				} else if(le < responseSize) {
 					Assert.assertEquals(0, sample.value, 0.1);
-				}else if(le > responseTime) {
+				}else if(le > responseSize) {
 					Assert.assertEquals(1, sample.value, 0.1);
 				}
 				
-			}
+			}		
+			
 		}
 		
-		
 	}
-
 	
 	@Test
 	public void testSummary() throws Exception {	
 		BaseCollectorConfig base = TestUtilities.simpleSummaryCfg();
 		base.setLabels(new String[] {"foo_label","label"});
 		ListenerCollectorConfig cfg = new ListenerCollectorConfig(base);
-		cfg.setMetricName("rt_updater_test_summ");
+		cfg.setMetricName("size_updater_test_summ");
 
 		Summary collector = (Summary) reg.getOrCreateAndRegister(cfg);
-		ResponseTimeUpdater u = new ResponseTimeUpdater(cfg);
+		ResponseSizeUpdater u = new ResponseSizeUpdater(cfg);
 		
 		SampleResult res = new SampleResult();
 		res.setSampleLabel("myLabelz");
-		int responseTime = 650;
-		res.setStampAndTime(System.currentTimeMillis(), 650);
+		int responseSize = 650;
+		res.setStampAndTime(System.currentTimeMillis(), 1000);
+		res.setResponseData(new byte[responseSize]);
 		
 		JMeterVariables vars = new JMeterVariables();
 		vars.put("foo_label", "bar_value");
@@ -158,7 +154,7 @@ public class RTUpdaterTest {
 				if(sample.name.endsWith("count")) {
 					Assert.assertEquals(1, sample.value, 0.1);
 				}else {
-					Assert.assertEquals(responseTime, sample.value, 0.1);
+					Assert.assertEquals(responseSize, sample.value, 0.1);
 				}
 				
 			}else {
@@ -167,13 +163,11 @@ public class RTUpdaterTest {
 				//double quantile =  Double.parseDouble(values.get(2));
 				
 				
-				Assert.assertEquals(responseTime, sample.value, 0.1);
+				Assert.assertEquals(responseSize, sample.value, 0.1);
 				
 		
 			}
 		}
-		
-		
 	}
-
+	
 }
