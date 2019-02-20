@@ -25,7 +25,7 @@
         <stringProp name="ThreadGroup.delay"></stringProp>
       </ThreadGroup>
       <hashTree>
-        <JSR223Sampler guiclass="TestBeanGUI" testclass="JSR223Sampler" testname="random_sampler" enabled="true">
+        <JSR223Sampler guiclass="TestBeanGUI" testclass="JSR223Sampler" testname="can_fail_sampler" enabled="true">
           <stringProp name="TestPlan.comments">This sampler just does something to generate data for the prometheus listener.
 
 Note that just by calling the function in the parameters section assigns the variable &apos;category&apos; which the PrometheusListener plugin will pick up on.</stringProp>
@@ -33,13 +33,22 @@ Note that just by calling the function in the parameters section assigns the var
           <stringProp name="filename"></stringProp>
           <stringProp name="parameters">${__RandomString(1,ABC,category)}</stringProp>
           <stringProp name="script">import java.util.Random;
+import org.apache.commons.lang3.RandomStringUtils;
 
 Random rand = new Random();
 int wait = rand.nextInt(3500);
+int fail = rand.nextInt(10);
 
 log.info(&quot;sleeping for {} ms&quot;, wait);
 
-Thread.currentThread().sleep(wait);</stringProp>
+Thread.currentThread().sleep(wait);
+
+if(fail &gt;= 8 ){
+	SampleResult.setSuccessful(false);
+}
+
+SampleResult.setResponseData(new byte[wait]);
+</stringProp>
           <stringProp name="scriptLanguage">groovy</stringProp>
         </JSR223Sampler>
         <hashTree/>
@@ -47,7 +56,7 @@ Thread.currentThread().sleep(wait);</stringProp>
           <collectionProp name="prometheus.collector_definitions">
             <elementProp name="" elementType="com.github.johrstrom.listener.ListenerCollectorConfig">
               <stringProp name="collector.help">the response time for a jsr223 sampler</stringProp>
-              <stringProp name="collector.metric_name">jsr223:rt_as_hist</stringProp>
+              <stringProp name="collector.metric_name">jsr223_rt_as_hist</stringProp>
               <stringProp name="collector.type">HISTOGRAM</stringProp>
               <collectionProp name="collector.labels">
                 <stringProp name="102727412">label</stringProp>
@@ -58,13 +67,42 @@ Thread.currentThread().sleep(wait);</stringProp>
             </elementProp>
             <elementProp name="" elementType="com.github.johrstrom.listener.ListenerCollectorConfig">
               <stringProp name="collector.help">the response time for a jsr223 sampler</stringProp>
-              <stringProp name="collector.metric_name">jsr223:rt_as_summary</stringProp>
+              <stringProp name="collector.metric_name">jsr223_rt_as_summary</stringProp>
               <stringProp name="collector.type">SUMMARY</stringProp>
               <collectionProp name="collector.labels">
                 <stringProp name="50511102">category</stringProp>
+                <stringProp name="102727412">label</stringProp>
               </collectionProp>
               <stringProp name="collector.quantiles_or_buckets">0.75,0.5|0.95,0.1|0.99,0.01</stringProp>
               <stringProp name="listener.collector.measuring">ResponseTime</stringProp>
+            </elementProp>
+            <elementProp name="" elementType="com.github.johrstrom.listener.ListenerCollectorConfig">
+              <stringProp name="collector.help">the total number of samplers</stringProp>
+              <stringProp name="collector.metric_name">jsr223_count_total</stringProp>
+              <stringProp name="collector.type">COUNTER</stringProp>
+              <collectionProp name="collector.labels">
+                <stringProp name="102727412">label</stringProp>
+              </collectionProp>
+              <stringProp name="collector.quantiles_or_buckets"></stringProp>
+              <stringProp name="listener.collector.measuring">CountTotal</stringProp>
+            </elementProp>
+            <elementProp name="" elementType="com.github.johrstrom.listener.ListenerCollectorConfig">
+              <stringProp name="collector.help">the total number of successful samplers</stringProp>
+              <stringProp name="collector.metric_name">jsr223_success_total</stringProp>
+              <stringProp name="collector.type">COUNTER</stringProp>
+              <collectionProp name="collector.labels">
+                <stringProp name="102727412">label</stringProp>
+              </collectionProp>
+              <stringProp name="collector.quantiles_or_buckets"></stringProp>
+              <stringProp name="listener.collector.measuring">SuccessTotal</stringProp>
+            </elementProp>
+            <elementProp name="" elementType="com.github.johrstrom.listener.ListenerCollectorConfig">
+              <stringProp name="collector.help">the response size for a jsr223 sampler</stringProp>
+              <stringProp name="collector.metric_name">jsr223_rsize_as_hist</stringProp>
+              <stringProp name="collector.type">HISTOGRAM</stringProp>
+              <collectionProp name="collector.labels"/>
+              <stringProp name="collector.quantiles_or_buckets">100,500,1000,3000</stringProp>
+              <stringProp name="listener.collector.measuring">ResponseSize</stringProp>
             </elementProp>
           </collectionProp>
         </com.github.johrstrom.listener.PrometheusListener>
@@ -87,7 +125,7 @@ Thread.currentThread().sleep(wait);</stringProp>
           <collectionProp name="prometheus.collector_definitions">
             <elementProp name="" elementType="com.github.johrstrom.collector.BaseCollectorConfig">
               <stringProp name="collector.help">default help string</stringProp>
-              <stringProp name="collector.metric_name">jsr223:animals_total</stringProp>
+              <stringProp name="collector.metric_name">jsr223_animals_total</stringProp>
               <stringProp name="collector.type">COUNTER</stringProp>
               <collectionProp name="collector.labels">
                 <stringProp name="94842723">color</stringProp>
@@ -111,7 +149,7 @@ String color = vars.get(&quot;color&quot;);
 String size = vars.get(&quot;size&quot;);
 String mammal = vars.get(&quot;mammal&quot;);
 
-Counter counter = (Counter) vars.getObject(&quot;jsr223:animals_total&quot;);
+Counter counter = (Counter) vars.getObject(&quot;jsr223_animals_total&quot;);
 
 counter.labels(color,size,mammal).inc();
 </stringProp>
@@ -158,7 +196,7 @@ Thread.currentThread().sleep(wait);</stringProp>
             <collectionProp name="prometheus.collector_definitions">
               <elementProp name="" elementType="com.github.johrstrom.listener.ListenerCollectorConfig">
                 <stringProp name="collector.help">the response time for a jsr223 sampler</stringProp>
-                <stringProp name="collector.metric_name">jsr223:rt_as_hist</stringProp>
+                <stringProp name="collector.metric_name">jsr223_rt_as_hist</stringProp>
                 <stringProp name="collector.type">HISTOGRAM</stringProp>
                 <collectionProp name="collector.labels">
                   <stringProp name="102727412">label</stringProp>
@@ -169,7 +207,7 @@ Thread.currentThread().sleep(wait);</stringProp>
               </elementProp>
               <elementProp name="" elementType="com.github.johrstrom.listener.ListenerCollectorConfig">
                 <stringProp name="collector.help">the response time for a jsr223 sampler</stringProp>
-                <stringProp name="collector.metric_name">jsr223:rt_as_summary</stringProp>
+                <stringProp name="collector.metric_name">jsr223_rt_as_summary</stringProp>
                 <stringProp name="collector.type">SUMMARY</stringProp>
                 <collectionProp name="collector.labels">
                   <stringProp name="50511102">category</stringProp>
@@ -221,7 +259,7 @@ Thread.currentThread().sleep(wait);</stringProp>
             <collectionProp name="prometheus.collector_definitions">
               <elementProp name="" elementType="com.github.johrstrom.listener.ListenerCollectorConfig">
                 <stringProp name="collector.help">the response time for a jsr223 sampler</stringProp>
-                <stringProp name="collector.metric_name">jsr223:rt_as_hist</stringProp>
+                <stringProp name="collector.metric_name">jsr223_rt_as_hist</stringProp>
                 <stringProp name="collector.type">HISTOGRAM</stringProp>
                 <collectionProp name="collector.labels">
                   <stringProp name="102727412">label</stringProp>
@@ -232,7 +270,7 @@ Thread.currentThread().sleep(wait);</stringProp>
               </elementProp>
               <elementProp name="" elementType="com.github.johrstrom.listener.ListenerCollectorConfig">
                 <stringProp name="collector.help">the response time for a jsr223 sampler</stringProp>
-                <stringProp name="collector.metric_name">jsr223:rt_as_summary</stringProp>
+                <stringProp name="collector.metric_name">jsr223_rt_as_summary</stringProp>
                 <stringProp name="collector.type">SUMMARY</stringProp>
                 <collectionProp name="collector.labels">
                   <stringProp name="50511102">category</stringProp>
