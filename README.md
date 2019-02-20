@@ -1,12 +1,12 @@
-#Prometheus Listener for Jmeter
+# Prometheus Listener for Jmeter
 
-#Overview
+# Overview
 This JMeter plugin is highly configurable listener (and config element) to allow users define they're own metrics (names, types etc.) and expose them through a Prometheus /metrics API to be scraped by a Prometheus server.
 
-#Documentation
+# Documentation
 More documentation can be found on [this project's wiki](https://github.com/johrstrom/jmeter-prometheus-plugin/wiki).
 
-#Listener QuickDoc
+# Listener QuickDoc
 Here's a simple example to get us started.  This example [can be found here](https://github.com/johrstrom/jmeter-prometheus-plugin/blob/master/docs/examples/simple_prometheus_example.jmx).  All the documentation on this README is from this jmx file.
 
 ![JMeter testplan](/docs/imgs/simple_testplan.png?raw=true)
@@ -26,7 +26,7 @@ Which will generate metrics like the image below.  Two things to note about the 
 
 ![JMeter testplan](/docs/imgs/rt_as_sum.png?raw=true)
 
-#Config QuickDoc
+# Config QuickDoc
 
 This library provides not only a listener, but a configuration element as well.  This is useful when users have to make some computation for a specific and they want to expose that metric in Prometheus.
 
@@ -46,9 +46,9 @@ Which will expose a counter with all the appropriate labels.
 
 ![JMeter testplan](/docs/imgs/prom_cfg_output.png?raw=true)
 
-#Usage Tips
+# Usage Tips
 
-###Skipping samplers or other elements
+### Skipping samplers or other elements
 
 You can re-use metrics in multiple listeners so long as they're defined in the **exact** same way. There will be undefined behavior if two or more listeners have the same metric (the same metric name) with different configurations.
 
@@ -57,7 +57,7 @@ Here you see `first_random_sampler` and `second_random_sampler` in the labels of
 
 ![JMeter testplan](/docs/imgs/rt_as_hist.png?raw=true)
 
-#Properties you can override
+# Properties you can override
 
 |Property | default | description|
 |:----------:|:-----------:|:-------------------------------:|
@@ -67,7 +67,7 @@ Here you see `first_random_sampler` and `second_random_sampler` in the labels of
 |prometheus.save.threads.name|jmeter_threads|The name of the metric describing jmeter threads|
 
 
-#Building
+# Building
 
 To build, simply maven package:
 ```
@@ -75,6 +75,6 @@ mvn clean package
 ```
 This creates 2 jars, a shaded jar that has all the dependencies within it (this is the one you want) and the original jar. Both are in the target directory.  Simply move the jar to your $JMETER\_HOME/lib directory as with any JMeter plugin and you're ready to go!
 
-##Feedback
+## Feedback
 
 Feel free to open issues against this project, even to ask questions.
