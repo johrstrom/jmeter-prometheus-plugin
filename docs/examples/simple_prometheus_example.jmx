@@ -36,7 +36,18 @@ Note that just by calling the function in the parameters section assigns the var
 import org.apache.commons.lang3.RandomStringUtils;
 
 Random rand = new Random();
-int wait = rand.nextInt(3500);
+int maxWait = 3500;
+
+// emulate different &apos;categories&apos; being slower than others
+if(args[0].equals(&quot;A&quot;)) { 
+	maxWait = 1000;	
+} else if (args[0].equals(&quot;B&quot;)) {
+	maxWait = 1750;	
+} else if (args[0].equals(&quot;C&quot;)) {
+	maxWait = 3000;	
+}
+
+int wait = rand.nextInt(maxWait);
 int fail = rand.nextInt(10);
 
 log.info(&quot;sleeping for {} ms&quot;, wait);

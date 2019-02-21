@@ -57,6 +57,13 @@ Here you see `first_random_sampler` and `second_random_sampler` in the labels of
 
 ![JMeter testplan](/docs/imgs/rt_as_hist.png?raw=true)
 
+### Visualization
+
+This plugin has limited "out of the box" functionality because it gives you, the user, total control over what the metric names may be.  That said, here's a sample dashboard given [here](/examples/grafana_dashboard.json) that if you have a local prometheus/grafana stack you can a dashboard that looks something like this.
+
+![JMeter testplan](/docs/imgs/grafana_jsr223_test.png?raw=true)
+
+
 # Properties you can override
 
 |Property | default | description|
@@ -65,7 +72,6 @@ Here you see `first_random_sampler` and `second_random_sampler` in the labels of
 |prometheus.delay|0|The delay (in seconds) the http server will wait before being destroyed|
 |prometheus.save.threads|true|True or false value to save and collect jmeter thread metrics|
 |prometheus.save.threads.name|jmeter_threads|The name of the metric describing jmeter threads|
-
 
 # Building
 
