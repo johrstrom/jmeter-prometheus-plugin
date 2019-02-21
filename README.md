@@ -59,7 +59,7 @@ Here you see `first_random_sampler` and `second_random_sampler` in the labels of
 
 ### Visualization
 
-This plugin has limited "out of the box" functionality because it gives you, the user, total control over what the metric names may be.  That said, here's a sample dashboard given [here in examples](/examples/grafana_jsr223_test.json) such that if you have a local prometheus/grafana stack you can a dashboard that looks something like this.
+This plugin has limited "out of the box" functionality because it gives you, the user, total control over what the metric names may be.  That said, here's a sample dashboard given [here in examples](/docs/examples/grafana_jsr223_test.json) such that if you have a local prometheus/grafana stack you can a dashboard that looks something like this.
 
 ![JMeter testplan](/docs/imgs/grafana_jsr223_test.png?raw=true)
 
