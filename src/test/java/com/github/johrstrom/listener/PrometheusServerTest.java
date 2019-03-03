@@ -1,21 +1,11 @@
 package com.github.johrstrom.listener;
 
-import org.apache.jmeter.util.JMeterUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 
 public class PrometheusServerTest {
-	
-	static {
-		JMeterUtils.loadJMeterProperties("src/test/resources/user.properties");
-	}
-	
-	@Before
-	public void setup() {
-		//
-	}
 	
 	@Test
 	public void ensureCleanStartStop() throws Exception {

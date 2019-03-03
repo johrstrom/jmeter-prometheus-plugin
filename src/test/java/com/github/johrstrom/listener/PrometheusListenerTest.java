@@ -1,10 +1,12 @@
 package com.github.johrstrom.listener;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 
-import org.apache.jmeter.util.JMeterUtils;
+import org.apache.jmeter.save.SaveService;
+import org.apache.jorphan.collections.HashTree;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -18,17 +20,7 @@ public class PrometheusListenerTest {
 	private static final JMeterCollectorRegistry reg = JMeterCollectorRegistry.getInstance();
 	
 	static {
-		JMeterUtils.loadJMeterProperties("src/test/resources/user.properties");
-	}
-	
-	@Before
-	public void before() {
-		reg.clear();
-	}
-	
-	@After
-	public void after() {
-		reg.clear();
+		TestUtilities.createJmeterEnv();
 	}
 	
 	@Test
@@ -61,6 +53,14 @@ public class PrometheusListenerTest {
 		first.testEnded();
 		second.testEnded();
 		
+	}
+	
+	@Test
+	public void canReadJMX() throws IOException {
+		File jmx = new File("src/test/resources/simple_prometheus_example.jmx");
+		HashTree tree = SaveService.loadTree(jmx);
+		
+		Assert.assertTrue(tree != null);
 	}
 	
 }

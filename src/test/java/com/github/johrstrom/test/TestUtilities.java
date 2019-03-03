@@ -1,5 +1,6 @@
 package com.github.johrstrom.test;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -8,6 +9,7 @@ import org.apache.jmeter.control.LoopController;
 import org.apache.jmeter.engine.StandardJMeterEngine;
 import org.apache.jmeter.gui.tree.JMeterTreeListener;
 import org.apache.jmeter.gui.tree.JMeterTreeModel;
+import org.apache.jmeter.save.SaveService;
 import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.threads.JMeterThread;
 import org.apache.jmeter.threads.JMeterThreadMonitor;
@@ -60,8 +62,16 @@ public class TestUtilities {
 	}
 
     public static void createJmeterEnv() {
-        JMeterUtils.setJMeterHome(System.getProperty("java.io.tmpdir"));
+    	
+        JMeterUtils.setJMeterHome("src/test/resources");
         JMeterUtils.setLocale(new Locale("ignoreResources"));
+        JMeterUtils.loadJMeterProperties("src/test/resources/bin/jmeter.properties");
+        try {
+			SaveService.loadProperties();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
         JMeterTreeModel jMeterTreeModel = new JMeterTreeModel();
         JMeterTreeListener jMeterTreeListener = new JMeterTreeListener();
