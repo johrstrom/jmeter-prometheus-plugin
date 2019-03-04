@@ -1,7 +1,6 @@
 package com.github.johrstrom.listener;
 
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
 

@@ -7,17 +7,12 @@ import java.io.ObjectOutputStream;
 
 import org.apache.jmeter.save.SaveService;
 import org.apache.jorphan.collections.HashTree;
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
-import com.github.johrstrom.collector.JMeterCollectorRegistry;
 import com.github.johrstrom.test.TestUtilities;
 
 public class PrometheusListenerTest {
-	
-	private static final JMeterCollectorRegistry reg = JMeterCollectorRegistry.getInstance();
 	
 	static {
 		TestUtilities.createJmeterEnv();

@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.github.johrstrom</groupId>
 	<artifactId>jmeter-prometheus-plugin</artifactId>
-	<version>0.2.0-rc3</version>
+	<version>0.2.0-rc4</version>
 	<name>Jmeter-Prometheus Listener Plugin</name>
 	<description>A Jmeter plugin that creates a Prometheus endpoint of results.</description>
 
@@ -23,6 +23,12 @@
 			<artifactId>ApacheJMeter_core</artifactId>
 			<version>${jmeter.version}</version>
 			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.jmeter</groupId>
+			<artifactId>ApacheJMeter_java</artifactId>
+			<version>${jmeter.version}</version>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>io.prometheus</groupId>
