@@ -7,38 +7,76 @@ This JMeter plugin is highly configurable listener (and config element) to allow
 More documentation can be found on [this project's wiki](https://github.com/johrstrom/jmeter-prometheus-plugin/wiki).
 
 # Listener QuickDoc
-Here's a simple example to get us started.  This example [can be found here](https://github.com/johrstrom/jmeter-prometheus-plugin/blob/master/docs/examples/simple_prometheus_example.jmx).  All the documentation on this README is from this jmx file.
+Here's a simple example to get us started.  This example [can be found here](/docs/examples/simple_prometheus_example.jmx).  All the documentation on this README is from this jmx file.
 
 ![JMeter testplan](/docs/imgs/simple_testplan.png?raw=true)
 
-If we look closer at the very first Prometheus listener, it looks like this.  As you can see the current features are:
-* Histograms and Summaries measuring response times (in seconds) or response sizes (in bytes)
-* Counters measuring totals, successes, or failures.
-
-
 ![JMeter testplan](/docs/imgs/response_time_listener.png?raw=true)
 
-Which will generate metrics like the image below.  Two things to note about the labels here in this example.  First is that `label` is a keyword so the label value `label="can_fail_sampler"` in the jsr223_rt_as_hist metric is from the testplan above.  It's the **name** of the actual sampler.
+If we look closer at the very first Prometheus listener, it looks like the image below.
+
+- **Name**: the name of the metric.
+- **Help**: The help message of the metric.
+- **Labels**: A comma seperated list of labels you want to apply to the metric.
+  - `label` is a keyword. In JMeter it means the *name* of the sampler.
+  - JMeter variables can be used here. See the section [below](#Using-JMeter-variables-as-labels).
+- **Type**: The type of metric you're creating.
+- **Buckets of Quantiles**:
+  - Buckets are comma seperated list of decimals. Examples are below. Note some are integers, and that's OK, it can be a mixture of integers and real numbers (both positive and negative).
+  - Quantiles are comma `,` separated pair of decimals separated by a vertical bar `|`. The first decimal being the quantile and the second being the error rating.
+- **Listen To**: Drowdown to listen to samples or assertions.
+  - **Only samples are implemented at this time**
+- **Measuring**: Dropdown menu of all the things you can measure
+  - See the [Type and Measuring compatibility matrix](#Type-and-Measuring-compatibility-matrix) section below.
+
+### Using JMeter variables as labels
+
+Notice in the image above `jsr223_rt_as_summary` (the 2nd down) has `category,label` in it's labels column.
+
+This plugin allows you to use variables in the test plan as label values for a given metric.  You can see here in the above image, I simply generated a random string and assigned it to the `category` jmeter variable, and this plugin exposed it as a label.
+
+As you can see below, it produced that metric with the `category="[A,B,C]"`. Again, this example [can be found here](/docs/examples/simple_prometheus_example.jmx).
 
 ![JMeter testplan](/docs/imgs/category_variable.png?raw=true)
 
- The second thing of note is this label `category` in the jsr223_rt_as_summary metric which produced `category="[A,B,C]"`.  This plugin allows you to use variables in the test plan as label values for a given metric.  You can see here in the above image, I simply generated a random string and assigned it to the `category` jmeter variable, and this plugin exposed it as a label.
+
+### Listener output
 
 ![JMeter testplan](/docs/imgs/rt_as_sum.png?raw=true)
 
+
+### Type and Measuring compatibility matrix
+
+Does it make sense to have a Counter measuring Response Time? No. Does it make sense to have a Histogram of total successes? No.  
+
+This is a matrix of what metric types can measure what metrics.  If you configure, say a histogram to measure count total, the plugin will likely do nothing to update that metric.
+
+| | Histogram | Summary | Counter | Guage |
+|:-----:|:------:|:------:|:------:|:------:|  
+| Response time  | x | x |   |   |
+| Response Size  | x | x |   |   |   
+| Count total    |   |   | x |   |
+| Failure total  |   |   | x |   |
+| Success total  |   |   | x |   |
+
+#### What about gauges
+I'm not quite sure how Guages make sense in the plugin.  If you have a use case, I'd love to hear it. I wrote them in without actually having one, so you can technically create one, I just don't know how the listener may update it.
+
 # Config QuickDoc
 
-This library provides not only a listener, but a configuration element as well.  This is useful when users have to make some computation for a specific and they want to expose that metric in Prometheus.
+This library provides not only a listener, but a configuration element as well.  This is useful when users have to make some computation for a specific use case and then want to expose that metric in Prometheus.
 
-The use cases for this are mostly functional, where say you're validating something about a response that's specific the thing under test.
+These use cases for this are mostly functional, where say you're validating something about a response that's specific the thing under test.  
 
 It works like this.  Define a metric with this configuration element, and at test run-time this library will place that object in the jmeter variables from which you can access it.
 
-This example [can be found here](https://github.com/johrstrom/jmeter-prometheus-plugin/), but looks look at it. Here I define a metric where I'm counting all the animals of different colors, sizes and whether they're mammals or not.  
-
+Let's consider this use case.  You, have an API that tells you the current number animals categorized by `color` `size`and `mammal` - perhaps running down your street.  You may create a counter like this as you watch them go by.
 ![JMeter testplan](/docs/imgs/prometheus_cfg.png?raw=true)
 
-So I then access the object I've created above like so.  This is an absolutely trivial case of randomly generating the variables `color` `size`and `mammal`, but the example is only trying to convey how one may interact with the objects created by the configuration element.
+
+So I then access the object I've created above like so.  This is an absolutely trivial case of randomly generating the variables but the example is only trying to convey how one may interact with the objects created by the configuration element.  However you extract the data, you can access and interact with the Prometheus metric you've created.  
+
+See the [Prometheus Javadocs](https://prometheus.github.io/client_java/) for more information on their API.
 
 ![JMeter testplan](/docs/imgs/jsr223_use_prometheus_cfg.png?raw=true)
 
@@ -79,7 +117,7 @@ To build, simply maven package:
 ```
 mvn clean package
 ```
-This creates 2 jars, a shaded jar that has all the dependencies within it (this is the one you want) and the original jar. Both are in the target directory.  Simply move the jar to your $JMETER\_HOME/lib directory as with any JMeter plugin and you're ready to go!
+This creates 2 jars, a shaded jar that has all the dependencies within it (this is the one you want) and the original jar. Both are in the target directory.  Simply move the jar to your $JMETER\_HOME/lib/ext directory as with any JMeter plugin and you're ready to go!
 
 ## Feedback
 
