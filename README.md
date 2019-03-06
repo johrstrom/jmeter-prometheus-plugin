@@ -11,9 +11,11 @@ Here's a simple example to get us started.  This example [can be found here](/do
 
 ![JMeter testplan](/docs/imgs/simple_testplan.png?raw=true)
 
+If we look closer at the very first Prometheus listener, it looks like the image below.
+
 ![JMeter testplan](/docs/imgs/response_time_listener.png?raw=true)
 
-If we look closer at the very first Prometheus listener, it looks like the image below.
+Let's go through all the columns one by one.
 
 - **Name**: the name of the metric.
 - **Help**: The help message of the metric.
