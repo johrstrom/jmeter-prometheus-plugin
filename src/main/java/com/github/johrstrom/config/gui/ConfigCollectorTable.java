@@ -8,10 +8,10 @@ import javax.swing.table.TableColumn;
 import org.apache.jorphan.reflect.Functor;
 
 import com.github.johrstrom.collector.BaseCollectorConfig;
+import com.github.johrstrom.collector.BaseCollectorConfig.JMeterCollectorType;
 import com.github.johrstrom.collector.gui.AbstractCollectorTable;
 import com.github.johrstrom.collector.gui.Flatten;
 
-import io.prometheus.client.Collector.Type;
 
 public class ConfigCollectorTable extends AbstractCollectorTable<BaseCollectorConfig>  
 	implements Flatten {
@@ -29,10 +29,11 @@ public class ConfigCollectorTable extends AbstractCollectorTable<BaseCollectorCo
 	
 	static {
 		typeComboBox = new JComboBox<>();
-		typeComboBox.addItem(Type.COUNTER.name());
-		typeComboBox.addItem(Type.SUMMARY.name());
-		typeComboBox.addItem(Type.HISTOGRAM.name());
-		typeComboBox.addItem(Type.GAUGE.name());
+		typeComboBox.addItem(JMeterCollectorType.COUNTER.toString());
+		typeComboBox.addItem(JMeterCollectorType.SUMMARY.toString());
+		typeComboBox.addItem(JMeterCollectorType.HISTOGRAM.toString());
+		typeComboBox.addItem(JMeterCollectorType.GAUGE.toString());
+		typeComboBox.addItem(JMeterCollectorType.SUCCESS_RATIO.toString());
 	}
 	
 	public ConfigCollectorTable() {

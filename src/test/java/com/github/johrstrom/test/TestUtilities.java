@@ -19,16 +19,15 @@ import org.apache.jmeter.util.JMeterUtils;
 import org.apache.jorphan.collections.HashTree;
 
 import com.github.johrstrom.collector.BaseCollectorConfig;
+import com.github.johrstrom.collector.BaseCollectorConfig.JMeterCollectorType;
 import com.github.johrstrom.listener.ListenerCollectorConfig;
-
-import io.prometheus.client.Collector.Type;
 
 public class TestUtilities {
 	
 	public static BaseCollectorConfig simpleCounterCfg() {
 		BaseCollectorConfig cfg = new BaseCollectorConfig();
 		cfg.setMetricName("simple_counter");
-		cfg.setType(Type.COUNTER.name());
+		cfg.setType(JMeterCollectorType.COUNTER.toString());
 		cfg.setHelp("some helpe message");
 		
 		return cfg;
@@ -37,7 +36,7 @@ public class TestUtilities {
 	public static BaseCollectorConfig simpleSummaryCfg() {
 		BaseCollectorConfig cfg = new BaseCollectorConfig();
 		cfg.setMetricName("simple_summary");
-		cfg.setType(Type.SUMMARY.name());
+		cfg.setType(JMeterCollectorType.SUMMARY.toString());
 		cfg.setHelp("some helpe message");
 		
 		return cfg;
@@ -46,7 +45,7 @@ public class TestUtilities {
 	public static BaseCollectorConfig simpleHistogramCfg() {
 		BaseCollectorConfig cfg = new BaseCollectorConfig();
 		cfg.setMetricName("simple_histogram");
-		cfg.setType(Type.HISTOGRAM.name());
+		cfg.setType(JMeterCollectorType.HISTOGRAM.toString());
 		cfg.setHelp("some helpe message");
 		
 		return cfg;
@@ -55,7 +54,16 @@ public class TestUtilities {
 	public static BaseCollectorConfig simpleGaugeCfg() {
 		BaseCollectorConfig cfg = new BaseCollectorConfig();
 		cfg.setMetricName("simple_gauge");
-		cfg.setType(Type.GAUGE.name());
+		cfg.setType(JMeterCollectorType.GAUGE.toString());
+		cfg.setHelp("some helpe message");
+		
+		return cfg;
+	}
+	
+	public static BaseCollectorConfig simpleSuccessRatioCfg() {
+		BaseCollectorConfig cfg = new BaseCollectorConfig();
+		cfg.setMetricName("simple_ratio");
+		cfg.setType(JMeterCollectorType.SUCCESS_RATIO.toString());
 		cfg.setHelp("some helpe message");
 		
 		return cfg;

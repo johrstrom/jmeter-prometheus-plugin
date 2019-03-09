@@ -187,6 +187,9 @@ public class PrometheusListener extends CollectorElement<ListenerCollectorConfig
 				case SuccessTotal:
 					updater = new SuccessTotalUpdater(config);
 					break;
+				case SuccessRatio:
+					updater = new SuccessRatioUpdater(config);
+					break;
 				default:
 					// improbable because you get a sort of class cast exception on Enum
 					// because you're casting null*

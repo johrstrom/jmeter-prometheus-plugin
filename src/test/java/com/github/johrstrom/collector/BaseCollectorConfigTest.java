@@ -6,11 +6,12 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.github.johrstrom.collector.BaseCollectorConfig;
+import com.github.johrstrom.collector.BaseCollectorConfig.JMeterCollectorType;
 import com.github.johrstrom.collector.BaseCollectorConfig.QuantileDefinition;
 import com.github.johrstrom.test.TestUtilities;
 
 import io.prometheus.client.Collector;
-import io.prometheus.client.Collector.Type;
+//import io.prometheus.client.Collector.Type;
 import io.prometheus.client.Counter;
 import io.prometheus.client.Gauge;
 import io.prometheus.client.Histogram;
@@ -150,7 +151,7 @@ public class BaseCollectorConfigTest {
 		Assert.assertEquals(init.getHelp(), BaseCollectorConfig.DEFAULT_HELP_STRING);
 		Assert.assertArrayEquals(new String[0], init.getLabels());
 		Assert.assertTrue(init.getLabelsAsString().isEmpty());
-		Assert.assertEquals(init.getType(), Type.COUNTER.name());
+		Assert.assertEquals(init.getType(), JMeterCollectorType.COUNTER.toString());
 		
 		Assert.assertTrue(
 			init.getMetricName() + " does not match the expected pattern.",
@@ -177,6 +178,11 @@ public class BaseCollectorConfigTest {
 		cfg = TestUtilities.simpleSummaryCfg();
 		c = BaseCollectorConfig.fromConfig(cfg);
 		Assert.assertTrue(c instanceof Summary);
+		
+
+		cfg = TestUtilities.simpleSuccessRatioCfg();
+		c = BaseCollectorConfig.fromConfig(cfg);
+		Assert.assertTrue(c instanceof SuccessRatioCollector);
 	}
 	
 	@Test

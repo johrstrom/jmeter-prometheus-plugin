@@ -41,6 +41,7 @@ public class ListenerCollectorTable extends AbstractCollectorTable<ListenerColle
 		measuringComboBox.addItem(Measurable.SuccessTotal.toString());
 		measuringComboBox.addItem(Measurable.FailureTotal.toString());
 		measuringComboBox.addItem(Measurable.CountTotal.toString());
+		measuringComboBox.addItem(Measurable.SuccessRatio.toString());
 	}
 	
 	public ListenerCollectorTable() {

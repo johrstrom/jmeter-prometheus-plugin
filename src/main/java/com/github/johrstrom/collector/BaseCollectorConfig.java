@@ -20,7 +20,7 @@ import io.prometheus.client.Counter;
 import io.prometheus.client.Gauge;
 import io.prometheus.client.Histogram;
 import io.prometheus.client.Summary;
-import io.prometheus.client.Collector.Type;
+//import io.prometheus.client.Collector.Type;
 
 /**
  * The base class for turning text/strings (from the JMeter GUI, or a .jmx file, etc.) into Prometheus Collector
@@ -61,10 +61,18 @@ public class BaseCollectorConfig extends AbstractTestElement  {
 	
 	private static Logger log = LoggerFactory.getLogger(BaseCollectorConfig.class);
 	
+	public enum JMeterCollectorType {
+		COUNTER,
+		GAUGE,
+		HISTOGRAM,
+		SUMMARY,
+		SUCCESS_RATIO;
+	}
+	
 	public BaseCollectorConfig(){
 		this.setHelp(DEFAULT_HELP_STRING);
 		this.setMetricName(this.getRandomMetricName());
-		this.setType(Type.COUNTER.name());
+		this.setType(JMeterCollectorType.COUNTER.toString());
 		this.setLabels(new String[0]);
 		this.setQuantileOrBucket("");
 	}
@@ -81,19 +89,19 @@ public class BaseCollectorConfig extends AbstractTestElement  {
 	}
 
 	public String getType() {
-		return this.getPropertyAsString(TYPE, Type.COUNTER.name());
+		return this.getPropertyAsString(TYPE, JMeterCollectorType.COUNTER.name());
 	}
 	
-	public Type getPrometheusType() {
-		return Type.valueOf(this.getType());
+	public JMeterCollectorType getCollectorType() {
+		return JMeterCollectorType.valueOf(this.getType());
 	}
 
 	public void setType(String type) {
 		this.setProperty(TYPE, type);
 		
-		if(type != null && type.equals(Type.HISTOGRAM.name()) && this.getQuantileOrBucket().isEmpty())
+		if(type != null && type.equals(JMeterCollectorType.HISTOGRAM.name()) && this.getQuantileOrBucket().isEmpty())
 			this.setQuantileOrBucket(DEFAULT_BUCKET_SIZES_STRING);
-		if(type != null && type.equals(Type.SUMMARY.name()) && this.getQuantileOrBucket().isEmpty())
+		if(type != null && type.equals(JMeterCollectorType.SUMMARY.name()) && this.getQuantileOrBucket().isEmpty())
 			this.setQuantileOrBucket(DEFAULT_QUANTILES_STRING);
 	}
 
@@ -249,21 +257,24 @@ public class BaseCollectorConfig extends AbstractTestElement  {
 	}
 	
 	public static Collector fromConfig(BaseCollectorConfig cfg) {
-		Type t = cfg.getPrometheusType();
+		JMeterCollectorType t = cfg.getCollectorType();
 		Collector c = null;
 		
 		try {
-			if(t.equals(Type.COUNTER)) {
+			if(t.equals(JMeterCollectorType.COUNTER)) {
 				c = BaseCollectorConfig.newCounter(cfg);
 				
-			}else if(t.equals(Type.SUMMARY)) {
+			}else if(t.equals(JMeterCollectorType.SUMMARY)) {
 				c = BaseCollectorConfig.newSummary(cfg);
 				
-			}else if(t.equals(Type.HISTOGRAM)) {
+			}else if(t.equals(JMeterCollectorType.HISTOGRAM)) {
 				c = BaseCollectorConfig.newHistogram(cfg);
-			}else if(t.equals(Type.GAUGE)) {
+			}else if(t.equals(JMeterCollectorType.GAUGE)) {
 				c = BaseCollectorConfig.newGauge(cfg);
+			}else if(t.equals(JMeterCollectorType.SUCCESS_RATIO)) {
+				c = new SuccessRatioCollector(cfg);
 			}
+			
 		} catch(Exception e) {
 			log.error(String.format("Didn't create collector from definition %s because of an error", cfg), e);
 		} 
