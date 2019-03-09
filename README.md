@@ -24,7 +24,7 @@ Let's go through all the columns one by one.
   - JMeter variables can be used here. See the section [below](#Using-JMeter-variables-as-labels).
 - **Type**: The type of metric you're creating.
 - **Buckets of Quantiles**:
-  - Buckets are comma seperated list of decimals. Examples are below. Note some are integers, and that's OK, it can be a mixture of integers and real numbers (both positive and negative).
+  - Buckets are comma seperated list of numbers. Can be integers or decimals.
   - Quantiles are comma `,` separated pair of decimals separated by a vertical bar `|`. The first decimal being the quantile and the second being the error rating.
 - **Listen To**: Drowdown to listen to samples or assertions.
   - **Only samples are implemented at this time**
