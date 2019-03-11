@@ -13,7 +13,7 @@ Here's a simple example to get us started.  This example [can be found here](/do
 
 If we look closer at the very first Prometheus listener, it looks like the image below.
 
-![JMeter testplan](/docs/imgs/response_time_listener.png?raw=true)
+![JMeter testplan](/docs/imgs/listener_full.png?raw=true)
 
 Let's go through all the columns one by one.
 
@@ -23,6 +23,8 @@ Let's go through all the columns one by one.
   - `label` is a keyword. In JMeter it means the *name* of the sampler.
   - JMeter variables can be used here. See the section [below](#Using-JMeter-variables-as-labels).
 - **Type**: The type of metric you're creating.
+  - See [Prometheus documentation](https://prometheus.io/docs/concepts/metric_types/) about metric types.
+  - [Success Ratio](#Success-Ratio) is something specific to this plugin and you can see the documentation below.
 - **Buckets of Quantiles**:
   - Buckets are comma seperated list of numbers. Can be integers or decimals.
   - Quantiles are comma `,` separated pair of decimals separated by a vertical bar `|`. The first decimal being the quantile and the second being the error rating.
@@ -46,6 +48,19 @@ As you can see below, it produced that metric with the `category="[A,B,C]"`. Aga
 
 ![JMeter testplan](/docs/imgs/rt_as_sum.png?raw=true)
 
+### Success Ratio
+
+Success ratio is a concept specific to this plugin library.  Often we want measure success rates of samplers and it's difficult to do so when the failure for a given metric or labelset has never occurred.  It's difficult because it involves computations with NaNs.
+
+So, we want to measure success ratios and be sure to emit zeros for both failures and success when the other is created for the first time.  That way you can always safely run computations like rate() and so on.
+
+[Here's prometheus](https://www.robustperception.io/existential-issues-with-metrics) documentation on why it's important.  [Here](https://github.com/johrstrom/jmeter-prometheus-plugin/issues/24) is this repositories issue for this feature.
+
+Here you can see from the example `jsr223_can_fail` turned into 3 metrics.  The names have appeneded `_success`, `_failure` and `_total`.  They're all counter type metrics that increment on success failure and total, respectively.  
+
+From this example you can see that `4 success + 2 failures = 6 total`.  Again, this metric guarantees a zero, for success or failure, for a metric that has a total of one or more.
+
+![JMeter testplan](/docs/imgs/success_ratio_output.png?raw=true)
 
 ### Type and Measuring compatibility matrix
 
@@ -53,13 +68,14 @@ Does it make sense to have a Counter measuring Response Time? No. Does it make s
 
 This is a matrix of what metric types can measure what metrics.  If you configure, say a histogram to measure count total, the plugin will likely do nothing to update that metric.
 
-| | Histogram | Summary | Counter | Guage |
-|:-----:|:------:|:------:|:------:|:------:|  
-| Response time  | x | x |   |   |
-| Response Size  | x | x |   |   |   
-| Count total    |   |   | x |   |
-| Failure total  |   |   | x |   |
-| Success total  |   |   | x |   |
+| | Histogram | Summary | Counter | Guage | Success Ratio |
+|:-----:|:------:|:------:|:------:|:------:|:------:|
+| Response time  | x | x |   |   |   |
+| Response Size  | x | x |   |   |   |
+| Count total    |   |   | x |   |   |
+| Failure total  |   |   | x |   |   |
+| Success total  |   |   | x |   |   |
+| Success Ratio  |   |   |   |   | x |
 
 #### What about gauges
 I'm not quite sure how Guages make sense in the plugin.  If you have a use case, I'd love to hear it. I wrote them in without actually having one, so you can technically create one, I just don't know how the listener may update it.

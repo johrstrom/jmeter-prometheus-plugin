@@ -115,6 +115,14 @@ SampleResult.setResponseData(new byte[wait]);
               <stringProp name="collector.quantiles_or_buckets">100,500,1000,3000</stringProp>
               <stringProp name="listener.collector.measuring">ResponseSize</stringProp>
             </elementProp>
+            <elementProp name="" elementType="com.github.johrstrom.listener.ListenerCollectorConfig">
+              <stringProp name="collector.help">success ratio of the can_fail_sampler</stringProp>
+              <stringProp name="collector.metric_name">jsr223_can_fail</stringProp>
+              <stringProp name="collector.type">SUCCESS_RATIO</stringProp>
+              <collectionProp name="collector.labels"/>
+              <stringProp name="collector.quantiles_or_buckets"></stringProp>
+              <stringProp name="listener.collector.measuring">SuccessRatio</stringProp>
+            </elementProp>
           </collectionProp>
         </com.github.johrstrom.listener.PrometheusListener>
         <hashTree/>
