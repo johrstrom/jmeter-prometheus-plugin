@@ -63,8 +63,6 @@ public abstract class AbstractUpdater {
 		String[] values =  new String[labels.length];
 		JMeterVariables vars = JMeterContextService.getContext().getVariables();
 		
-		
-		
 		for(int i = 0; i < labels.length; i++) {
 			String name = labels[i];
 			String value = null;
@@ -72,21 +70,22 @@ public abstract class AbstractUpdater {
 			// reserved keyword for the sampler's label (the name)
 			if(name.equalsIgnoreCase("label")) { 
 				value = event.getResult().getSampleLabel();
-			
+		
+			} else if(name.equalsIgnoreCase("code")) {	// code also reserved
+				value = event.getResult().getResponseCode();
+				
 			// try to find it as a plain'ol variable.
 			} else if (this.varIndexLookup.get(name) != null){
 				int idx = this.varIndexLookup.get(name);
 				value = event.getVarValue(idx);
 			
-				// lastly look in sample_variables
+			// lastly look in sample_variables
 			}else if (vars != null){
 				value = vars.get(name);
 			}
 			
 			values[i] = (value == null || value.isEmpty()) ? NULL : value;
 		}
-		
-		
 		
 		return values;
 	}

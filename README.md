@@ -21,6 +21,7 @@ Let's go through all the columns one by one.
 - **Help**: The help message of the metric.
 - **Labels**: A comma seperated list of labels you want to apply to the metric.
   - `label` is a keyword. In JMeter it means the *name* of the sampler.
+  - `code` is a keyword. It's the response code of the result.
   - JMeter variables can be used here. See the section [below](#Using-JMeter-variables-as-labels).
 - **Type**: The type of metric you're creating.
   - See [Prometheus documentation](https://prometheus.io/docs/concepts/metric_types/) about metric types.

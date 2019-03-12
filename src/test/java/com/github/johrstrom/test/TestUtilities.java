@@ -74,6 +74,7 @@ public class TestUtilities {
         JMeterUtils.setJMeterHome("src/test/resources");
         JMeterUtils.setLocale(new Locale("ignoreResources"));
         JMeterUtils.loadJMeterProperties("src/test/resources/bin/jmeter.properties");
+        
         try {
 			SaveService.loadProperties();
 		} catch (IOException e) {

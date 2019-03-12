@@ -21,19 +21,5 @@ public class PrometheusServerTest {
 		Thread.sleep(1000);
 		server.stop();
 	}
-	
-
-//	@Test
-//	public void ensurePropertiesLoaded() throws Exception {
-//		PrometheusServer server = PrometheusServer.getInstance();
-//		server.start();
-//		
-//		ThreadPool tp = server.getThreadPool();
-//		
-//		Assert.assertTrue("expected 5, got " + tp.getThreads(), tp.getThreads() == 10);
-//		Assert.assertTrue("expected 5, got " + tp.getIdleThreads(), tp.getIdleThreads() >= 5);
-//		
-//		server.stop();
-//	}
 
 }
