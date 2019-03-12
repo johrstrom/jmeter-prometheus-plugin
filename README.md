@@ -129,6 +129,7 @@ This plugin has limited "out of the box" functionality because it gives you, the
 |prometheus.delay|0|The delay (in seconds) the http server will wait before being destroyed|
 |prometheus.save.threads|true|True or false value to save and collect jmeter thread metrics|
 |prometheus.save.threads.name|jmeter_threads|The name of the metric describing jmeter threads|
+|prometheus.save.jvm|true|Collect metrics from the JVM|
 
 # Building
 

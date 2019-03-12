@@ -22,6 +22,11 @@ public class JMeterCollectorRegistry extends CollectorRegistry {
 	
 	private static final boolean saveThreads = 
 			JMeterUtils.getPropDefault(ThreadCollector.COLLECT_THREADS, ThreadCollector.COLLECT_THREADS_DEFAULT);
+	
+	public static final String COLLECT_JVM  = "prometheus.save.jvm";
+	public static final boolean COLLECT_JVM_DEFAULT  = true;
+	private static final boolean saveJVM = JMeterUtils.getPropDefault(COLLECT_JVM, COLLECT_JVM_DEFAULT);
+	
 			
 	public synchronized static JMeterCollectorRegistry getInstance() {
 		if (instance == null) {
@@ -38,14 +43,16 @@ public class JMeterCollectorRegistry extends CollectorRegistry {
 	}
 	
 	private void initDefaultExports() {
-	    new StandardExports().register(this);
-	    new MemoryPoolsExports().register(this);
-	    new MemoryAllocationExports().register(this);
-	    new BufferPoolsExports().register(this);
-	    new GarbageCollectorExports().register(this);
-	    new ThreadExports().register(this);
-	    new ClassLoadingExports().register(this);
-	    new VersionInfoExports().register(this);
+		if(saveJVM) {
+		    new StandardExports().register(this);
+		    new MemoryPoolsExports().register(this);
+		    new MemoryAllocationExports().register(this);
+		    new BufferPoolsExports().register(this);
+		    new GarbageCollectorExports().register(this);
+		    new ThreadExports().register(this);
+		    new ClassLoadingExports().register(this);
+		    new VersionInfoExports().register(this);	
+		}
 	}
 	
 	private void createJMeterExports() {
@@ -54,7 +61,6 @@ public class JMeterCollectorRegistry extends CollectorRegistry {
 			this.register(tc);
 			this.registered.put(ThreadCollector.getConfig(), tc);
 		}
-		
 	}
 
 	

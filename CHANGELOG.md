@@ -1,3 +1,10 @@
+#0.2.0-rc4
+
+* #24 - success ratios to send zeros.
+* #46 - code is a label keyword for response code.
+* #11 - save jvm stats and allow for configuration.
+
+
 #0.2.0-rc3
 * #42 - implement counters (success, failure and total)
 * listener can now measure response sizes of samples in histogram and summary.
