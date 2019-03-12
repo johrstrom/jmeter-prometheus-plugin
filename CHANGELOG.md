@@ -1,4 +1,4 @@
-#0.2.0-rc4
+#0.2.0
 
 * #24 - success ratios to send zeros.
 * #46 - code is a label keyword for response code.
