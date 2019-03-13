@@ -114,6 +114,7 @@ public class TestUtilities {
     	list.add(simpleHistogramCfg());
     	list.add(simpleSummaryCfg());
     	list.add(simpleCounterCfg());
+    	list.add(simpleSuccessRatioCfg());
     	
     	return list;
     }
@@ -125,6 +126,7 @@ public class TestUtilities {
     	list.add(new ListenerCollectorConfig(simpleHistogramCfg()));
     	list.add(new ListenerCollectorConfig(simpleSummaryCfg()));
     	list.add(new ListenerCollectorConfig(simpleCounterCfg()));
+    	list.add(new ListenerCollectorConfig(simpleSuccessRatioCfg()));
     	
     	return list;
     }
