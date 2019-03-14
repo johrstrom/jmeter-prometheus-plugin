@@ -135,7 +135,7 @@ public class PrometheusServer {
 
     private PrometheusServer() { }
     
-    public void start() throws IOException {
+    public synchronized void start() throws IOException {
     	if(server != null){
     		server.stop(0);
     	}
@@ -153,7 +153,7 @@ public class PrometheusServer {
         server.start();      
     }
     
-    public void stop() {
+    public synchronized void stop() {
     	server.stop(delay);
     }
 
