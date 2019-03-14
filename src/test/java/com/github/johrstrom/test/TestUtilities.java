@@ -9,6 +9,7 @@ import org.apache.jmeter.control.LoopController;
 import org.apache.jmeter.engine.StandardJMeterEngine;
 import org.apache.jmeter.gui.tree.JMeterTreeListener;
 import org.apache.jmeter.gui.tree.JMeterTreeModel;
+import org.apache.jmeter.samplers.SampleResult;
 import org.apache.jmeter.save.SaveService;
 import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.threads.JMeterThread;
@@ -21,8 +22,17 @@ import org.apache.jorphan.collections.HashTree;
 import com.github.johrstrom.collector.BaseCollectorConfig;
 import com.github.johrstrom.collector.BaseCollectorConfig.JMeterCollectorType;
 import com.github.johrstrom.listener.ListenerCollectorConfig;
+import com.github.johrstrom.listener.ListenerCollectorConfig.Measurable;
 
 public class TestUtilities {
+	
+	public static final String TEST_VAR_NAME = "arbitrary_var";
+	public static final String TEST_SAMPLER_NAME = "super_cool_sampler";
+	public static final String TEST_SAMPLER_CODE = "909";
+	public static final String TEST_VAR_VALUE = "bar_value";
+	
+	public static final String[] TEST_LABELS = new String[] {TEST_VAR_NAME,"label","code"};
+	public static final String[] EXPECTED_LABELS = new String[] {TEST_VAR_VALUE, TEST_SAMPLER_NAME, TEST_SAMPLER_CODE};
 	
 	public static BaseCollectorConfig simpleCounterCfg() {
 		BaseCollectorConfig cfg = new BaseCollectorConfig();
@@ -130,4 +140,76 @@ public class TestUtilities {
     	
     	return list;
     }
+    
+    public static List<ListenerCollectorConfig> fullListListener(){
+    	List<ListenerCollectorConfig> list = new ArrayList<ListenerCollectorConfig>();
+    	
+    	// ---------- counters and success ratio
+    	ListenerCollectorConfig cfg = new ListenerCollectorConfig(simpleCounterCfg());
+    	cfg = redoNameAndMeasuring(cfg, "test_count_total", Measurable.CountTotal);
+    	list.add(cfg);
+    	
+    	cfg = redoNameAndMeasuring(cfg, "test_failure_total", Measurable.FailureTotal);
+    	list.add(cfg);
+    	
+    	cfg = redoNameAndMeasuring(cfg, "test_success_total", Measurable.SuccessTotal);
+    	list.add(cfg);
+    	
+    	cfg = new ListenerCollectorConfig(simpleSuccessRatioCfg());
+    	cfg = redoNameAndMeasuring(cfg, "test_ratio", Measurable.SuccessRatio);
+    	list.add(cfg);
+    	
+    	// ------- histograms
+    	cfg = new ListenerCollectorConfig(simpleHistogramCfg());
+    	cfg = redoNameAndMeasuring(cfg, "test_hist_rtime", Measurable.ResponseTime);
+    	list.add(cfg);
+    
+    	cfg = redoNameAndMeasuring(cfg, "test_hist_rsize", Measurable.ResponseSize);
+    	list.add(cfg);
+    
+    	// -------- summaries
+    	cfg = new ListenerCollectorConfig(simpleSummaryCfg());
+    	cfg = redoNameAndMeasuring(cfg, "test_summary_rtime", Measurable.ResponseTime);
+    	list.add(cfg);
+    
+    	cfg = redoNameAndMeasuring(cfg, "test_summary_rsize", Measurable.ResponseSize);
+    	list.add(cfg);
+    	
+    	
+    	return list;
+    }
+    
+    public static ListenerCollectorConfig redoNameAndMeasuring(ListenerCollectorConfig cfg, String name, Measurable m) {
+    	ListenerCollectorConfig clone = (ListenerCollectorConfig) cfg.clone();
+    	
+    	clone.setMetricName(name);
+    	clone.setMeasuring(m.toString());
+    	   	
+    	return clone;
+    }
+    
+    public static ResultAndVariables resultWithLabels() {
+    	SampleResult result = new SampleResult();
+    	
+    	result.setSampleLabel(TEST_SAMPLER_NAME);
+    	result.setResponseCode(TEST_SAMPLER_CODE);
+    	
+    	JMeterVariables vars = new JMeterVariables();
+		vars.put(TEST_VAR_NAME, TEST_VAR_VALUE);
+		JMeterContextService.getContext().setVariables(vars);
+		
+		return new ResultAndVariables(result, vars);
+    }
+    
+    public static class ResultAndVariables {
+    	public SampleResult result;
+    	public JMeterVariables vars;
+    	
+    	public ResultAndVariables(SampleResult result, JMeterVariables vars) {
+    		this.result = result;
+    		this.vars = vars;
+    	}
+    }
+    
+    
 }

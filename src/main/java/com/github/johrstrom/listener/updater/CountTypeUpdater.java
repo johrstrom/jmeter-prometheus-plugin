@@ -19,7 +19,7 @@ import io.prometheus.client.Counter;
  */
 public class CountTypeUpdater extends AbstractUpdater {
 	
-	private static final Logger log = LoggerFactory.getLogger(CountTotalUpdater.class);
+	private static final Logger log = LoggerFactory.getLogger(CountTypeUpdater.class);
 
 	public CountTypeUpdater(ListenerCollectorConfig cfg) {
 		super(cfg);
