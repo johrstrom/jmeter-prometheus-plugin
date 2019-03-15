@@ -85,7 +85,7 @@ public class PrometheusListenerTest {
 		long connectTime = 3123;
 		long idleTime = 1233;
 		long elapsedTime = 2213;
-		long latency = 12;
+		long latency = 1532;
 		int responseSize = 1342;
 		int samplesOccured = 0;
 		
@@ -133,15 +133,20 @@ public class PrometheusListenerTest {
 	    	case "test_hist_rsize":
 	    		assertOnHistogram(reg.getOrCreateAndRegister(cfg), responseSize*samplesOccured, samplesOccured, responseSize);
 	    		break;
+	    	case "test_hist_latency":
+	    		assertOnHistogram(reg.getOrCreateAndRegister(cfg), latency*samplesOccured, samplesOccured, latency);
+	    		break;
 	    	case "test_summary_rtime":
 	    		assertOnSummary(reg.getOrCreateAndRegister(cfg), elapsedTime*samplesOccured, samplesOccured, elapsedTime);
 	    		break;	    
 	    	case "test_summary_rsize":
 	    		assertOnSummary(reg.getOrCreateAndRegister(cfg), responseSize*samplesOccured, samplesOccured, responseSize);
 	    		break;
-			
+	    	case "test_summary_latency":
+	    		assertOnSummary(reg.getOrCreateAndRegister(cfg), latency*samplesOccured, samplesOccured, latency);
+	    		break;
 			default:
-				Assert.assertTrue("shouldn't have made it here, untested switch case", false);
+				Assert.assertTrue( name + " triggered untested switch case", false);
 				break;
 			}
 		}
@@ -169,8 +174,9 @@ public class PrometheusListenerTest {
 			List<MetricFamilySamples> metrics = collector.collect();
 			Assert.assertTrue(metrics.size() == 1);
 			MetricFamilySamples family = metrics.get(0);
-			Assert.assertTrue(family.samples.size() == 7); 	// 4 buckets + Inf + count + sum
 			
+			// labels + Inf + count + sum
+			Assert.assertEquals(TestUtilities.EXPECTED_LABELS.length +4, family.samples.size());	
 			
 			for(Sample sample : family.samples) {
 				List<String> values = sample.labelValues;

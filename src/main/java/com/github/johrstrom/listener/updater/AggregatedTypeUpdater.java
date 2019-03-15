@@ -51,6 +51,8 @@ public class AggregatedTypeUpdater extends AbstractUpdater {
 			return result.getBodySizeAsLong();
 		case ResponseTime:
 			return result.getTime();
+		case Latency:
+			return result.getLatency();
 		default:
 			return 0;
 		}

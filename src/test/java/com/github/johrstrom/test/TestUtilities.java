@@ -166,6 +166,9 @@ public class TestUtilities {
     
     	cfg = redoNameAndMeasuring(cfg, "test_hist_rsize", Measurable.ResponseSize);
     	list.add(cfg);
+    	
+    	cfg = redoNameAndMeasuring(cfg, "test_hist_latency", Measurable.Latency);
+    	list.add(cfg);
     
     	// -------- summaries
     	cfg = new ListenerCollectorConfig(simpleSummaryCfg());
@@ -175,6 +178,8 @@ public class TestUtilities {
     	cfg = redoNameAndMeasuring(cfg, "test_summary_rsize", Measurable.ResponseSize);
     	list.add(cfg);
     	
+    	cfg = redoNameAndMeasuring(cfg, "test_summary_latency", Measurable.Latency);
+    	list.add(cfg);    	
     	
     	return list;
     }

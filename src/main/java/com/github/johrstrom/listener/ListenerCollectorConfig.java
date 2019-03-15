@@ -21,8 +21,12 @@ public class ListenerCollectorConfig extends BaseCollectorConfig {
 	}
 	
 	public enum Measurable {
+		// for aggregated type updater
 		ResponseTime,
 		ResponseSize,
+		Latency,
+		
+		// for count type updater
 		SuccessTotal,
 		FailureTotal,
 		CountTotal,

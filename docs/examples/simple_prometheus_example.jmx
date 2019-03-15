@@ -127,6 +127,16 @@ SampleResult.setResponseData(new byte[wait]);
               <stringProp name="collector.quantiles_or_buckets"></stringProp>
               <stringProp name="listener.collector.measuring">SuccessRatio</stringProp>
             </elementProp>
+            <elementProp name="" elementType="com.github.johrstrom.listener.ListenerCollectorConfig">
+              <stringProp name="collector.help">the latency (ttfb) for a jsr223 sampler</stringProp>
+              <stringProp name="collector.metric_name">jsr223_latency_as_hist</stringProp>
+              <stringProp name="collector.type">HISTOGRAM</stringProp>
+              <collectionProp name="collector.labels">
+                <stringProp name="102727412">label</stringProp>
+              </collectionProp>
+              <stringProp name="collector.quantiles_or_buckets">100,500,1000,3000</stringProp>
+              <stringProp name="listener.collector.measuring">Latency</stringProp>
+            </elementProp>
           </collectionProp>
         </com.github.johrstrom.listener.PrometheusListener>
         <hashTree/>

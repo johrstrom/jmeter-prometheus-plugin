@@ -73,6 +73,7 @@ This is a matrix of what metric types can measure what metrics.  If you configur
 |:-----:|:------:|:------:|:------:|:------:|:------:|
 | Response time  | x | x |   |   |   |
 | Response Size  | x | x |   |   |   |
+| Latency        | x | x |   |   |   |
 | Count total    |   |   | x |   |   |
 | Failure total  |   |   | x |   |   |
 | Success total  |   |   | x |   |   |
