@@ -75,6 +75,7 @@ This is a matrix of what metric types can measure what metrics.  If you configur
 | Response size  | x | x |   |   |   |
 | Latency        | x | x |   |   |   |
 | Idle time      | x | x |   |   |   |
+| Connect time   | x | x |   |   |   |
 | Count total    |   |   | x |   |   |
 | Failure total  |   |   | x |   |   |
 | Success total  |   |   | x |   |   |

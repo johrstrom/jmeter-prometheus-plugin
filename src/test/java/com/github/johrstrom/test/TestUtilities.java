@@ -172,6 +172,9 @@ public class TestUtilities {
     	
     	cfg = redoNameAndMeasuring(cfg, "test_hist_idle_time", Measurable.IdleTime);
     	list.add(cfg);
+    	
+    	cfg = redoNameAndMeasuring(cfg, "test_hist_connect_time", Measurable.ConnectTime);
+    	list.add(cfg);
     
     	// -------- summaries
     	cfg = new ListenerCollectorConfig(simpleSummaryCfg());
@@ -185,6 +188,9 @@ public class TestUtilities {
     	list.add(cfg);    	
     	
     	cfg = redoNameAndMeasuring(cfg, "test_summary_idle_time", Measurable.IdleTime);
+    	list.add(cfg);
+    	
+    	cfg = redoNameAndMeasuring(cfg, "test_summary_connect_time", Measurable.ConnectTime);
     	list.add(cfg);
     	
     	return list;

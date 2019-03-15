@@ -1,6 +1,8 @@
 # 0.3.0
 
 * #50 - listening to latency
+* #49 - listening to idle time
+* #48 - listening to connection time
 
 # 0.2.0
 

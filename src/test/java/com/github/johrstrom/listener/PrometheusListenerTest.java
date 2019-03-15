@@ -141,6 +141,9 @@ public class PrometheusListenerTest {
 	    	case "test_hist_idle_time":
 	    		assertOnHistogram(reg.getOrCreateAndRegister(cfg), idleTime*samplesOccured, samplesOccured, idleTime);
 	    		break;
+	    	case "test_hist_connect_time":
+	    		assertOnHistogram(reg.getOrCreateAndRegister(cfg), connectTime*samplesOccured, samplesOccured, connectTime);
+	    		break;
 	    		
 	    	// summaries
 	    	case "test_summary_rtime":
@@ -154,6 +157,9 @@ public class PrometheusListenerTest {
 	    		break;
 	    	case "test_summary_idle_time":
 	    		assertOnSummary(reg.getOrCreateAndRegister(cfg), idleTime*samplesOccured, samplesOccured, idleTime);
+	    		break;
+	    	case "test_summary_connect_time":
+	    		assertOnSummary(reg.getOrCreateAndRegister(cfg), connectTime*samplesOccured, samplesOccured, connectTime);
 	    		break;
 	    		
 			default:

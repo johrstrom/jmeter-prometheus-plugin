@@ -182,6 +182,7 @@ public class PrometheusListener extends CollectorElement<ListenerCollectorConfig
 				case ResponseTime:
 				case Latency:
 				case IdleTime:
+				case ConnectTime:
 					updater = new AggregatedTypeUpdater(config);
 					break;
 				default:
