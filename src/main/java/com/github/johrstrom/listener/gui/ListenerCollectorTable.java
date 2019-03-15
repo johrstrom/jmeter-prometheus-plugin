@@ -35,13 +35,7 @@ public class ListenerCollectorTable extends AbstractCollectorTable<ListenerColle
 		listenToComboBox.addItem("samples");
 		listenToComboBox.addItem("assertions");
 		
-		measuringComboBox = new JComboBox<>();
-		measuringComboBox.addItem(Measurable.ResponseTime.toString());
-		measuringComboBox.addItem(Measurable.ResponseSize.toString());
-		measuringComboBox.addItem(Measurable.SuccessTotal.toString());
-		measuringComboBox.addItem(Measurable.FailureTotal.toString());
-		measuringComboBox.addItem(Measurable.CountTotal.toString());
-		measuringComboBox.addItem(Measurable.SuccessRatio.toString());
+		measuringComboBox = measuringBox();
 	}
 	
 	public ListenerCollectorTable() {
@@ -104,6 +98,14 @@ public class ListenerCollectorTable extends AbstractCollectorTable<ListenerColle
 		editors.add(ComboBoxEditor.class);
 		
 		return editors.toArray(new Class<?>[editors.size()]);
+	}
+	
+	public static JComboBox<String> measuringBox() {
+		JComboBox<String> box = new JComboBox<String>();
+		for (Measurable value : Measurable.values()) {
+			box.addItem(value.toString());
+		}
+		return box;
 	}
 
 }

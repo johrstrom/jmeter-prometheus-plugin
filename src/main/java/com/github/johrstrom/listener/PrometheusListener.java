@@ -173,27 +173,20 @@ public class PrometheusListener extends CollectorElement<ListenerCollectorConfig
 				
 				switch (config.getMeasuringAsEnum()) {
 				case CountTotal:
-					updater = new CountTotalUpdater(config);
-					break;
 				case FailureTotal:
-					updater = new FailureTotalUpdater(config);
+				case SuccessTotal:
+				case SuccessRatio:
+					updater = new CountTypeUpdater(config);
 					break;
 				case ResponseSize:
-					updater = new ResponseSizeUpdater(config);
-					break;
 				case ResponseTime:
-					updater = new ResponseTimeUpdater(config);
-					break;
-				case SuccessTotal:
-					updater = new SuccessTotalUpdater(config);
-					break;
-				case SuccessRatio:
-					updater = new SuccessRatioUpdater(config);
+				case Latency:
+					updater = new AggregatedTypeUpdater(config);
 					break;
 				default:
-					// improbable because you get a sort of class cast exception on Enum
-					// because you're casting null*
-					// *unless we've missed a case, i.e., more enums defined than switch cases coded here
+					// hope our IDEs are telling us to use all possible enums!	
+					log.error(config.getMeasuringAsEnum() + " triggered default case, which means there's "
+							+ "no functionality for this and is likely a bug");
 					break;		
 				}
 				
