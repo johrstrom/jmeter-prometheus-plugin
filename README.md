@@ -72,8 +72,9 @@ This is a matrix of what metric types can measure what metrics.  If you configur
 | | Histogram | Summary | Counter | Guage | Success Ratio |
 |:-----:|:------:|:------:|:------:|:------:|:------:|
 | Response time  | x | x |   |   |   |
-| Response Size  | x | x |   |   |   |
+| Response size  | x | x |   |   |   |
 | Latency        | x | x |   |   |   |
+| Idle time      | x | x |   |   |   |
 | Count total    |   |   | x |   |   |
 | Failure total  |   |   | x |   |   |
 | Success total  |   |   | x |   |   |

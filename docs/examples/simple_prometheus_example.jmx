@@ -137,6 +137,14 @@ SampleResult.setResponseData(new byte[wait]);
               <stringProp name="collector.quantiles_or_buckets">100,500,1000,3000</stringProp>
               <stringProp name="listener.collector.measuring">Latency</stringProp>
             </elementProp>
+            <elementProp name="" elementType="com.github.johrstrom.listener.ListenerCollectorConfig">
+              <stringProp name="collector.help">the idle time for a jsr223 sampler</stringProp>
+              <stringProp name="collector.metric_name">jsr223_idle_time</stringProp>
+              <stringProp name="collector.type">SUMMARY</stringProp>
+              <collectionProp name="collector.labels"/>
+              <stringProp name="collector.quantiles_or_buckets">0.75,0.5|0.95,0.1|0.99,0.01</stringProp>
+              <stringProp name="listener.collector.measuring">IdleTime</stringProp>
+            </elementProp>
           </collectionProp>
         </com.github.johrstrom.listener.PrometheusListener>
         <hashTree/>

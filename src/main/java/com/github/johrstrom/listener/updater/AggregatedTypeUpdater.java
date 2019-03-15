@@ -53,6 +53,8 @@ public class AggregatedTypeUpdater extends AbstractUpdater {
 			return result.getTime();
 		case Latency:
 			return result.getLatency();
+		case IdleTime:
+			return result.getIdleTime();
 		default:
 			return 0;
 		}

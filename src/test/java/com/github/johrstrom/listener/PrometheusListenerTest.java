@@ -127,6 +127,8 @@ public class PrometheusListenerTest {
 	    	case "test_ratio":
 	    		assertOnRatio(cfg);	    		
 	    		break;
+	    		
+	    	// histograms
 	    	case "test_hist_rtime":			
 	    		assertOnHistogram(reg.getOrCreateAndRegister(cfg), elapsedTime*samplesOccured, samplesOccured, elapsedTime);
 	    		break;    		    
@@ -136,6 +138,11 @@ public class PrometheusListenerTest {
 	    	case "test_hist_latency":
 	    		assertOnHistogram(reg.getOrCreateAndRegister(cfg), latency*samplesOccured, samplesOccured, latency);
 	    		break;
+	    	case "test_hist_idle_time":
+	    		assertOnHistogram(reg.getOrCreateAndRegister(cfg), idleTime*samplesOccured, samplesOccured, idleTime);
+	    		break;
+	    		
+	    	// summaries
 	    	case "test_summary_rtime":
 	    		assertOnSummary(reg.getOrCreateAndRegister(cfg), elapsedTime*samplesOccured, samplesOccured, elapsedTime);
 	    		break;	    
@@ -145,6 +152,10 @@ public class PrometheusListenerTest {
 	    	case "test_summary_latency":
 	    		assertOnSummary(reg.getOrCreateAndRegister(cfg), latency*samplesOccured, samplesOccured, latency);
 	    		break;
+	    	case "test_summary_idle_time":
+	    		assertOnSummary(reg.getOrCreateAndRegister(cfg), idleTime*samplesOccured, samplesOccured, idleTime);
+	    		break;
+	    		
 			default:
 				Assert.assertTrue( name + " triggered untested switch case", false);
 				break;

@@ -169,6 +169,9 @@ public class TestUtilities {
     	
     	cfg = redoNameAndMeasuring(cfg, "test_hist_latency", Measurable.Latency);
     	list.add(cfg);
+    	
+    	cfg = redoNameAndMeasuring(cfg, "test_hist_idle_time", Measurable.IdleTime);
+    	list.add(cfg);
     
     	// -------- summaries
     	cfg = new ListenerCollectorConfig(simpleSummaryCfg());
@@ -180,6 +183,9 @@ public class TestUtilities {
     	
     	cfg = redoNameAndMeasuring(cfg, "test_summary_latency", Measurable.Latency);
     	list.add(cfg);    	
+    	
+    	cfg = redoNameAndMeasuring(cfg, "test_summary_idle_time", Measurable.IdleTime);
+    	list.add(cfg);
     	
     	return list;
     }

@@ -25,6 +25,7 @@ public class ListenerCollectorConfig extends BaseCollectorConfig {
 		ResponseTime,
 		ResponseSize,
 		Latency,
+		IdleTime,
 		
 		// for count type updater
 		SuccessTotal,
