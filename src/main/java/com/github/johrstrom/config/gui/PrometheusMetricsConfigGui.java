@@ -60,11 +60,7 @@ public class PrometheusMetricsConfigGui<C> extends AbstractConfigGui {
 	 */
 	@Override
 	public String getName() {
-		if (super.getName() == null) {
-			return this.getStaticLabel();
-		} else {
-			return super.getName();
-		}
+		return super.getName() == null ? this.getStaticLabel() : super.getName();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -79,6 +75,10 @@ public class PrometheusMetricsConfigGui<C> extends AbstractConfigGui {
 		
 		List<BaseCollectorConfig> collectors = this.table.getRowsAsCollectors();
 		config.setCollectorConfigs(collectors);	
+		
+
+		config.setName(this.getName());
+		config.setComment(this.getComment());
 	}
 
 	private void init() {
@@ -102,6 +102,9 @@ public class PrometheusMetricsConfigGui<C> extends AbstractConfigGui {
 				log.error("didn't modify test element because {}:{}", e.getClass(), e.getMessage());
 			}
 		}
+		
+		this.setName(ele.getName());
+		this.setComment(ele.getComment());
 	}
 
 	@Override

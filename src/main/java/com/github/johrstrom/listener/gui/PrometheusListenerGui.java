@@ -89,11 +89,7 @@ public class PrometheusListenerGui extends AbstractListenerGui {
 	 */
 	@Override
 	public String getName() {
-		if (super.getName() == null) {
-			return this.getStaticLabel();
-		} else {
-			return super.getName();
-		}
+		return super.getName() == null ? this.getStaticLabel() : super.getName();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -108,6 +104,10 @@ public class PrometheusListenerGui extends AbstractListenerGui {
 				log.error("didn't modify test element because {}. {}", e.getClass(), e.getMessage());
 			}
 		}
+		
+		//ele.getName() == null ? this.setName(ele.getName()) : this.setName(getStaticLabel());;
+		this.setName(ele.getName() == null ? getStaticLabel() : ele.getName());
+		this.setComment(ele.getComment() == null ? "" : ele.getComment());
 	}
 
 	@Override
@@ -140,6 +140,8 @@ public class PrometheusListenerGui extends AbstractListenerGui {
 		List<ListenerCollectorConfig> collectors = this.table.getRowsAsCollectors();
 		config.setCollectorConfigs(collectors);	
 		
+		config.setName(this.getName());
+		config.setComment(this.getComment());
 	}
 	
 	@Override

@@ -1,3 +1,7 @@
+# 0.4.0
+
+* #47 - bugfix so to correctly rename gui elements.
+
 # 0.3.0
 
 * #50 - listening to latency

@@ -67,6 +67,8 @@ public class PrometheusListenerTest {
 		File jmx = new File("src/test/resources/simple_prometheus_example.jmx");
 		HashTree tree = SaveService.loadTree(jmx);
 		
+		
+		
 		Assert.assertTrue(tree != null);
 	}
 	

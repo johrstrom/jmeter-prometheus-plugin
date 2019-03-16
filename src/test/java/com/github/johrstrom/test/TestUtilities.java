@@ -82,7 +82,7 @@ public class TestUtilities {
     public static void createJmeterEnv() {
     	
         JMeterUtils.setJMeterHome("src/test/resources");
-        JMeterUtils.setLocale(new Locale("ignoreResources"));
+        JMeterUtils.setLocale(Locale.ENGLISH);
         JMeterUtils.loadJMeterProperties("src/test/resources/bin/jmeter.properties");
         
         try {
