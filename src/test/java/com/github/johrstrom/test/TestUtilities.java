@@ -28,17 +28,45 @@ public class TestUtilities {
 	
 	public static final String TEST_VAR_NAME = "arbitrary_var";
 	public static final String TEST_SAMPLER_NAME = "super_cool_sampler";
+	public static final String TEST_ASSERTION_NAME = "super_cool_assertion";
+	public static final String TEST_ASSERTION_NAME_ALT = "other_super_cool_assertion";
 	public static final String TEST_SAMPLER_CODE = "909";
 	public static final String TEST_VAR_VALUE = "bar_value";
 	
 	public static final String[] TEST_LABELS = new String[] {TEST_VAR_NAME,"label","code"};
 	public static final String[] EXPECTED_LABELS = new String[] {TEST_VAR_VALUE, TEST_SAMPLER_NAME, TEST_SAMPLER_CODE};
 	
+	public static final String[] TEST_ASSERTION_LABELS = new String[] {TEST_VAR_NAME,"label"};
+	public static final String[] EXPECTED_ASSERTION_LABELS = new String[] {TEST_VAR_VALUE, TEST_ASSERTION_NAME};
+	public static final String[] EXPECTED_ASSERTION_LABELS_ALT = new String[] {TEST_VAR_VALUE, TEST_ASSERTION_NAME_ALT};
+	
 	public static BaseCollectorConfig simpleCounterCfg() {
 		BaseCollectorConfig cfg = new BaseCollectorConfig();
 		cfg.setMetricName("simple_counter");
 		cfg.setType(JMeterCollectorType.COUNTER.toString());
 		cfg.setHelp("some helpe message");
+		
+		return cfg;
+	}
+	
+	public static ListenerCollectorConfig listenerCounterCfg(String name, Measurable measurable, String listenTo) {
+		BaseCollectorConfig base = TestUtilities.simpleCounterCfg();
+		base.setLabels(TestUtilities.TEST_ASSERTION_LABELS);
+		ListenerCollectorConfig cfg = new ListenerCollectorConfig(base);
+		cfg.setMetricName(name);
+		cfg.setMeasuring(measurable.toString());
+		cfg.setListenTo(listenTo);
+		
+		return cfg;
+	}
+	
+	public static ListenerCollectorConfig listenerSuccessRatioCfg(String name, String listenTo) {
+		ListenerCollectorConfig cfg = new ListenerCollectorConfig();
+		cfg.setLabels(TestUtilities.TEST_ASSERTION_LABELS);
+		cfg.setMetricName(name);
+		cfg.setType(JMeterCollectorType.SUCCESS_RATIO.toString());
+		cfg.setHelp("some helpe message");
+		cfg.setListenTo(listenTo);
 		
 		return cfg;
 	}

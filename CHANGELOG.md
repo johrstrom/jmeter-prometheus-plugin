@@ -1,6 +1,7 @@
 # 0.4.0
 
-* #47 - bugfix so to correctly rename gui elements.
+* #47 - bugfix so to correctly rename gui elements.\
+* #51 - enable listening to assertions in counter type metrics.
 
 # 0.3.0
 

@@ -1,5 +1,6 @@
 package com.github.johrstrom.listener.updater;
 
+import org.apache.jmeter.assertions.AssertionResult;
 import org.apache.jmeter.samplers.SampleEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,15 +25,26 @@ public class CountTypeUpdater extends AbstractUpdater {
 	public CountTypeUpdater(ListenerCollectorConfig cfg) {
 		super(cfg);
 	}
-
+	
 	@Override
 	public void update(SampleEvent event) {
+		if(this.config.listenToSamples()) {
+			boolean successful = event.getResult().isSuccessful();
+			this.inc(this.labelValues(event), successful);
+			
+		} else if(this.config.listenToAssertions()) {
+			for(AssertionResult assertion : event.getResult().getAssertionResults()) {
+				updateAssertions(new AssertionContext(assertion, event));
+			}
+		}
+		
+	}
+
+	
+	protected void inc(String[] labels, boolean successful) {
 		try {
 			Collector collector = registry.getOrCreateAndRegister(this.config);
-			
-			String[] labels = this.labelValues(event);
-			boolean successful = event.getResult().isSuccessful();
-			
+						
 			if(collector instanceof Counter) {
 				Counter c = (Counter) collector;
 				
@@ -69,5 +81,11 @@ public class CountTypeUpdater extends AbstractUpdater {
 		}
 	}
 	
+	protected void updateAssertions(AssertionContext ctx) {
+		String[] labels = this.labelValues(ctx);
+		boolean successful = !ctx.assertion.isFailure();
+		
+		this.inc(labels, successful);
+	}
 
 }

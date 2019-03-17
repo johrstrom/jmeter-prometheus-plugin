@@ -29,8 +29,7 @@ Let's go through all the columns one by one.
 - **Buckets of Quantiles**:
   - Buckets are comma seperated list of numbers. Can be integers or decimals.
   - Quantiles are comma `,` separated pair of decimals separated by a vertical bar `|`. The first decimal being the quantile and the second being the error rating.
-- **Listen To**: Drowdown to listen to samples or assertions.
-  - **Only samples are implemented at this time**
+- **Listen To**: Dropdown to listen to samples or assertions. This only applies to Counters and SuccessRatio type metrics.
 - **Measuring**: Dropdown menu of all the things you can measure
   - See the [Type and Measuring compatibility matrix](#Type-and-Measuring-compatibility-matrix) section below.
 
@@ -69,6 +68,8 @@ Does it make sense to have a Counter measuring Response Time? No. Does it make s
 
 This is a matrix of what metric types can measure what metrics.  If you configure, say a histogram to measure count total, the plugin will likely do nothing to update that metric.
 
+**Bold** types can listen to samples or assertions (not both at the same time).  Note that if you don't use `label` when listening to assertions you may get strange results.  This is because *one* sample can generate many *assertion results* which are then counted. When there's no label to distinguish those counts, they'll be summed together which may or may not be expected.
+
 | | Histogram | Summary | Counter | Guage | Success Ratio |
 |:-----:|:------:|:------:|:------:|:------:|:------:|
 | Response time  | x | x |   |   |   |
@@ -76,10 +77,10 @@ This is a matrix of what metric types can measure what metrics.  If you configur
 | Latency        | x | x |   |   |   |
 | Idle time      | x | x |   |   |   |
 | Connect time   | x | x |   |   |   |
-| Count total    |   |   | x |   |   |
-| Failure total  |   |   | x |   |   |
-| Success total  |   |   | x |   |   |
-| Success Ratio  |   |   |   |   | x |
+| Count total    |   |   | **x** |   |   |
+| Failure total  |   |   | **x** |   |   |
+| Success total  |   |   | **x** |   |   |
+| Success Ratio  |   |   |   |   | **x** |
 
 #### What about gauges
 I'm not quite sure how Guages make sense in the plugin.  If you have a use case, I'd love to hear it. I wrote them in without actually having one, so you can technically create one, I just don't know how the listener may update it.

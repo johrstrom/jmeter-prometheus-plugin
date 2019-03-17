@@ -1,5 +1,6 @@
 package com.github.johrstrom.listener.updater;
 
+import org.apache.jmeter.assertions.AssertionResult;
 import org.apache.jmeter.samplers.SampleEvent;
 import org.apache.jmeter.samplers.SampleResult;
 import org.apache.jmeter.threads.JMeterContextService;
@@ -205,8 +206,180 @@ public class CountTypeUpdaterTest {
 		Assert.assertEquals(1, failureShouldBeOne, 0.1);
 		Assert.assertEquals(3, totalShouldBeThree, 0.1);
 	}
+	
+	@Test
+	public void testRatioOnAssertions() {
+		ListenerCollectorConfig cfg = TestUtilities.listenerSuccessRatioCfg(
+				"ratio_on_assertions",
+				ListenerCollectorConfig.ASSERTIONS);
+		
+		SuccessRatioCollector ratio = (SuccessRatioCollector) reg.getOrCreateAndRegister(cfg);
+		CountTypeUpdater u = new CountTypeUpdater(cfg);
+		
+		SampleResult result = newSampleResultWithAssertion(true);
+		u.update(new SampleEvent(result,"tg1", vars()));	// #1 success
+		
+		double actualSuccess = ratio.getSuccess(TestUtilities.EXPECTED_ASSERTION_LABELS);
+		double actualFailure = ratio.getFailure(TestUtilities.EXPECTED_ASSERTION_LABELS);
+		double actualTotal = ratio.getTotal(TestUtilities.EXPECTED_ASSERTION_LABELS);
+		Assert.assertEquals(1.0, actualSuccess, 0.1);
+		Assert.assertEquals(0.0, actualFailure, 0.1);
+		Assert.assertEquals(1.0, actualTotal, 0.1);
+		
+		
+		result = newSampleResultWithAssertion(false);
+		u.update(new SampleEvent(result,"tg1", vars()));	// #1 failure
+		
+		actualSuccess = ratio.getSuccess(TestUtilities.EXPECTED_ASSERTION_LABELS);
+		actualFailure = ratio.getFailure(TestUtilities.EXPECTED_ASSERTION_LABELS);
+		actualTotal = ratio.getTotal(TestUtilities.EXPECTED_ASSERTION_LABELS);
+		Assert.assertEquals(1.0, actualSuccess, 0.1);
+		Assert.assertEquals(1.0, actualFailure, 0.1);
+		Assert.assertEquals(2.0, actualTotal, 0.1);
+		
+		result = newSampleResultWithAssertion(true);
+		result.addAssertionResult(altAssertion(true));
+		u.update(new SampleEvent(result,"tg1", vars()));	// #now update alt as well
+		
+		actualSuccess = ratio.getSuccess(TestUtilities.EXPECTED_ASSERTION_LABELS);
+		actualFailure = ratio.getFailure(TestUtilities.EXPECTED_ASSERTION_LABELS);
+		actualTotal = ratio.getTotal(TestUtilities.EXPECTED_ASSERTION_LABELS);
+		Assert.assertEquals(2.0, actualSuccess, 0.1);
+		Assert.assertEquals(1.0, actualFailure, 0.1);
+		Assert.assertEquals(3.0, actualTotal, 0.1);
+		
+		actualSuccess = ratio.getSuccess(TestUtilities.EXPECTED_ASSERTION_LABELS_ALT);
+		actualFailure = ratio.getFailure(TestUtilities.EXPECTED_ASSERTION_LABELS_ALT);
+		actualTotal = ratio.getTotal(TestUtilities.EXPECTED_ASSERTION_LABELS_ALT);
+		Assert.assertEquals(1.0, actualSuccess, 0.1);
+		Assert.assertEquals(0.0, actualFailure, 0.1);
+		Assert.assertEquals(1.0, actualTotal, 0.1);
+	}
 
+	
+	@Test
+	public void testSuccessAssertions() {
+		ListenerCollectorConfig cfg = TestUtilities.listenerCounterCfg(
+				"count_assertion_success_test",
+				Measurable.SuccessTotal,
+				ListenerCollectorConfig.ASSERTIONS);
+		
+		Counter c = (Counter) reg.getOrCreateAndRegister(cfg);
+		CountTypeUpdater u = new CountTypeUpdater(cfg);
+		
+		SampleResult result = newSampleResultWithAssertion(true);
+		u.update(new SampleEvent(result,"tg1", vars()));	// #1
+		double shouldBeOne = c.labels(TestUtilities.EXPECTED_ASSERTION_LABELS).get();
+		Assert.assertEquals(1.0, shouldBeOne, 0.1);
+		
+		result = newSampleResultWithAssertion(false);
+		u.update(new SampleEvent(result,"tg1", vars()));	// #could be 2, but should be 1
+		shouldBeOne = c.labels(TestUtilities.EXPECTED_ASSERTION_LABELS).get();
+		Assert.assertEquals(1.0, shouldBeOne, 0.1);
+		
+		// now update 2 assertions
+		result = newSampleResultWithAssertion(true);
+		result.addAssertionResult(altAssertion(true));
+		u.update(new SampleEvent(result,"tg1", vars()));	// #now should be 2
+		double shouldBeTwo = c.labels(TestUtilities.EXPECTED_ASSERTION_LABELS).get();
+		Assert.assertEquals(2.0, shouldBeTwo, 0.1);
+		shouldBeOne = c.labels(TestUtilities.EXPECTED_ASSERTION_LABELS_ALT).get();	//but alt is just 1
+		Assert.assertEquals(1.0, shouldBeOne, 0.1);
+	}
+	
+	@Test
+	public void testFailureAssertions() {
+		ListenerCollectorConfig cfg = TestUtilities.listenerCounterCfg(
+				"count_assertion_failure_test",
+				Measurable.FailureTotal,
+				ListenerCollectorConfig.ASSERTIONS);
+		
+		Counter c = (Counter) reg.getOrCreateAndRegister(cfg);
+		CountTypeUpdater u = new CountTypeUpdater(cfg);
+		
+		SampleResult result = newSampleResultWithAssertion(false);
+		u.update(new SampleEvent(result,"tg1", vars()));	// #1
+		double shouldBeOne = c.labels(TestUtilities.EXPECTED_ASSERTION_LABELS).get();
+		Assert.assertEquals(1.0, shouldBeOne, 0.1);
+		
+		
+		result = newSampleResultWithAssertion(true);
+		u.update(new SampleEvent(result,"tg1", vars()));	// #could be 2, but should be 1
+		shouldBeOne = c.labels(TestUtilities.EXPECTED_ASSERTION_LABELS).get();
+		Assert.assertEquals(1.0, shouldBeOne, 0.1);
+		
+		// now update 2 assertions
+		result = newSampleResultWithAssertion(false);
+		result.addAssertionResult(altAssertion(false));
+		u.update(new SampleEvent(result,"tg1", vars()));	// #now should be 2
+		double shouldBeTwo = c.labels(TestUtilities.EXPECTED_ASSERTION_LABELS).get();
+		Assert.assertEquals(2.0, shouldBeTwo, 0.1);
+		shouldBeOne = c.labels(TestUtilities.EXPECTED_ASSERTION_LABELS_ALT).get();	//but alt is just 1
+		Assert.assertEquals(1.0, shouldBeOne, 0.1);		
+	}
+	
+	@Test
+	public void testTotalAssertions() {
+		ListenerCollectorConfig cfg = TestUtilities.listenerCounterCfg(
+				"count_assertion_total_test",
+				Measurable.CountTotal,
+				ListenerCollectorConfig.ASSERTIONS);
+		
+		Counter c = (Counter) reg.getOrCreateAndRegister(cfg);
+		CountTypeUpdater u = new CountTypeUpdater(cfg);
+		
+		SampleResult result = newSampleResultWithAssertion(false);
+		u.update(new SampleEvent(result,"tg1", vars()));	// #1
+		double shouldBeOne = c.labels(TestUtilities.EXPECTED_ASSERTION_LABELS).get();
+		Assert.assertEquals(1.0, shouldBeOne, 0.1);
+		
+		
+		result = newSampleResultWithAssertion(true);
+		u.update(new SampleEvent(result,"tg1", vars()));	// #2
+		double shouldBeTwo = c.labels(TestUtilities.EXPECTED_ASSERTION_LABELS).get();
+		Assert.assertEquals(2.0, shouldBeTwo, 0.1);
+		
+		// now update 2 assertions
+		result = newSampleResultWithAssertion(false);
+		result.addAssertionResult(altAssertion(false));
+		u.update(new SampleEvent(result,"tg1", vars()));	// #3
+		double shouldBeThree = c.labels(TestUtilities.EXPECTED_ASSERTION_LABELS).get();
+		Assert.assertEquals(3.0, shouldBeThree, 0.1);
+		shouldBeOne = c.labels(TestUtilities.EXPECTED_ASSERTION_LABELS_ALT).get();	//but alt is just 1
+		Assert.assertEquals(1.0, shouldBeOne, 0.1);
+	}
+	
+	public static SampleResult newSampleResult(boolean success) {
+		SampleResult res = new SampleResult();
+		res.setSampleLabel(TestUtilities.TEST_SAMPLER_NAME);
+		res.setSuccessful(success);
+		
+		return res;
+	}
+	
+	public static SampleResult newSampleResultWithAssertion(boolean success) {
+		SampleResult res = newSampleResult(success);
+		
+		AssertionResult assertion = new AssertionResult(TestUtilities.TEST_ASSERTION_NAME);
+		assertion.setFailure(!success);
+		
+		res.addAssertionResult(assertion);
+		return res;
+	}
+	
+	public static AssertionResult altAssertion(boolean success) {
+		AssertionResult assertion = new AssertionResult(TestUtilities.TEST_ASSERTION_NAME_ALT);
+		assertion.setFailure(!success);
+		return assertion;
+	}
 
+	public static JMeterVariables vars() {
+		JMeterVariables vars = new JMeterVariables();
+		vars.put(TestUtilities.TEST_VAR_NAME, TestUtilities.TEST_VAR_VALUE);
+		JMeterContextService.getContext().setVariables(vars);
+		return vars;
+	}
 
+	
 
 }

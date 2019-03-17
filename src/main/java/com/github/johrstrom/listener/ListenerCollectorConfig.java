@@ -6,8 +6,10 @@ public class ListenerCollectorConfig extends BaseCollectorConfig {
 
 	private static final long serialVersionUID = -8968099072667146399L;
 
-	public static String LISTEN_TO = "listener.collector.listen_to";
-	public static String MEASURING = "listener.collector.measuring";
+	public static final String LISTEN_TO = "listener.collector.listen_to";
+	public static final String MEASURING = "listener.collector.measuring";
+	public static final String SAMPLES = "samples";
+	public static final String ASSERTIONS = "assertions";
 	
 	public ListenerCollectorConfig() {
 		this(new BaseCollectorConfig());
@@ -36,11 +38,17 @@ public class ListenerCollectorConfig extends BaseCollectorConfig {
 	}
 	
 	public void setListenTo(String listenTo) {
-		this.setProperty(LISTEN_TO, listenTo);
+		if(listenTo.equalsIgnoreCase(SAMPLES)) {
+			this.setProperty(LISTEN_TO, SAMPLES);
+		}else if(listenTo.equalsIgnoreCase(ASSERTIONS)) {
+			this.setProperty(LISTEN_TO, ASSERTIONS);
+		} else {
+			this.setProperty(LISTEN_TO, SAMPLES);
+		}
 	}
 	
 	public String getListenTo() {
-		return this.getPropertyAsString(LISTEN_TO, "samples");
+		return this.getPropertyAsString(LISTEN_TO, SAMPLES);
 	}
 	
 	public void setMeasuring(String measuring) {
@@ -53,6 +61,14 @@ public class ListenerCollectorConfig extends BaseCollectorConfig {
 	
 	public Measurable getMeasuringAsEnum() {		
 		return Measurable.valueOf(this.getMeasuring());
+	}
+	
+	public boolean listenToSamples() {
+		return this.getListenTo().equalsIgnoreCase(SAMPLES);
+	}
+	
+	public boolean listenToAssertions() {
+		return this.getListenTo().equalsIgnoreCase(ASSERTIONS);
 	}
 	
 //	@Override

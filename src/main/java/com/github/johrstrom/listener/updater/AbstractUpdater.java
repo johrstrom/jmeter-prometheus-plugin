@@ -3,6 +3,7 @@ package com.github.johrstrom.listener.updater;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.jmeter.assertions.AssertionResult;
 import org.apache.jmeter.samplers.SampleEvent;
 import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.threads.JMeterVariables;
@@ -50,6 +51,17 @@ public abstract class AbstractUpdater {
 	 * @param e
 	 */
 	public abstract void update(SampleEvent e);
+	
+	public static class AssertionContext {
+		public AssertionResult assertion;
+		public SampleEvent event;
+		
+		public AssertionContext(AssertionResult a, SampleEvent e) {
+			this.assertion = a;
+			this.event = e;
+		}
+		
+	}
 
 	/**
 	 * Helper function to extract the label values from the Sample Event. Values
@@ -89,6 +101,36 @@ public abstract class AbstractUpdater {
 		
 		return values;
 	}
+	
+	protected String[] labelValues(AssertionContext ctx) {
+		String[] labels = config.getLabels();
+		String[] values =  new String[labels.length];
+		JMeterVariables vars = JMeterContextService.getContext().getVariables();
+		
+		for(int i = 0; i < labels.length; i++) {
+			String name = labels[i];
+			String value = null;
+			
+			if(name.equalsIgnoreCase("label")) {
+				value = ctx.assertion.getName();
+				
+			// try to find it as a plain'ol variable.
+			} else if (this.varIndexLookup.get(name) != null){
+				int idx = this.varIndexLookup.get(name);
+				value = ctx.event.getVarValue(idx);
+				
+			
+			// lastly look in sample_variables
+			}else if (vars != null){
+				value = vars.get(name);
+			}
+						
+			values[i] = (value == null || value.isEmpty()) ? NULL : value;
+		}
+		
+		return values;
+	}
+	
 	
 	private void buildVarLookup() {
 		this.varIndexLookup = new HashMap<String,Integer>();

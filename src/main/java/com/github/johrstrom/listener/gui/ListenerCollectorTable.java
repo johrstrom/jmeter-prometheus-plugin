@@ -32,8 +32,8 @@ public class ListenerCollectorTable extends AbstractCollectorTable<ListenerColle
 	
 	static {
 		listenToComboBox = new JComboBox<>();
-		listenToComboBox.addItem("samples");
-		listenToComboBox.addItem("assertions");
+		listenToComboBox.addItem(ListenerCollectorConfig.SAMPLES);
+		listenToComboBox.addItem(ListenerCollectorConfig.ASSERTIONS);
 		
 		measuringComboBox = measuringBox();
 	}
