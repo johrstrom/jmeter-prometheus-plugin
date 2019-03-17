@@ -66,7 +66,7 @@ SampleResult.setResponseData(new byte[wait]);
           <stringProp name="scriptLanguage">groovy</stringProp>
         </JSR223Sampler>
         <hashTree/>
-        <com.github.johrstrom.listener.PrometheusListener guiclass="com.github.johrstrom.listener.gui.PrometheusListenerGui" testclass="com.github.johrstrom.listener.PrometheusListener" testname="PrometheusListener" enabled="true">
+        <com.github.johrstrom.listener.PrometheusListener guiclass="com.github.johrstrom.listener.gui.PrometheusListenerGui" testclass="com.github.johrstrom.listener.PrometheusListener" testname="Main prometheus listener" enabled="true">
           <collectionProp name="prometheus.collector_definitions">
             <elementProp name="" elementType="com.github.johrstrom.listener.ListenerCollectorConfig">
               <stringProp name="collector.help">the response time for a jsr223 sampler</stringProp>
@@ -146,6 +146,7 @@ SampleResult.setResponseData(new byte[wait]);
               <stringProp name="listener.collector.measuring">IdleTime</stringProp>
             </elementProp>
           </collectionProp>
+          <stringProp name="TestPlan.comments">This listener &quot;measures&quot; everything, sometimes in summaries, sometimes in histograms.</stringProp>
         </com.github.johrstrom.listener.PrometheusListener>
         <hashTree/>
       </hashTree>
@@ -233,7 +234,7 @@ Thread.currentThread().sleep(wait);</stringProp>
           <stringProp name="scriptLanguage">groovy</stringProp>
         </JSR223Sampler>
         <hashTree>
-          <com.github.johrstrom.listener.PrometheusListener guiclass="com.github.johrstrom.listener.gui.PrometheusListenerGui" testclass="com.github.johrstrom.listener.PrometheusListener" testname="PrometheusListener" enabled="true">
+          <com.github.johrstrom.listener.PrometheusListener guiclass="com.github.johrstrom.listener.gui.PrometheusListenerGui" testclass="com.github.johrstrom.listener.PrometheusListener" testname="GetFirstSample" enabled="true">
             <collectionProp name="prometheus.collector_definitions">
               <elementProp name="" elementType="com.github.johrstrom.listener.ListenerCollectorConfig">
                 <stringProp name="collector.help">the response time for a jsr223 sampler</stringProp>
@@ -286,7 +287,7 @@ Thread.currentThread().sleep(wait);</stringProp>
           <stringProp name="scriptLanguage">groovy</stringProp>
         </JSR223Sampler>
         <hashTree>
-          <com.github.johrstrom.listener.PrometheusListener guiclass="com.github.johrstrom.listener.gui.PrometheusListenerGui" testclass="com.github.johrstrom.listener.PrometheusListener" testname="PrometheusListener" enabled="true">
+          <com.github.johrstrom.listener.PrometheusListener guiclass="com.github.johrstrom.listener.gui.PrometheusListenerGui" testclass="com.github.johrstrom.listener.PrometheusListener" testname="GetSampleSample" enabled="true">
             <collectionProp name="prometheus.collector_definitions">
               <elementProp name="" elementType="com.github.johrstrom.listener.ListenerCollectorConfig">
                 <stringProp name="collector.help">the response time for a jsr223 sampler</stringProp>

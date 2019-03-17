@@ -16,7 +16,7 @@
   "gnetId": null,
   "graphTooltip": 0,
   "id": 1,
-  "iteration": 1550773461172,
+  "iteration": 1552700793018,
   "links": [],
   "panels": [
     {
@@ -31,6 +31,7 @@
       },
       "id": 10,
       "interval": "",
+      "links": [],
       "pageSize": null,
       "scroll": true,
       "showHeader": true,
@@ -62,7 +63,7 @@
       ],
       "targets": [
         {
-          "expr": "jsr223_rt_as_hist_count{}",
+          "expr": "jsr223_rsize_as_hist_bucket{}",
           "format": "table",
           "instant": true,
           "intervalFactor": 1,
@@ -71,7 +72,7 @@
       ],
       "timeFrom": null,
       "timeShift": null,
-      "title": "Panel Title",
+      "title": "Response Sizes",
       "transform": "table",
       "type": "table"
     },
@@ -190,6 +191,7 @@
       "points": false,
       "renderer": "flot",
       "seriesOverrides": [],
+      "spaceLength": 10,
       "stack": false,
       "steppedLine": false,
       "targets": [
@@ -275,15 +277,24 @@
       "points": false,
       "renderer": "flot",
       "seriesOverrides": [],
+      "spaceLength": 10,
       "stack": false,
       "steppedLine": false,
       "targets": [
         {
-          "expr": "jsr223_success_total{} / jsr223_count_total",
+          "expr": "jsr223_success_total{} / jsr223_count_total{}",
           "format": "time_series",
           "intervalFactor": 1,
-          "legendFormat": "{{label}}",
+          "legendFormat": "using counters",
           "refId": "A"
+        },
+        {
+          "expr": "jsr223_can_fail_success{} / jsr223_can_fail_total{}",
+          "format": "time_series",
+          "hide": false,
+          "intervalFactor": 1,
+          "legendFormat": "using success ratio",
+          "refId": "B"
         }
       ],
       "thresholds": [],
@@ -361,6 +372,7 @@
       "points": false,
       "renderer": "flot",
       "seriesOverrides": [],
+      "spaceLength": 10,
       "stack": false,
       "steppedLine": false,
       "targets": [
@@ -414,8 +426,8 @@
       }
     }
   ],
-  "refresh": false,
-  "schemaVersion": 18,
+  "refresh": "30s",
+  "schemaVersion": 16,
   "style": "dark",
   "tags": [],
   "templating": {
@@ -560,5 +572,5 @@
   "timezone": "",
   "title": "jsr223 test",
   "uid": "wC0ipF9ik",
-  "version": 4
+  "version": 5
 }
