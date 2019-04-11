@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/johrstrom/jmeter-prometheus-plugin.png)](https://travis-ci.org/johrstrom/jmeter-prometheus-plugin.png)
+
 # Prometheus Listener for Jmeter
 
 # Overview
