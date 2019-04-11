@@ -1,5 +1,8 @@
 package com.github.johrstrom.config.gui;
 
+import java.util.Locale;
+
+import org.apache.jmeter.util.JMeterUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -11,6 +14,8 @@ public class ConfigGuiTest {
 
 	@Test
 	public void simpleTest() {
+		JMeterUtils.setLocale(Locale.ENGLISH);
+		
 		PrometheusMetricsConfigGui<BaseCollectorConfig> gui = new PrometheusMetricsConfigGui<>();
 		
 		String comment = "this should be the comment";
