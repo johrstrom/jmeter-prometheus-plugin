@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.net.URL;
 import java.util.List;
 
 import org.apache.jmeter.samplers.SampleEvent;
@@ -64,10 +65,8 @@ public class PrometheusListenerTest {
 	
 	@Test
 	public void canReadJMX() throws IOException {
-		File jmx = new File("src/test/resources/simple_prometheus_example.jmx");
+		File jmx = new File("target/test-classes/simple_prometheus_example.jmx");
 		HashTree tree = SaveService.loadTree(jmx);
-		
-		
 		
 		Assert.assertTrue(tree != null);
 	}
