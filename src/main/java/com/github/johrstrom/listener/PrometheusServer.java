@@ -22,6 +22,8 @@ import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 import com.github.johrstrom.collector.JMeterCollectorRegistry;
 import com.sun.net.httpserver.HttpExchange;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Expose Prometheus metrics using a plain Java HttpServer.
@@ -40,6 +42,7 @@ public class PrometheusServer {
 	
 	public static final String PROMETHEUS_DELAY = "prometheus.delay";
 	public static final int PROMETHEUS_DELAY_DEFAULT = 0;
+    private static final Logger log = LoggerFactory.getLogger(PrometheusServer.class);
 
 	private static class LocalByteArray extends ThreadLocal<ByteArrayOutputStream> {
 	    protected ByteArrayOutputStream initialValue() {
@@ -127,6 +130,7 @@ public class PrometheusServer {
 
     public synchronized static PrometheusServer getInstance() {
     	if(instance == null) {
+            log.debug("Creating Prometheus Server");
     		instance = new PrometheusServer();
     	}
     	

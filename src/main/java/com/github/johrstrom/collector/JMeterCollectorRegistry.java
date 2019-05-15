@@ -30,9 +30,9 @@ public class JMeterCollectorRegistry extends CollectorRegistry {
 			
 	public synchronized static JMeterCollectorRegistry getInstance() {
 		if (instance == null) {
+			log.debug("Creating prometheus collector registry");
 			instance = new JMeterCollectorRegistry();
 		}
-		
 		return instance;
 	}
 	
