@@ -1,18 +1,17 @@
 package com.github.johrstrom.collector;
 
-import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
-
+import io.prometheus.client.Collector;
+import io.prometheus.client.CollectorRegistry;
+import io.prometheus.client.Gauge;
+import io.prometheus.client.hotspot.*;
 import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.threads.JMeterContextService.ThreadCounts;
 import org.apache.jmeter.util.JMeterUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.prometheus.client.Collector;
-import io.prometheus.client.CollectorRegistry;
-import io.prometheus.client.Gauge;
-import io.prometheus.client.hotspot.*;
+import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class JMeterCollectorRegistry extends CollectorRegistry {
 

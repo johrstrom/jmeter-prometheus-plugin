@@ -1,18 +1,7 @@
 package com.github.johrstrom.collector.gui;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
-import javax.swing.JButton;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-
+import com.github.johrstrom.collector.BaseCollectorConfig;
+import com.github.johrstrom.collector.CollectorElement;
 import org.apache.jmeter.gui.util.HorizontalPanel;
 import org.apache.jmeter.gui.util.VerticalPanel;
 import org.apache.jmeter.testelement.property.CollectionProperty;
@@ -21,8 +10,13 @@ import org.apache.jorphan.gui.ObjectTableModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.johrstrom.collector.BaseCollectorConfig;
-import com.github.johrstrom.collector.CollectorElement;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 public abstract class AbstractCollectorTable<C extends BaseCollectorConfig> 
 	extends JPanel implements ActionListener {

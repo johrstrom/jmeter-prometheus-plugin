@@ -1,10 +1,10 @@
 package com.github.johrstrom.listener.gui;
 
-import java.util.Locale;
-
 import org.apache.jmeter.util.JMeterUtils;
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.util.Locale;
 
 
 public class ListenerGuiTest {

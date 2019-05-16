@@ -1,16 +1,13 @@
 package com.github.johrstrom.config.gui;
 
-import javax.swing.ComboBoxEditor;
-import javax.swing.DefaultCellEditor;
-import javax.swing.JComboBox;
-import javax.swing.table.TableColumn;
-
-import org.apache.jorphan.reflect.Functor;
-
 import com.github.johrstrom.collector.BaseCollectorConfig;
 import com.github.johrstrom.collector.BaseCollectorConfig.JMeterCollectorType;
 import com.github.johrstrom.collector.gui.AbstractCollectorTable;
 import com.github.johrstrom.collector.gui.Flatten;
+import org.apache.jorphan.reflect.Functor;
+
+import javax.swing.*;
+import javax.swing.table.TableColumn;
 
 
 public class ConfigCollectorTable extends AbstractCollectorTable<BaseCollectorConfig>  

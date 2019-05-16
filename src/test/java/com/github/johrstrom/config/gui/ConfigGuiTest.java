@@ -1,12 +1,11 @@
 package com.github.johrstrom.config.gui;
 
-import java.util.Locale;
-
+import com.github.johrstrom.collector.BaseCollectorConfig;
 import org.apache.jmeter.util.JMeterUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.github.johrstrom.collector.BaseCollectorConfig;
+import java.util.Locale;
 
 
 

@@ -1,5 +1,12 @@
 package com.github.johrstrom.listener.updater;
 
+import com.github.johrstrom.collector.BaseCollectorConfig;
+import com.github.johrstrom.collector.JMeterCollectorRegistry;
+import com.github.johrstrom.collector.SuccessRatioCollector;
+import com.github.johrstrom.listener.ListenerCollectorConfig;
+import com.github.johrstrom.listener.ListenerCollectorConfig.Measurable;
+import com.github.johrstrom.test.TestUtilities;
+import io.prometheus.client.Counter;
 import org.apache.jmeter.assertions.AssertionResult;
 import org.apache.jmeter.samplers.SampleEvent;
 import org.apache.jmeter.samplers.SampleResult;
@@ -7,15 +14,6 @@ import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.threads.JMeterVariables;
 import org.junit.Assert;
 import org.junit.Test;
-
-import com.github.johrstrom.collector.BaseCollectorConfig;
-import com.github.johrstrom.collector.JMeterCollectorRegistry;
-import com.github.johrstrom.collector.SuccessRatioCollector;
-import com.github.johrstrom.listener.ListenerCollectorConfig;
-import com.github.johrstrom.listener.ListenerCollectorConfig.Measurable;
-import com.github.johrstrom.test.TestUtilities;
-
-import io.prometheus.client.Counter;
 
 
 public class CountTypeUpdaterTest {

@@ -1,21 +1,15 @@
 package com.github.johrstrom.collector;
 
-import java.util.regex.Pattern;
-
-import org.junit.Assert;
-import org.junit.Test;
-
-import com.github.johrstrom.collector.BaseCollectorConfig;
 import com.github.johrstrom.collector.BaseCollectorConfig.JMeterCollectorType;
 import com.github.johrstrom.collector.BaseCollectorConfig.QuantileDefinition;
 import com.github.johrstrom.test.TestUtilities;
+import io.prometheus.client.*;
+import org.junit.Assert;
+import org.junit.Test;
 
-import io.prometheus.client.Collector;
+import java.util.regex.Pattern;
+
 //import io.prometheus.client.Collector.Type;
-import io.prometheus.client.Counter;
-import io.prometheus.client.Gauge;
-import io.prometheus.client.Histogram;
-import io.prometheus.client.Summary;
 
 
 public class BaseCollectorConfigTest {
@@ -27,18 +21,18 @@ public class BaseCollectorConfigTest {
 		// first try with a brand new String array 
 		cfg.setLabels(new String[]{});  
 		Collector collector = BaseCollectorConfig.fromConfig(cfg);
-		Assert.assertTrue(collector != null);
+		Assert.assertNotNull(collector);
 		
 		
 		// Now try with a String array with an empty string in it
 		cfg.setLabels(new String[]{""});
 		collector = BaseCollectorConfig.fromConfig(cfg);
-		Assert.assertTrue(collector != null);
+		Assert.assertNotNull(collector);
 		
 		// Now just for kicks, try with several empty strings in it
 		cfg.setLabels(new String[]{"a", "", "b", ""});
 		collector = BaseCollectorConfig.fromConfig(cfg);
-		Assert.assertTrue(collector != null);
+		Assert.assertNotNull(collector);
 		
 	}
 	
@@ -49,7 +43,7 @@ public class BaseCollectorConfigTest {
 		
 		
 		QuantileDefinition[] quantiles = cfg.getQuantiles();
-		Assert.assertTrue(quantiles.length == 1);
+		Assert.assertEquals(1, quantiles.length);
 		Assert.assertEquals(0.95, quantiles[0].quantile,0.001);
 		Assert.assertEquals(0.1, quantiles[0].error,0.001);
 	}
@@ -61,7 +55,7 @@ public class BaseCollectorConfigTest {
 		
 		
 		QuantileDefinition[] quantiles = cfg.getQuantiles();
-		Assert.assertTrue(quantiles.length == 3);
+		Assert.assertEquals(3, quantiles.length);
 		Assert.assertEquals(0.95, quantiles[0].quantile,0.001);
 		Assert.assertEquals(0.1, quantiles[0].error,0.001);
 		Assert.assertEquals(0.99, quantiles[1].quantile,0.001);
@@ -76,12 +70,12 @@ public class BaseCollectorConfigTest {
 		cfg.setQuantileOrBucket("skdn fsdfu|,nsf");
 		
 		QuantileDefinition[] quantiles = cfg.getQuantiles();
-		Assert.assertTrue(quantiles.length == 3);
+		Assert.assertEquals(3, quantiles.length);
 		Assert.assertArrayEquals(BaseCollectorConfig.DEFAULT_QUANTILES, quantiles);
 		
 		cfg.setQuantileOrBucket(";sdfg|other_str	ing|asl dfuy");
 		quantiles = cfg.getQuantiles();
-		Assert.assertTrue(quantiles.length == 3);
+		Assert.assertEquals(3, quantiles.length);
 		Assert.assertArrayEquals(BaseCollectorConfig.DEFAULT_QUANTILES, quantiles);
 	}
 	
@@ -91,13 +85,13 @@ public class BaseCollectorConfigTest {
 		cfg.setQuantileOrBucket("skdnfs dfuns	f|0.5|0.75,0.1"); //only 1 good at the end
 		
 		QuantileDefinition[] quantiles = cfg.getQuantiles();
-		Assert.assertTrue(quantiles.length == 1);
+		Assert.assertEquals(1, quantiles.length);
 		Assert.assertEquals(0.75, quantiles[0].quantile,0.001);
 		Assert.assertEquals(0.1, quantiles[0].error,0.001);
 		
 		cfg.setQuantileOrBucket("skdnfsdfunsf|0.5,0.1|0.75,0.1|0.99"); //2 in middle are good
 		quantiles = cfg.getQuantiles();
-		Assert.assertTrue(quantiles.length == 2);
+		Assert.assertEquals(2, quantiles.length);
 		Assert.assertEquals(0.5, quantiles[0].quantile,0.001);
 		Assert.assertEquals(0.1, quantiles[0].error,0.001);
 		Assert.assertEquals(0.75, quantiles[1].quantile,0.001);
@@ -112,7 +106,7 @@ public class BaseCollectorConfigTest {
 		double[] expected = new double[] {100, 500, 1000, 2500, 5000};
 		
 		double[] buckets = cfg.getBuckets();
-		Assert.assertTrue(buckets.length == 5);
+		Assert.assertEquals(5, buckets.length);
 		Assert.assertArrayEquals(expected, buckets,0.01);
 	}
 	
@@ -122,12 +116,12 @@ public class BaseCollectorConfigTest {
 		cfg.setQuantileOrBucket("akldjand| sfpoa	sdnf");
 		
 		double[] buckets = cfg.getBuckets();
-		Assert.assertTrue(buckets.length == 4);
+		Assert.assertEquals(4, buckets.length);
 		Assert.assertArrayEquals(BaseCollectorConfig.DEFAULT_BUCKET_SIZES, buckets,0.01);
 		
 		cfg.setQuantileOrBucket("fail,otherFi al,123cantPa	rse,not123 ThisEither,a3");
 		buckets = cfg.getBuckets();
-		Assert.assertTrue(buckets.length == 4);
+		Assert.assertEquals(4, buckets.length);
 		Assert.assertArrayEquals(BaseCollectorConfig.DEFAULT_BUCKET_SIZES, buckets,0.01);
 		
 	}
@@ -138,7 +132,7 @@ public class BaseCollectorConfigTest {
 		cfg.setQuantileOrBucket("akldjand,17,lakj	asdf,123no,48");
 		
 		double[] buckets = cfg.getBuckets();
-		Assert.assertTrue(buckets.length == 2);
+		Assert.assertEquals(2, buckets.length);
 		Assert.assertEquals(17, buckets[0], 0.001);
 		Assert.assertEquals(48, buckets[1], 0.001);
 	}
@@ -189,14 +183,14 @@ public class BaseCollectorConfigTest {
 	public void setOfElementsTest() {
 		BaseCollectorConfig left = TestUtilities.simpleCounterCfg();
 		BaseCollectorConfig right = TestUtilities.simpleCounterCfg();
-		
-		Assert.assertTrue(left != right);
-		Assert.assertTrue(left.equals(right));
+
+		Assert.assertNotSame(left, right);
+		Assert.assertEquals(left, right);
 		
 		int leftHash = left.hashCode();
 		int rightHash = right.hashCode();
-		
-		Assert.assertTrue(leftHash == rightHash);
+
+		Assert.assertEquals(leftHash, rightHash);
 	}
 
 }

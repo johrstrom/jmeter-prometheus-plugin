@@ -1,15 +1,13 @@
 package com.github.johrstrom.listener.updater;
 
+import com.github.johrstrom.listener.ListenerCollectorConfig;
+import io.prometheus.client.Collector;
+import io.prometheus.client.Histogram;
+import io.prometheus.client.Summary;
 import org.apache.jmeter.samplers.SampleEvent;
 import org.apache.jmeter.samplers.SampleResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.github.johrstrom.listener.ListenerCollectorConfig;
-
-import io.prometheus.client.Collector;
-import io.prometheus.client.Histogram;
-import io.prometheus.client.Summary;
 
 public class AggregatedTypeUpdater extends AbstractUpdater {
 	

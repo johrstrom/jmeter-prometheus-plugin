@@ -1,16 +1,15 @@
 package com.github.johrstrom.config.gui;
 
-import java.awt.BorderLayout;
-import java.util.List;
-
+import com.github.johrstrom.collector.BaseCollectorConfig;
+import com.github.johrstrom.collector.CollectorElement;
+import com.github.johrstrom.config.PrometheusMetricsConfig;
 import org.apache.jmeter.config.gui.AbstractConfigGui;
 import org.apache.jmeter.testelement.TestElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.johrstrom.collector.BaseCollectorConfig;
-import com.github.johrstrom.collector.CollectorElement;
-import com.github.johrstrom.config.PrometheusMetricsConfig;
+import java.awt.*;
+import java.util.List;
 
 
 public class PrometheusMetricsConfigGui<C> extends AbstractConfigGui {
@@ -114,7 +113,7 @@ public class PrometheusMetricsConfigGui<C> extends AbstractConfigGui {
 	}
 	
 	@Override
-	protected PrometheusMetricsConfigGui<C> clone() throws CloneNotSupportedException {
+	protected PrometheusMetricsConfigGui<C> clone() {
 		return new PrometheusMetricsConfigGui<C>();
 	}
 	

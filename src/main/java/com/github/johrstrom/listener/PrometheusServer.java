@@ -1,7 +1,14 @@
 package com.github.johrstrom.listener;
 
+import com.github.johrstrom.collector.JMeterCollectorRegistry;
+import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpHandler;
+import com.sun.net.httpserver.HttpServer;
 import io.prometheus.client.CollectorRegistry;
 import io.prometheus.client.exporter.common.TextFormat;
+import org.apache.jmeter.util.JMeterUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -9,21 +16,12 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
 import java.net.URLDecoder;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.HashSet;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.zip.GZIPOutputStream;
-
-import org.apache.jmeter.util.JMeterUtils;
-
-import com.sun.net.httpserver.HttpHandler;
-import com.sun.net.httpserver.HttpServer;
-import com.github.johrstrom.collector.JMeterCollectorRegistry;
-import com.sun.net.httpserver.HttpExchange;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Expose Prometheus metrics using a plain Java HttpServer.
