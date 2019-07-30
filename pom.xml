@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.johrstrom</groupId>
     <artifactId>jmeter-prometheus-plugin</artifactId>
-    <version>0.5.0-SNAPSHOT</version>
+    <version>0.5.1-SNAPSHOT</version>
     <name>Jmeter-Prometheus Listener Plugin</name>
     <description>A Jmeter plugin that creates a Prometheus endpoint of results.</description>
 
@@ -77,7 +77,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.20.1</version>
+                <version>3.0.0-M3</version>
                 <configuration>
                     <parallel>methods</parallel>
                     <threadCount>4</threadCount>
