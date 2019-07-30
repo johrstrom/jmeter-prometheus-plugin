@@ -32,6 +32,7 @@ Let's go through all the columns one by one.
   - Buckets are comma seperated list of numbers. Can be integers or decimals.
   - Quantiles are comma `,` separated pair of decimals separated by a vertical bar `|`. The first decimal being the quantile and the second being the error rating.
 - **Listen To**: Dropdown to listen to samples or assertions. This only applies to Counters and SuccessRatio type metrics.
+- **Max Age Seconds**: When using a Summary collector, the length (in seconds) of the sliding window used to calculate percentiles (defaults to 10 minutes).
 - **Measuring**: Dropdown menu of all the things you can measure
   - See the [Type and Measuring compatibility matrix](#Type-and-Measuring-compatibility-matrix) section below.
 
