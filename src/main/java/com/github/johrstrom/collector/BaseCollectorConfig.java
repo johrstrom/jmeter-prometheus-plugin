@@ -141,8 +141,8 @@ public class BaseCollectorConfig extends AbstractTestElement  {
         return METRIC_NAME_BASE + RandomStringUtils.randomAlphanumeric(8);
     }
 
-	public long getMaxAgeSeconds() { return this.getPropertyAsLong(MAX_AGE_SECONDS, TimeUnit.MINUTES.toSeconds(10));}
-	public void setMaxAgeSeconds(long maxAgeSeconds) { this.setProperty(MAX_AGE_SECONDS, maxAgeSeconds);}
+	public Long getMaxAgeSeconds() { return this.getPropertyAsLong(MAX_AGE_SECONDS, TimeUnit.MINUTES.toSeconds(10));}
+	public void setMaxAgeSeconds(Long maxAgeSeconds) { this.setProperty(MAX_AGE_SECONDS, maxAgeSeconds);}
 
     public void setLabels(String labels) {
         this.setLabels(labels.split(","));
@@ -307,7 +307,7 @@ public class BaseCollectorConfig extends AbstractTestElement  {
         result = prime * result + this.getType().hashCode();
         result = prime * result + this.getQuantileOrBucket().hashCode();
         result = prime * result + this.getLabelsAsString().hashCode();
-		result = prime * result + (int) this.getMaxAgeSeconds();
+		result = prime * result + this.getMaxAgeSeconds().intValue();
 
         return result;
     }

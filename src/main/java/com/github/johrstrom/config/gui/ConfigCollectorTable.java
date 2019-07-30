@@ -20,7 +20,8 @@ public class ConfigCollectorTable extends AbstractCollectorTable<BaseCollectorCo
 	public static int LABEL_NAME_INDEX = 2;
 	public static int TYPE_INDEX = 3;
 	public static int QUANTILE_OR_BUCKET_INDEX = 4;
-	public static int BASE_COLUMN_SIZE = 5;
+	public static int MAX_AGE_SECONDS_INDEX = 5;
+	public static int BASE_COLUMN_SIZE = 6;
 	
 	private static final long serialVersionUID = 8675797078488652676L;
 	
@@ -57,7 +58,8 @@ public class ConfigCollectorTable extends AbstractCollectorTable<BaseCollectorCo
 		functors[LABEL_NAME_INDEX] = new Functor("getLabelsAsString");
 		functors[TYPE_INDEX] = new Functor("getType");
 		functors[QUANTILE_OR_BUCKET_INDEX] = new Functor("getQuantileOrBucket");
-			
+		functors[MAX_AGE_SECONDS_INDEX] = new Functor("getMaxAgeSeconds");
+
 		return functors;
 	}
 
@@ -70,7 +72,7 @@ public class ConfigCollectorTable extends AbstractCollectorTable<BaseCollectorCo
 		functors[LABEL_NAME_INDEX] = new Functor("setLabels");
 		functors[TYPE_INDEX] = new Functor("setType");
 		functors[QUANTILE_OR_BUCKET_INDEX] = new Functor("setQuantileOrBucket");
-		
+		functors[MAX_AGE_SECONDS_INDEX] = new Functor("setMaxAgeSeconds");
 		return functors;
 	}
 
@@ -83,6 +85,7 @@ public class ConfigCollectorTable extends AbstractCollectorTable<BaseCollectorCo
 		headers[LABEL_NAME_INDEX] = "Labels";
 		headers[TYPE_INDEX] = "Type";
 		headers[QUANTILE_OR_BUCKET_INDEX] = "Buckets or Quantiles";
+		headers[MAX_AGE_SECONDS_INDEX] = "Max Age Seconds";
 		
 		return headers;
 	}
@@ -96,6 +99,7 @@ public class ConfigCollectorTable extends AbstractCollectorTable<BaseCollectorCo
 		clazzes[LABEL_NAME_INDEX] = String.class;
 		clazzes[TYPE_INDEX] = ComboBoxEditor.class;
 		clazzes[QUANTILE_OR_BUCKET_INDEX] = String.class;
+		clazzes[MAX_AGE_SECONDS_INDEX] = Long.class;
 		
 		return clazzes;
 	}
