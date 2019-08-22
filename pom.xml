@@ -80,7 +80,7 @@
 				<version>3.0.0-M3</version>
 				<configuration>
 					<parallel>methods</parallel>
-					<threadCount>2</threadCount>
+					<threadCount>4</threadCount>
 					<trimStackTrace>false</trimStackTrace>
 				</configuration>
 			</plugin>

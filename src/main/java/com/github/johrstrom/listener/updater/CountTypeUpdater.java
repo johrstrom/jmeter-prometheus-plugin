@@ -1,15 +1,13 @@
 package com.github.johrstrom.listener.updater;
 
+import com.github.johrstrom.collector.SuccessRatioCollector;
+import com.github.johrstrom.listener.ListenerCollectorConfig;
+import io.prometheus.client.Collector;
+import io.prometheus.client.Counter;
 import org.apache.jmeter.assertions.AssertionResult;
 import org.apache.jmeter.samplers.SampleEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.github.johrstrom.collector.SuccessRatioCollector;
-import com.github.johrstrom.listener.ListenerCollectorConfig;
-
-import io.prometheus.client.Collector;
-import io.prometheus.client.Counter;
 
 /**
  * This is the AbstractUpdater sub-type that can handle updating any kind of Counter metrics 

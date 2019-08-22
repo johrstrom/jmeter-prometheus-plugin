@@ -9,7 +9,7 @@ public class PrometheusServerTest {
 	@Test
 	public void ensureCleanStartStop() throws Exception {
 		PrometheusServer server = PrometheusServer.getInstance();
-		Assert.assertTrue(server != null);
+		Assert.assertNotNull(server);
 		
 		server.start();
 		Thread.currentThread();

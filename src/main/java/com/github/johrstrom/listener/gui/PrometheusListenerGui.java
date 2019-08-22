@@ -19,17 +19,16 @@
 package com.github.johrstrom.listener.gui;
 
 
-import java.awt.BorderLayout;
-import java.util.List;
-
+import com.github.johrstrom.collector.CollectorElement;
+import com.github.johrstrom.listener.ListenerCollectorConfig;
+import com.github.johrstrom.listener.PrometheusListener;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.visualizers.gui.AbstractListenerGui;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.johrstrom.collector.CollectorElement;
-import com.github.johrstrom.listener.ListenerCollectorConfig;
-import com.github.johrstrom.listener.PrometheusListener;
+import java.awt.*;
+import java.util.List;
 
 
 /**

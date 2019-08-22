@@ -1,7 +1,14 @@
 package com.github.johrstrom.listener.updater;
 
-import java.util.List;
-
+import com.github.johrstrom.collector.BaseCollectorConfig;
+import com.github.johrstrom.collector.JMeterCollectorRegistry;
+import com.github.johrstrom.listener.ListenerCollectorConfig;
+import com.github.johrstrom.listener.ListenerCollectorConfig.Measurable;
+import com.github.johrstrom.test.TestUtilities;
+import io.prometheus.client.Collector.MetricFamilySamples;
+import io.prometheus.client.Collector.MetricFamilySamples.Sample;
+import io.prometheus.client.Histogram;
+import io.prometheus.client.Summary;
 import org.apache.jmeter.samplers.SampleEvent;
 import org.apache.jmeter.samplers.SampleResult;
 import org.apache.jmeter.threads.JMeterContextService;
@@ -9,16 +16,10 @@ import org.apache.jmeter.threads.JMeterVariables;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.github.johrstrom.collector.BaseCollectorConfig;
-import com.github.johrstrom.collector.JMeterCollectorRegistry;
-import com.github.johrstrom.listener.ListenerCollectorConfig;
-import com.github.johrstrom.listener.ListenerCollectorConfig.Measurable;
-import com.github.johrstrom.test.TestUtilities;
+import java.util.List;
 
-import io.prometheus.client.Histogram;
-import io.prometheus.client.Summary;
-import io.prometheus.client.Collector.MetricFamilySamples;
-import io.prometheus.client.Collector.MetricFamilySamples.Sample;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class AggregatedTypeUpdaterTest {
 
@@ -31,7 +32,7 @@ public class AggregatedTypeUpdaterTest {
 	private static final String[] expectedLabels = new String[] {var_value,name,code};
 
 	@Test
-	public void testHistogramResponseTime() throws Exception {
+	public void testHistogramResponseTime() {
 		BaseCollectorConfig base = TestUtilities.simpleHistogramCfg();
 		base.setLabels(labels);
 		ListenerCollectorConfig cfg = new ListenerCollectorConfig(base);
@@ -59,9 +60,9 @@ public class AggregatedTypeUpdaterTest {
 		u.update(e);
 
 		List<MetricFamilySamples> metrics = collector.collect();
-		Assert.assertTrue(metrics.size() == 1);
+		assertEquals(1, metrics.size());
 		MetricFamilySamples family = metrics.get(0);
-		Assert.assertTrue(family.samples.size() == 7); 	// 4 buckets + Inf + count + sum
+		assertEquals(7, family.samples.size()); 	// 4 buckets + Inf + count + sum
 		
 		
 		for(Sample sample : family.samples) {
@@ -76,11 +77,11 @@ public class AggregatedTypeUpdaterTest {
 					values.get(1).equals(expectedLabels[1]) &&
 					values.get(2).equals(expectedLabels[2]);
 			
-			Assert.assertTrue(correctLabels);
+			assertTrue(correctLabels);
 			
 			// _sum and _count don't have an 'le' label
 			if(sample.name.endsWith("count") || sample.name.endsWith("sum")) {
-				Assert.assertTrue(values.size() == 3 && names.size() == 3);
+				assertTrue(values.size() == 3 && names.size() == 3);
 				
 				if(sample.name.endsWith("count")) {
 					Assert.assertEquals(1, sample.value, 0.1);
@@ -89,7 +90,7 @@ public class AggregatedTypeUpdaterTest {
 				}
 				
 			}else {
-				Assert.assertTrue(values.size() == 4 && names.size() == 4);
+				assertTrue(values.size() == 4 && names.size() == 4);
 				
 				String leString = values.get(3);
 				
@@ -111,7 +112,7 @@ public class AggregatedTypeUpdaterTest {
 
 	
 	@Test
-	public void testSummaryResponseTime() throws Exception {	
+	public void testSummaryResponseTime() {
 		BaseCollectorConfig base = TestUtilities.simpleSummaryCfg();
 		base.setLabels(labels);
 		ListenerCollectorConfig cfg = new ListenerCollectorConfig(base);
@@ -140,9 +141,9 @@ public class AggregatedTypeUpdaterTest {
 		u.update(e);
 		
 		List<MetricFamilySamples> metrics = collector.collect();
-		Assert.assertTrue(metrics.size() == 1);
+		assertEquals(1, metrics.size());
 		MetricFamilySamples family = metrics.get(0);
-		Assert.assertTrue(family.samples.size() == 5); 	// 3 quantiles + count + sum
+		assertEquals(5, family.samples.size()); 	// 3 quantiles + count + sum
 		
 		
 		for(Sample sample : family.samples) {
@@ -157,11 +158,11 @@ public class AggregatedTypeUpdaterTest {
 					values.get(1).equals(expectedLabels[1]) &&
 					values.get(2).equals(expectedLabels[2]);
 			
-			Assert.assertTrue(correctLabels);
+			assertTrue(correctLabels);
 			
 			// _sum and _count don't have an 'le' label
 			if(sample.name.endsWith("count") || sample.name.endsWith("sum")) {
-				Assert.assertTrue(values.size() == 3 && names.size() == 3);
+				assertTrue(values.size() == 3 && names.size() == 3);
 				
 				if(sample.name.endsWith("count")) {
 					Assert.assertEquals(1, sample.value, 0.1);
@@ -170,7 +171,7 @@ public class AggregatedTypeUpdaterTest {
 				}
 				
 			}else {
-				Assert.assertTrue(values.size() == 4 && names.size() == 4);
+				assertTrue(values.size() == 4 && names.size() == 4);
 				Assert.assertEquals(responseTime, sample.value, 0.1);
 			}
 		}
@@ -179,7 +180,7 @@ public class AggregatedTypeUpdaterTest {
 
 	
 	@Test
-	public void testHistogramResponseSize() throws Exception {		
+	public void testHistogramResponseSize() {
 		BaseCollectorConfig base = TestUtilities.simpleHistogramCfg();
 		base.setLabels(labels);
 		ListenerCollectorConfig cfg = new ListenerCollectorConfig(base);
@@ -209,9 +210,9 @@ public class AggregatedTypeUpdaterTest {
 		
 		
 		List<MetricFamilySamples> metrics = collector.collect();
-		Assert.assertTrue(metrics.size() == 1);
+		Assert.assertEquals(1, metrics.size());
 		MetricFamilySamples family = metrics.get(0);
-		Assert.assertTrue(family.samples.size() == 7); 	// 4 buckets + Inf + count + sum
+		Assert.assertEquals(7, family.samples.size()); 	// 4 buckets + Inf + count + sum
 		
 		
 		for(Sample sample : family.samples) {
@@ -222,7 +223,7 @@ public class AggregatedTypeUpdaterTest {
 			
 			// _sum and _count don't have an 'le' label
 			if(sample.name.endsWith("count") || sample.name.endsWith("sum")) {
-				Assert.assertTrue(values.size() == 3 && names.size() == 3);
+				assertTrue(values.size() == 3 && names.size() == 3);
 				
 				if(sample.name.endsWith("count")) {
 					Assert.assertEquals(1, sample.value, 0.1);
@@ -231,7 +232,7 @@ public class AggregatedTypeUpdaterTest {
 				}
 				
 			}else {
-				Assert.assertTrue(values.size() == 4 && names.size() == 4);
+				assertTrue(values.size() == 4 && names.size() == 4);
 				
 				String leString = values.get(3);
 				
@@ -252,7 +253,7 @@ public class AggregatedTypeUpdaterTest {
 	}
 	
 	@Test
-	public void testSummaryResponseSize() throws Exception {	
+	public void testSummaryResponseSize() {
 		BaseCollectorConfig base = TestUtilities.simpleSummaryCfg();
 		base.setLabels(labels);
 		ListenerCollectorConfig cfg = new ListenerCollectorConfig(base);
@@ -280,9 +281,9 @@ public class AggregatedTypeUpdaterTest {
 		u.update(e);
 		
 		List<MetricFamilySamples> metrics = collector.collect();
-		Assert.assertTrue(metrics.size() == 1);
+		Assert.assertEquals(1, metrics.size());
 		MetricFamilySamples family = metrics.get(0);
-		Assert.assertTrue(family.samples.size() == 5); 	// 3 quantiles + count + sum
+		Assert.assertEquals(5, family.samples.size()); 	// 3 quantiles + count + sum
 		
 		
 		for(Sample sample : family.samples) {
@@ -293,7 +294,7 @@ public class AggregatedTypeUpdaterTest {
 			
 			// _sum and _count don't have an 'le' label
 			if(sample.name.endsWith("count") || sample.name.endsWith("sum")) {
-				Assert.assertTrue(values.size() == 3 && names.size() == 3);
+				assertTrue(values.size() == 3 && names.size() == 3);
 				
 				if(sample.name.endsWith("count")) {
 					Assert.assertEquals(1, sample.value, 0.1);
@@ -302,13 +303,13 @@ public class AggregatedTypeUpdaterTest {
 				}
 				
 			}else {
-				Assert.assertTrue(values.size() == 4 && names.size() == 4);
+				assertTrue(values.size() == 4 && names.size() == 4);
 				Assert.assertEquals(responseSize, sample.value, 0.1);
 			}
 		}
 	}
 	
-	protected void correctLabels(List<String> names, List<String> values) {
+	private void correctLabels(List<String> names, List<String> values) {
 		boolean correctLabels = names.get(0).equals(labels[0]) && 
 				names.get(1).equals(labels[1]) &&
 				names.get(2).equals(labels[2]) &&
@@ -316,6 +317,6 @@ public class AggregatedTypeUpdaterTest {
 				values.get(1).equals(expectedLabels[1]) &&
 				values.get(2).equals(expectedLabels[2]);
 		
-		Assert.assertTrue(correctLabels);
+		assertTrue(correctLabels);
 	}
 }

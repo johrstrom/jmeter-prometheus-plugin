@@ -1,13 +1,12 @@
 package com.github.johrstrom.config;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-
+import com.github.johrstrom.test.TestUtilities;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.github.johrstrom.test.TestUtilities;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 
 
 public class PrometheusMetricsConfigTest {
@@ -21,8 +20,8 @@ public class PrometheusMetricsConfigTest {
 		cfg.setCollectorConfigs(TestUtilities.simpleListConfig());
 		
 		out.writeObject(cfg);
-		
-		Assert.assertTrue(cfg != null);
+
+		Assert.assertNotNull(cfg);
 		Assert.assertTrue(objectBuffer.size() > 0);
 		
 	}

@@ -1,7 +1,8 @@
 package com.github.johrstrom.config;
 
-import java.util.Map.Entry;
-
+import com.github.johrstrom.collector.BaseCollectorConfig;
+import com.github.johrstrom.collector.CollectorElement;
+import io.prometheus.client.Collector;
 import org.apache.jmeter.engine.util.NoThreadClone;
 import org.apache.jmeter.testelement.TestStateListener;
 import org.apache.jmeter.testelement.property.CollectionProperty;
@@ -10,10 +11,7 @@ import org.apache.jmeter.threads.JMeterVariables;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.johrstrom.collector.BaseCollectorConfig;
-import com.github.johrstrom.collector.CollectorElement;
-
-import io.prometheus.client.Collector;
+import java.util.Map.Entry;
 
 public class PrometheusMetricsConfig extends CollectorElement<BaseCollectorConfig>
 	implements NoThreadClone, TestStateListener {
