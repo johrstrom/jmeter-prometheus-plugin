@@ -40,7 +40,7 @@ public class PrometheusServer {
 	
 	public static final String PROMETHEUS_DELAY = "prometheus.delay";
 	public static final int PROMETHEUS_DELAY_DEFAULT = 0;
-    private static final Logger log = LoggerFactory.getLogger(PrometheusServer.class);
+	private static final Logger log = LoggerFactory.getLogger(PrometheusServer.class);
 
 	private static class LocalByteArray extends ThreadLocal<ByteArrayOutputStream> {
 	    protected ByteArrayOutputStream initialValue() {
@@ -128,7 +128,7 @@ public class PrometheusServer {
 
     public synchronized static PrometheusServer getInstance() {
     	if(instance == null) {
-            log.debug("Creating Prometheus Server");
+    		log.debug("Creating Prometheus Server");
     		instance = new PrometheusServer();
     	}
     	

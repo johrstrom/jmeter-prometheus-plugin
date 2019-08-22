@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-//import io.prometheus.client.Collector.Type;
 
 /**
  * The base class for turning text/strings (from the JMeter GUI, or a .jmx file, etc.) into Prometheus Collector
