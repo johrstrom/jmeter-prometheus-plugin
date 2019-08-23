@@ -137,6 +137,37 @@ This plugin has limited "out of the box" functionality because it gives you, the
 |prometheus.save.threads.name|jmeter_threads|The name of the metric describing jmeter threads|
 |prometheus.save.jvm|true|Collect metrics from the JVM|
 
+# Download
+
+We're now hosted on OSS Sonatype. If you want to download this jar in a maven style project, simply add this dependency:
+
+`
+    <!-- you'll have to specify jmeter-prometheus-plugin.version here -->
+    <dependency>
+      <groupId>com.github.johrstrom</groupId>
+      <artifactId>jmeter-prometheus-plugin</artifactId>
+      <version>${jmeter-prometheus-plugin.version}</version>
+    </dependency>
+`
+
+You'll also need to add this repository in your `$HOME/m2/.settings.xml`
+ 
+ `
+    <repository>
+        <id>oss-sonatype</id>
+        <name>oss sonatype repo</name>
+        <url>https://oss.sonatype.org/conent/groups/public</url>
+    </repository>
+
+ `
+
+You'll also be able to verify the jar you've downloaded against various .asc, .md5 and .sha1 files.
+
+## Hosted
+
+This project is hosted [here](https://oss.sonatype.org/content/groups/public/com/github/johrstrom/jmeter-prometheus-plugin/) on 
+[OSS sonatype org](https://oss.sonatype.org).
+
 # Building
 
 To build, simply maven package:
