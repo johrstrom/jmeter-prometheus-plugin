@@ -6,3 +6,5 @@ target/
 package_and_mv.sh
 dependency-reduced-pom.xml
 jmeter.log
+pom.xml.releaseBackup
+release.properties
