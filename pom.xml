@@ -8,7 +8,6 @@
 	<name>Jmeter-Prometheus Listener Plugin</name>
 	<description>A Jmeter plugin that creates a Prometheus endpoint of results.</description>
 
-
 	<properties>
 		<prometheus.version>0.6.0</prometheus.version>
 		<jmeter.version>3.2</jmeter.version>
@@ -16,6 +15,41 @@
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
+
+	<issueManagement>
+		<url>https://github.com/johrstrom/jmeter-prometheus-plugin/issues</url>
+		<system>GitHub Issues</system>
+	</issueManagement>
+
+	<licenses>
+		<license>
+			<name>Apache License, Version 2.0</name>
+			<url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+			<comments>A business-friendly OSS license</comments>
+		</license>
+	</licenses>
+
+	<scm>
+		<url>https://github.com/johrstrom/jmeter-prometheus-plugin</url>
+		<connection>scm:git:git://github.com/johrstrom/jmeter-prometheus-plugin.git</connection>
+		<developerConnection>scm:git:git@github.com:johrstrom/jmeter-prometheus-plugin.git</developerConnection>
+	</scm>
+
+	<developers>
+		<developer>
+			<email>johrstrom@hotmail.com</email>
+			<name>Jeff Ohrstrom</name>
+			<url>https://github.com/johrstrom</url>
+			<id>kevinsawicki</id>
+		</developer>
+		<developer>
+			<email>giovannipaolo.gibilisco@polimi.it</email>
+			<name>Giovanni Paolo Gibilisco</name>
+			<url>https://github.com/GiovanniPaoloGibilisco</url>
+			<id>GiovanniPaoloGibilisco</id>
+		</developer>
+	</developers>
 
 	<dependencies>
 		<dependency>
