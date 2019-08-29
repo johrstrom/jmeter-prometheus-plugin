@@ -1,15 +1,14 @@
 package com.github.johrstrom.listener.updater;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import com.github.johrstrom.collector.JMeterCollectorRegistry;
+import com.github.johrstrom.listener.ListenerCollectorConfig;
 import org.apache.jmeter.assertions.AssertionResult;
 import org.apache.jmeter.samplers.SampleEvent;
 import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.threads.JMeterVariables;
 
-import com.github.johrstrom.collector.JMeterCollectorRegistry;
-import com.github.johrstrom.listener.ListenerCollectorConfig;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * The Updater family of classes are meant to update the actual Collectors given the configuration. The main problem
@@ -34,8 +33,7 @@ public abstract class AbstractUpdater {
 
 	/**
 	 * All subclasses should have this and only this constructor signature. 
-	 * 
-	 * @param c the collector to update
+	 *
 	 * @param cfg the configuration of the collector
 	 */
 	public AbstractUpdater(ListenerCollectorConfig cfg) {

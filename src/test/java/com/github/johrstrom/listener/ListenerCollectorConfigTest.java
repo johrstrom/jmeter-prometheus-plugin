@@ -1,9 +1,8 @@
 package com.github.johrstrom.listener;
 
+import com.github.johrstrom.test.TestUtilities;
 import org.junit.Assert;
 import org.junit.Test;
-
-import com.github.johrstrom.test.TestUtilities;
 
 public class ListenerCollectorConfigTest {
 
@@ -11,14 +10,14 @@ public class ListenerCollectorConfigTest {
 	public void setOfElementsTest() {
 		ListenerCollectorConfig left = new ListenerCollectorConfig(TestUtilities.simpleCounterCfg());
 		ListenerCollectorConfig right = new ListenerCollectorConfig(TestUtilities.simpleCounterCfg());
-		
-		Assert.assertTrue(left != right);
-		Assert.assertTrue(left.equals(right));
+
+		Assert.assertNotSame(left, right);
+		Assert.assertEquals(left, right);
 		
 		int leftHash = left.hashCode();
 		int rightHash = right.hashCode();
-		
-		Assert.assertTrue(leftHash == rightHash);
+
+		Assert.assertEquals(leftHash, rightHash);
 	}
 	
 }

@@ -1,10 +1,10 @@
 package com.github.johrstrom.collector;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import io.prometheus.client.Collector;
 import io.prometheus.client.Counter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class SuccessRatioCollector extends Collector {
 

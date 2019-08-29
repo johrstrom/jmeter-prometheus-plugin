@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/johrstrom/jmeter-prometheus-plugin.png)](https://travis-ci.org/johrstrom/jmeter-prometheus-plugin.png)
+[![Build Status](https://travis-ci.org/johrstrom/jmeter-prometheus-plugin.png?branch=master)](travis)
 
 # Prometheus Listener for Jmeter
 
@@ -137,6 +137,53 @@ This plugin has limited "out of the box" functionality because it gives you, the
 |prometheus.save.threads|true|True or false value to save and collect jmeter thread metrics|
 |prometheus.save.threads.name|jmeter_threads|The name of the metric describing jmeter threads|
 |prometheus.save.jvm|true|Collect metrics from the JVM|
+
+# Download
+
+We're now hosted on OSS Sonatype. If you want to download this jar in a maven style project, simply add this dependency:
+
+```xml
+    <!-- you'll have to specify jmeter-prometheus-plugin.version here -->
+    <dependency>
+      <groupId>com.github.johrstrom</groupId>
+      <artifactId>jmeter-prometheus-plugin</artifactId>
+      <version>${jmeter-prometheus-plugin.version}</version>
+    </dependency>
+```
+
+You'll also need to add this repository in your `$HOME/m2/.settings.xml`
+ 
+ ```xml
+    <repository>
+        <id>oss-sonatype</id>
+        <name>oss sonatype repo</name>
+        <url>https://oss.sonatype.org/conent/groups/public</url>
+    </repository>
+ ```
+
+You'll also be able to verify the jar you've downloaded against various .asc, .md5 and .sha1 files.
+
+## Hosted
+
+This project is hosted [here](https://oss.sonatype.org/content/groups/public/com/github/johrstrom/jmeter-prometheus-plugin/) on 
+[OSS sonatype org](https://oss.sonatype.org).
+
+## Verifying
+
+I sign these release jars so you can verify with this method:
+
+```bash
+gpg --verify jmeter-prometheus-plugin-0.5.0.jar.asc
+```
+
+You should see output similar to this.
+
+```bash
+gpg: assuming signed data in 'jmeter-prometheus-plugin-0.5.0.jar'
+gpg: Signature made Thu 22 Aug 2019 09:35:15 PM EDT
+gpg:                using RSA key 6F5EAC674B279301932EC1FEAC2AEC6C76D4AF12
+gpg: Good signature from "Jeff Ohrstrom (Jeff Ohrstrom's personal key) <johrstrom@hotmail.com>" [ultimate]
+```
 
 # Building
 

@@ -1,28 +1,24 @@
 package com.github.johrstrom.test;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-
+import com.github.johrstrom.collector.BaseCollectorConfig;
+import com.github.johrstrom.collector.BaseCollectorConfig.JMeterCollectorType;
+import com.github.johrstrom.listener.ListenerCollectorConfig;
+import com.github.johrstrom.listener.ListenerCollectorConfig.Measurable;
 import org.apache.jmeter.control.LoopController;
 import org.apache.jmeter.engine.StandardJMeterEngine;
 import org.apache.jmeter.gui.tree.JMeterTreeListener;
 import org.apache.jmeter.gui.tree.JMeterTreeModel;
 import org.apache.jmeter.samplers.SampleResult;
 import org.apache.jmeter.save.SaveService;
-import org.apache.jmeter.threads.JMeterContextService;
-import org.apache.jmeter.threads.JMeterThread;
-import org.apache.jmeter.threads.JMeterThreadMonitor;
-import org.apache.jmeter.threads.JMeterVariables;
 import org.apache.jmeter.threads.ThreadGroup;
+import org.apache.jmeter.threads.*;
 import org.apache.jmeter.util.JMeterUtils;
 import org.apache.jorphan.collections.HashTree;
 
-import com.github.johrstrom.collector.BaseCollectorConfig;
-import com.github.johrstrom.collector.BaseCollectorConfig.JMeterCollectorType;
-import com.github.johrstrom.listener.ListenerCollectorConfig;
-import com.github.johrstrom.listener.ListenerCollectorConfig.Measurable;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
 public class TestUtilities {
 	

@@ -1,15 +1,14 @@
 package com.github.johrstrom.listener.updater;
 
+import com.github.johrstrom.collector.BaseCollectorConfig;
+import com.github.johrstrom.listener.ListenerCollectorConfig;
+import com.github.johrstrom.test.TestUtilities;
 import org.apache.jmeter.samplers.SampleEvent;
 import org.apache.jmeter.samplers.SampleResult;
 import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.threads.JMeterVariables;
 import org.junit.Assert;
 import org.junit.Test;
-
-import com.github.johrstrom.collector.BaseCollectorConfig;
-import com.github.johrstrom.listener.ListenerCollectorConfig;
-import com.github.johrstrom.test.TestUtilities;
 
 public class AbstractUpdaterTest {
 

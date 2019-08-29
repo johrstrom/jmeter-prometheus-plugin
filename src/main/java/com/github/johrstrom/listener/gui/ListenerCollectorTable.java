@@ -1,21 +1,17 @@
 package com.github.johrstrom.listener.gui;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import javax.swing.ComboBoxEditor;
-import javax.swing.DefaultCellEditor;
-import javax.swing.JComboBox;
-import javax.swing.table.TableColumn;
-
-import org.apache.jorphan.reflect.Functor;
-
 import com.github.johrstrom.collector.gui.AbstractCollectorTable;
 import com.github.johrstrom.collector.gui.Flatten;
 import com.github.johrstrom.config.gui.ConfigCollectorTable;
 import com.github.johrstrom.listener.ListenerCollectorConfig;
 import com.github.johrstrom.listener.ListenerCollectorConfig.Measurable;
+import org.apache.jorphan.reflect.Functor;
+
+import javax.swing.*;
+import javax.swing.table.TableColumn;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class ListenerCollectorTable extends AbstractCollectorTable<ListenerCollectorConfig> 
 	implements Flatten {

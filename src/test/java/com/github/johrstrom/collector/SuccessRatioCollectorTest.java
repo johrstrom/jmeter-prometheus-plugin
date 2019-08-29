@@ -1,15 +1,13 @@
 package com.github.johrstrom.collector;
 
-import java.util.List;
-
+import com.github.johrstrom.listener.ListenerCollectorConfig;
+import com.github.johrstrom.test.TestUtilities;
+import io.prometheus.client.Collector.MetricFamilySamples;
+import io.prometheus.client.Collector.MetricFamilySamples.Sample;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.github.johrstrom.listener.ListenerCollectorConfig;
-import com.github.johrstrom.test.TestUtilities;
-
-import io.prometheus.client.Collector.MetricFamilySamples;
-import io.prometheus.client.Collector.MetricFamilySamples.Sample;
+import java.util.List;
 
 public class SuccessRatioCollectorTest {
 	
@@ -38,20 +36,25 @@ public class SuccessRatioCollectorTest {
 		foundSuccess = foundFailure = foundTotal = false;
 		
 		for(MetricFamilySamples family : families) {
-			if(family.name.equals("something_ratio_success")) {
-				assertOnSingleFamily(family, 1);
-				foundSuccess = true;
-				
-			} else if(family.name.equals("something_ratio_failure")) {
-				assertOnSingleFamily(family, 0);
-				foundFailure = true;
-				
-			} else if(family.name.equals("something_ratio_total")) {
-				assertOnSingleFamily(family, 1);
-				foundTotal = true;
-				
-			} else {
-				Assert.assertTrue(family.name + " is not an expected metric family name", false);
+			switch (family.name) {
+				case "something_ratio_success":
+					assertOnSingleFamily(family, 1);
+					foundSuccess = true;
+
+					break;
+				case "something_ratio_failure":
+					assertOnSingleFamily(family, 0);
+					foundFailure = true;
+
+					break;
+				case "something_ratio_total":
+					assertOnSingleFamily(family, 1);
+					foundTotal = true;
+
+					break;
+				default:
+					Assert.fail(family.name + " is not an expected metric family name");
+					break;
 			}
 		}
 		
@@ -78,20 +81,25 @@ public class SuccessRatioCollectorTest {
 		foundSuccess = foundFailure = foundTotal = false;
 		
 		for(MetricFamilySamples family : families) {
-			if(family.name.equals("otherthing_ratio_success")) {
-				assertOnSingleFamily(family, 0);
-				foundSuccess = true;
-				
-			} else if(family.name.equals("otherthing_ratio_failure")) {
-				assertOnSingleFamily(family, 1);
-				foundFailure = true;
-				
-			} else if(family.name.equals("otherthing_ratio_total")) {
-				assertOnSingleFamily(family, 1);
-				foundTotal = true;
-				
-			} else {
-				Assert.assertTrue(family.name + " is not an expected metric family name", false);
+			switch (family.name) {
+				case "otherthing_ratio_success":
+					assertOnSingleFamily(family, 0);
+					foundSuccess = true;
+
+					break;
+				case "otherthing_ratio_failure":
+					assertOnSingleFamily(family, 1);
+					foundFailure = true;
+
+					break;
+				case "otherthing_ratio_total":
+					assertOnSingleFamily(family, 1);
+					foundTotal = true;
+
+					break;
+				default:
+					Assert.fail(family.name + " is not an expected metric family name");
+					break;
 			}
 		}
 		
@@ -99,7 +107,7 @@ public class SuccessRatioCollectorTest {
 	}
 	
 	private void assertOnSingleFamily(MetricFamilySamples family, double expectedValue) {
-		Assert.assertTrue(family.samples.size() == 1);
+		Assert.assertEquals(1, family.samples.size());
 		Sample sample = family.samples.get(0);
 		
 		Assert.assertArrayEquals(labelValues, sample.labelValues.toArray());
