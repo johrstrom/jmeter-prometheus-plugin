@@ -140,6 +140,7 @@ public class PrometheusServer {
     public synchronized void start() throws IOException {
     	if(server != null){
     		server.stop(0);
+            executorService.shutdown();
     	}
     	
         server = HttpServer.create();
@@ -157,6 +158,7 @@ public class PrometheusServer {
     
     public synchronized void stop() {
     	server.stop(delay);
+        executorService.shutdown();
     }
 
 
