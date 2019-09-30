@@ -8,3 +8,5 @@ dependency-reduced-pom.xml
 jmeter.log
 pom.xml.releaseBackup
 release.properties
+/.idea/
+/jmeter-prometheus-plugin.iml
