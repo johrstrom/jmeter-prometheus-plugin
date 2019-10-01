@@ -1,7 +1,8 @@
 
 language: java
 
-script: mvn clean package
+install: false
+script: mvn clean test
 
 notifications:
   email: false
