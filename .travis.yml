@@ -1,7 +1,7 @@
 
 language: java
 
-install: false
+install: skip
 script: mvn clean test
 
 notifications:
