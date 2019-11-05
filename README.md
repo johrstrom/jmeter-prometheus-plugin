@@ -134,10 +134,12 @@ This plugin has limited "out of the box" functionality because it gives you, the
 |prometheus.port|9270|The port the http server will bind to |
 |prometheus.delay|0|The delay (in seconds) the http server will wait before being destroyed|
 |prometheus.save.threads|true|True or false value to save and collect jmeter thread metrics|
-|prometheus.save.threads.name|jmeter_threads|The name of the metric describing jmeter threads|
+|prometheus.save.threads.name|jmeter\_threads|The name of the metric describing jmeter threads|
 |prometheus.save.jvm|true|Collect metrics from the JVM|
 
 # Download
+
+## Maven Dependency
 
 We're now hosted on OSS Sonatype. If you want to download this jar in a maven style project, simply add this dependency:
 
@@ -149,20 +151,13 @@ We're now hosted on OSS Sonatype. If you want to download this jar in a maven st
       <version>${jmeter-prometheus-plugin.version}</version>
     </dependency>
 ```
+## Maven Central
 
-You'll also need to add this repository in your `$HOME/m2/.settings.xml`
- 
- ```xml
-    <repository>
-        <id>oss-sonatype</id>
-        <name>oss sonatype repo</name>
-        <url>https://oss.sonatype.org/conent/groups/public</url>
-    </repository>
- ```
-
-You'll also be able to verify the jar you've downloaded against various .asc, .md5 and .sha1 files.
+We're not hosted directly on maven central, but it does sync with OSS Sonatype after some lag time (2-3 hours maybe).
 
 ## Hosted
+
+Search [maven central](https://search.maven.org/search?q=a:jmeter-prometheus-plugin) to get the latest version.
 
 This project is hosted [here](https://oss.sonatype.org/content/groups/public/com/github/johrstrom/jmeter-prometheus-plugin/) on 
 [OSS sonatype org](https://oss.sonatype.org).
