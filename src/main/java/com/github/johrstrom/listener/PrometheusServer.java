@@ -120,7 +120,6 @@ public class PrometheusServer {
 
     private HttpServer server;
     private static PrometheusServer instance = null;
-    private static final ExecutorService executorService = Executors.newSingleThreadExecutor();
     private int port = JMeterUtils.getPropDefault(PROMETHEUS_PORT, PROMETHEUS_PORT_DEFAULT);
     private int delay = JMeterUtils.getPropDefault(PROMETHEUS_DELAY, PROMETHEUS_DELAY_DEFAULT);
     
@@ -140,7 +139,7 @@ public class PrometheusServer {
     public synchronized void start() throws IOException {
     	if(server != null){
     		server.stop(0);
-            executorService.shutdown();
+            ((ExecutorService) this.server.getExecutor()).shutdown();
     	}
     	
         server = HttpServer.create();
@@ -152,15 +151,14 @@ public class PrometheusServer {
         server.createContext("/metrics", metricHandler);
         
 
-        server.setExecutor(executorService);
+        server.setExecutor(Executors.newSingleThreadExecutor());
         server.start();      
     }
     
     public synchronized void stop() {
     	server.stop(delay);
-        executorService.shutdown();
+    	((ExecutorService) this.server.getExecutor()).shutdown();
     }
-
 
 }
 
