@@ -132,6 +132,7 @@ This plugin has limited "out of the box" functionality because it gives you, the
 |Property | default | description|
 |:----------:|:-----------:|:-------------------------------:|
 |prometheus.port|9270|The port the http server will bind to |
+|prometheus.ip|127.0.0.1|The ip the http server will bind to. Containers may need `0.0.0.0`|
 |prometheus.delay|0|The delay (in seconds) the http server will wait before being destroyed|
 |prometheus.save.threads|true|True or false value to save and collect jmeter thread metrics|
 |prometheus.save.threads.name|jmeter\_threads|The name of the metric describing jmeter threads|
