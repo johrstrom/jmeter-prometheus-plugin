@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/johrstrom/jmeter-prometheus-plugin.png?branch=master)](travis)
+[![Current Version](https://img.shields.io/maven-central/v/com.github.johrstrom/jmeter-prometheus-plugin.svg)](maven-central)
 
 # Prometheus Listener for Jmeter
 
@@ -142,7 +143,7 @@ This plugin has limited "out of the box" functionality because it gives you, the
 
 ## Maven Dependency
 
-We're now hosted on OSS Sonatype. If you want to download this jar in a maven style project, simply add this dependency:
+We're now hosted on maven central! If you want to download this jar in a maven style project, simply add this dependency:
 
 ```xml
     <!-- you'll have to specify jmeter-prometheus-plugin.version here -->
@@ -152,11 +153,15 @@ We're now hosted on OSS Sonatype. If you want to download this jar in a maven st
       <version>${jmeter-prometheus-plugin.version}</version>
     </dependency>
 ```
-## Maven Central
 
-We're not hosted directly on maven central, but it does sync with OSS Sonatype after some lag time (2-3 hours maybe).
+## Programatically
 
-## Hosted
+This URL below seems to be the only way to download jars from maven through `curl` or `wget`.  Again, replace `0.6.0` here with the
+current version, which can be viewed at the top of this README.
+
+`https://search.maven.org/remotecontent?filepath=com/github/johrstrom/jmeter-prometheus-plugin/0.6.0/jmeter-prometheus-plugin-0.6.0.jar`
+
+## Web Browser
 
 Search [maven central](https://search.maven.org/search?q=a:jmeter-prometheus-plugin) to get the latest version.
 
@@ -165,7 +170,7 @@ This project is hosted [here](https://oss.sonatype.org/content/groups/public/com
 
 ## Verifying
 
-I sign these release jars so you can verify with this method:
+I sign these release jars so you can verify with this method (of course the version is going to change):
 
 ```bash
 gpg --verify jmeter-prometheus-plugin-0.5.0.jar.asc
