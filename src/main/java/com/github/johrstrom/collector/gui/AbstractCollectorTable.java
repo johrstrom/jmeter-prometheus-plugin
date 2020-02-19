@@ -176,7 +176,7 @@ public abstract class AbstractCollectorTable<C extends BaseCollectorConfig>
 			try {
 				this.model.addRow(this.clazzType.getDeclaredConstructor().newInstance());
 			} catch (Exception e) {
-				log.error("Couldn't add to model becuase of error. ", e);
+				log.error("Couldn't add to model. ", e);
 			}
 			break;
 		case DELETE:
