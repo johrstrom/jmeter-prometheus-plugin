@@ -35,7 +35,7 @@
 		<connection>scm:git:git://github.com/johrstrom/jmeter-prometheus-plugin.git</connection>
 		<developerConnection>scm:git:git@github.com:johrstrom/jmeter-prometheus-plugin.git</developerConnection>
 	  <tag>HEAD</tag>
-  </scm>
+  	</scm>
 
 	<distributionManagement>
 		<snapshotRepository>
@@ -57,7 +57,7 @@
 			<id>kevinsawicki</id>
 		</developer>
 		<developer>
-			<email>giovannipaolo.gibilisco@polimi.it</email>
+			<email>giovanni.gibilisco@akamas.io</email>
 			<name>Giovanni Paolo Gibilisco</name>
 			<url>https://github.com/GiovanniPaoloGibilisco</url>
 			<id>GiovanniPaoloGibilisco</id>

@@ -24,7 +24,7 @@ public class ListenerCollectorTable extends AbstractCollectorTable<ListenerColle
 	private static ConfigCollectorTable stealFrom = new ConfigCollectorTable();
 	
 	public static int LISTEN_TO_INDEX = ConfigCollectorTable.BASE_COLUMN_SIZE;
-	public static int MEARSURING_INDEX = LISTEN_TO_INDEX + 1;
+	public static int MEASURING_INDEX = LISTEN_TO_INDEX + 1;
 	
 	static {
 		listenToComboBox = new JComboBox<>();
@@ -51,7 +51,7 @@ public class ListenerCollectorTable extends AbstractCollectorTable<ListenerColle
 		column = table.getColumnModel().getColumn(ListenerCollectorTable.LISTEN_TO_INDEX);
 		column.setCellEditor(new DefaultCellEditor(listenToComboBox));
 		
-		column = table.getColumnModel().getColumn(ListenerCollectorTable.MEARSURING_INDEX);
+		column = table.getColumnModel().getColumn(ListenerCollectorTable.MEASURING_INDEX);
 		column.setCellEditor(new DefaultCellEditor(measuringComboBox));
 	}
 	
