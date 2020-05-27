@@ -31,7 +31,7 @@ Let's go through all the columns one by one.
   - [Success Ratio](#Success-Ratio) is something specific to this plugin and you can see the documentation below.
 - **Buckets of Quantiles**:
   - Buckets are comma seperated list of numbers. Can be integers or decimals.
-  - Quantiles are comma `,` separated pair of decimals separated by a vertical bar `|`. The first decimal being the quantile and the second being the error rating.
+  - Quantiles are comma `,` separated pair of decimals separated by a vertical bar `|`. The first decimal being the quantile and the second being the error rating. Optionally, after a `;` separator the lenght of the window used to calculate the quantile can be specified. Sample: `0.8,0.01|0.9,0.01|0.95,0.005|0.99,0.001;60`
 - **Listen To**: Dropdown to listen to samples or assertions. This only applies to Counters and SuccessRatio type metrics.
 - **Measuring**: Dropdown menu of all the things you can measure
   - See the [Type and Measuring compatibility matrix](#Type-and-Measuring-compatibility-matrix) section below.
