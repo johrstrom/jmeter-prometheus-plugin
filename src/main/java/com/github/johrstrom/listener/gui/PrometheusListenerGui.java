@@ -172,7 +172,7 @@ public class PrometheusListenerGui extends AbstractListenerGui {
 		cfg.setHelp("Sampler Response Time");
 		cfg.setLabels("label,code");
 		cfg.setType(BaseCollectorConfig.JMeterCollectorType.SUMMARY.toString());
-		cfg.setQuantileOrBucket("0.75,0.5|0.95,0.1|0.99,0.01");
+		cfg.setQuantileOrBucket("0.75,0.5|0.95,0.1|0.99,0.01;60");
 		ListenerCollectorConfig listenerCfg = new ListenerCollectorConfig(cfg);
 		listenerCfg.setListenTo(ListenerCollectorConfig.SAMPLES.toString());
 		listenerCfg.setMeasuring(ListenerCollectorConfig.Measurable.ResponseTime.toString());
