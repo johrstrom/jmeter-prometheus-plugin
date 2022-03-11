@@ -129,6 +129,7 @@ This plugin has limited "out of the box" functionality because it gives you, the
 
 
 # Properties you can override
+To overrider properties, add the Properties in the jmeter.properties file (JMETER_HOME/bin folder) and restart Jmeter to take effect
 
 |Property | default | description|
 |:----------:|:-----------:|:-------------------------------:|
