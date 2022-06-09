@@ -80,7 +80,10 @@ public abstract class AbstractUpdater {
 			// reserved keyword for the sampler's label (the name)
 			if(name.equalsIgnoreCase("label")) { 
 				value = event.getResult().getSampleLabel();
-		
+
+			} else if (name.equalsIgnoreCase("threadname")) {
+				value = event.getResult().getThreadName();
+
 			} else if(name.equalsIgnoreCase("code")) {	// code also reserved
 				value = event.getResult().getResponseCode();
 				
@@ -111,7 +114,9 @@ public abstract class AbstractUpdater {
 			
 			if(name.equalsIgnoreCase("label")) {
 				value = ctx.assertion.getName();
-				
+			} else if(name.equalsIgnoreCase("threadname")) {
+				value = ctx.event.getResult().getThreadName();
+
 			// try to find it as a plain'ol variable.
 			} else if (this.varIndexLookup.get(name) != null){
 				int idx = this.varIndexLookup.get(name);

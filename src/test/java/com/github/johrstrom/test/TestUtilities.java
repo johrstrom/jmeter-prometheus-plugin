@@ -28,9 +28,10 @@ public class TestUtilities {
 	public static final String TEST_ASSERTION_NAME_ALT = "other_super_cool_assertion";
 	public static final String TEST_SAMPLER_CODE = "909";
 	public static final String TEST_VAR_VALUE = "bar_value";
-	
-	public static final String[] TEST_LABELS = new String[] {TEST_VAR_NAME,"label","code"};
-	public static final String[] EXPECTED_LABELS = new String[] {TEST_VAR_VALUE, TEST_SAMPLER_NAME, TEST_SAMPLER_CODE};
+	public static final String TEST_THREADNAME = "super_cool_name";
+
+	public static final String[] TEST_LABELS = new String[] {TEST_VAR_NAME,"label","threadname","code"};
+	public static final String[] EXPECTED_LABELS = new String[] {TEST_VAR_VALUE, TEST_SAMPLER_NAME, "super_cool_name", TEST_SAMPLER_CODE};
 	
 	public static final String[] TEST_ASSERTION_LABELS = new String[] {TEST_VAR_NAME,"label"};
 	public static final String[] EXPECTED_ASSERTION_LABELS = new String[] {TEST_VAR_VALUE, TEST_ASSERTION_NAME};
