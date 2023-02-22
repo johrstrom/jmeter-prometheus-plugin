@@ -12,7 +12,11 @@ jobs:
     strategy:
       matrix:
         java_version:
+          - '8'
           - '11'
+          # TODO: Fix for java version 17
+          # - '17'
+    runs-on: 'ubuntu-latest'
 
     steps:
       - name: Checkout
