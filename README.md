@@ -1,4 +1,4 @@
-[![Build Status](https://github.com/johrstrom/jmeter-prometheus-plugins/workflows/Tests/badge.svg)](https://github.com/OSC/johrstrom/jmeter-prometheus-plugins?query=workflow%3ATests)
+[![Build Status](https://github.com/johrstrom/jmeter-prometheus-plugin/workflows/Tests/badge.svg)](https://github.com/johrstrom/jmeter-prometheus-plugin/actions?query=workflow%3ATests)
 [![Current Version](https://img.shields.io/maven-central/v/com.github.johrstrom/jmeter-prometheus-plugin.svg)](maven-central)
 
 # Prometheus Listener for Jmeter
