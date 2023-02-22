@@ -1,3 +1,8 @@
+# 0.6.1
+
+* bugfix in PrometheusServer.java to close the server after the delay.
+
+
 # 0.4.0
 
 * #47 - bugfix so to correctly rename gui elements.\
