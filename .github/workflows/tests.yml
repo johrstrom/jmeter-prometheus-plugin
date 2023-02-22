@@ -12,7 +12,9 @@ jobs:
     strategy:
       matrix:
         java_version:
+          - '8'
           - '11'
+          - '17'
     runs-on: 'ubuntu-latest'
 
     steps:
