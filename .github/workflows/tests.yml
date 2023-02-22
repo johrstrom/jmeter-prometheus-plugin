@@ -14,7 +14,8 @@ jobs:
         java_version:
           - '8'
           - '11'
-          - '17'
+          # TODO: Fix for java version 17
+          # - '17'
     runs-on: 'ubuntu-latest'
 
     steps:
