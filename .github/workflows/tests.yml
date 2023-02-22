@@ -13,6 +13,7 @@ jobs:
       matrix:
         java_version:
           - '11'
+    runs-on: 'ubuntu-latest'
 
     steps:
       - name: Checkout
