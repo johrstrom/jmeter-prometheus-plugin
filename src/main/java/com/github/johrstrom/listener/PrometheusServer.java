@@ -23,6 +23,7 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.zip.GZIPOutputStream;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Expose Prometheus metrics using a plain Java HttpServer.
@@ -161,8 +162,9 @@ public class PrometheusServer {
         server.start();      
     }
     
-    public synchronized void stop() {
-    	server.stop(delay);
+    public synchronized void stop() throws InterruptedException {
+    	TimeUnit.SECONDS.sleep(delay);
+    	server.stop(0);
     	((ExecutorService) this.server.getExecutor()).shutdown();
     }
 
