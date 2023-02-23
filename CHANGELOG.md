@@ -1,7 +1,7 @@
 # 0.6.1
 
-* bugfix in PrometheusServer.java to close the server after the delay.
-
+* #116 is a bugfix in PrometheusServer.java to close the server after the delay.
+  `prometheus.delay` will now work as expected.
 
 # 0.4.0
 
