@@ -103,13 +103,13 @@ public class PrometheusListener extends CollectorElement<ListenerCollectorConfig
 	 */
 	@Override
 	public void testEnded() {
-		this.clearCollectors();
-
 		try {
 			this.server.stop();
 		} catch (Exception e) {
 			log.error("Couldn't stop http server", e);
 		}
+
+		this.clearCollectors();
 	}
 
 	/*
