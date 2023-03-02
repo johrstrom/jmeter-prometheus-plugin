@@ -1,3 +1,7 @@
+# 0.6.2
+
+* #117 is a bugfix in PrometheusListener.java to clear the collectors after the server is closed.
+
 # 0.6.1
 
 * #116 is a bugfix in PrometheusServer.java to close the server after the delay.
