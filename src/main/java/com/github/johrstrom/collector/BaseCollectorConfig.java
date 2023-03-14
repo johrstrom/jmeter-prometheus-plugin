@@ -127,13 +127,13 @@ public class BaseCollectorConfig extends AbstractTestElement  {
 		}
 	}
 
-	public long getQuantileWindowLenght() {
+	public long getQuantileWindowLength() {
 		String quantiles = getQuantileOrBucket();
 
 		if (quantiles == null || quantiles.isEmpty()) {
 			return DEFAULT_QUANTILE_WINDOW_LENGHT;
 		} else {
-			return QuantileDefinition.parseQuantilesWindowLenghtFromString(quantiles);
+			return QuantileDefinition.parseQuantilesWindowLengthFromString(quantiles);
 		}
 	}
 
@@ -220,7 +220,7 @@ public class BaseCollectorConfig extends AbstractTestElement  {
 		io.prometheus.client.Summary.Builder builder = new Summary.Builder()
 				.name(cfg.getMetricName())
 				.help(cfg.getHelp())
-				.maxAgeSeconds(cfg.getQuantileWindowLenght());
+				.maxAgeSeconds(cfg.getQuantileWindowLength());
 
 		String[] labels = cfg.getLabels();
 		if(labels.length != 0) {
@@ -370,7 +370,7 @@ public class BaseCollectorConfig extends AbstractTestElement  {
 		public static final String QUANTILE_ERROR_SEPERATOR = ",";
 		public static final String QUANTILE_DEFINITION_SEPERATOR = "|";
 		public static final String QUANTILE_DEFINITION_SEPERATOR_REGEX = "\\|";
-		public static final String QUANTILE_LENGHT_SEPERATOR_REGEX = "\\;";
+		public static final String QUANTILE_LENGTH_SEPERATOR_REGEX = "\\;";
 
 		QuantileDefinition(double quantile, double error) {
 			this.quantile = quantile;
@@ -421,7 +421,7 @@ public class BaseCollectorConfig extends AbstractTestElement  {
 		}
 
 		public static QuantileDefinition[] parseQuantilesFromString(String fullQuantileString) {
-			String quantileOnlyString = fullQuantileString.split(QUANTILE_LENGHT_SEPERATOR_REGEX)[0];
+			String quantileOnlyString = fullQuantileString.split(QUANTILE_LENGTH_SEPERATOR_REGEX)[0];
 			String[] quantileDefStrings = quantileOnlyString.split(QUANTILE_DEFINITION_SEPERATOR_REGEX);
 			List<QuantileDefinition> quantiles = new ArrayList<QuantileDefinition>();
 
@@ -444,8 +444,8 @@ public class BaseCollectorConfig extends AbstractTestElement  {
 		}
 
 
-		public static long parseQuantilesWindowLenghtFromString(String fullQuantileString) {
-			String[] quantileDefStrings = fullQuantileString.split(QUANTILE_LENGHT_SEPERATOR_REGEX);
+		public static long parseQuantilesWindowLengthFromString(String fullQuantileString) {
+			String[] quantileDefStrings = fullQuantileString.split(QUANTILE_LENGTH_SEPERATOR_REGEX);
 			if (quantileDefStrings.length < 2) {
 				log.debug("Using default quantile window lenght of " + DEFAULT_QUANTILE_WINDOW_LENGHT + " seconds");
 				return DEFAULT_QUANTILE_WINDOW_LENGHT;

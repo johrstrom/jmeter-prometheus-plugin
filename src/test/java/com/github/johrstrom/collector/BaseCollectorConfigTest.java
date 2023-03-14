@@ -63,6 +63,24 @@ public class BaseCollectorConfigTest {
 		Assert.assertEquals(0.999, quantiles[2].quantile,0.001);
 		Assert.assertEquals(0.1, quantiles[2].error,0.001);
 	}
+
+  @Test
+	public void parseMultipleQuantilesWithWindowCorrectly() {
+		BaseCollectorConfig cfg = TestUtilities.simpleSummaryCfg();
+		cfg.setQuantileOrBucket("0.95,0.1|0.99,0.1|0.999,0.1;60");
+
+
+		QuantileDefinition[] quantiles = cfg.getQuantiles();
+		Assert.assertEquals(3, quantiles.length);
+		Assert.assertEquals(0.95, quantiles[0].quantile,0.001);
+		Assert.assertEquals(0.1, quantiles[0].error,0.001);
+		Assert.assertEquals(0.99, quantiles[1].quantile,0.001);
+		Assert.assertEquals(0.1, quantiles[1].error,0.001);
+		Assert.assertEquals(0.999, quantiles[2].quantile,0.001);
+		Assert.assertEquals(0.1, quantiles[2].error,0.001);
+
+    Assert.assertEquals(60, cfg.getQuantileWindowLength());
+	}
 	
 	@Test
 	public void parseQauntileFailsAndGivesDEFAULTs() {
@@ -96,7 +114,6 @@ public class BaseCollectorConfigTest {
 		Assert.assertEquals(0.1, quantiles[0].error,0.001);
 		Assert.assertEquals(0.75, quantiles[1].quantile,0.001);
 		Assert.assertEquals(0.1, quantiles[1].error,0.001);
-		
 	}
 	
 	@Test
@@ -192,5 +209,4 @@ public class BaseCollectorConfigTest {
 
 		Assert.assertEquals(leftHash, rightHash);
 	}
-
 }
