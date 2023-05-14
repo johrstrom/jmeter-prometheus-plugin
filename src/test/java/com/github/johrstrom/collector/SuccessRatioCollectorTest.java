@@ -47,7 +47,7 @@ public class SuccessRatioCollectorTest {
 					foundFailure = true;
 
 					break;
-				case "something_ratio_total":
+				case "something_ratio":
 					assertOnSingleFamily(family, 1);
 					foundTotal = true;
 
@@ -92,7 +92,7 @@ public class SuccessRatioCollectorTest {
 					foundFailure = true;
 
 					break;
-				case "otherthing_ratio_total":
+				case "otherthing_ratio":
 					assertOnSingleFamily(family, 1);
 					foundTotal = true;
 
@@ -107,7 +107,7 @@ public class SuccessRatioCollectorTest {
 	}
 	
 	private void assertOnSingleFamily(MetricFamilySamples family, double expectedValue) {
-		Assert.assertEquals(1, family.samples.size());
+		Assert.assertEquals(2, family.samples.size());
 		Sample sample = family.samples.get(0);
 		
 		Assert.assertArrayEquals(labelValues, sample.labelValues.toArray());
