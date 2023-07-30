@@ -77,13 +77,13 @@ public abstract class AbstractUpdater {
 			String name = labels[i];
 			String value = null;
 			
-			// reserved keyword for the sampler's label (the name)
+			// reserved keywords for the sampler's label name.
 			if (name.equalsIgnoreCase("label")) {
 				value = event.getResult().getSampleLabel();
 			} else if (name.equalsIgnoreCase("code")) {
 				// code also reserved
 				value = event.getResult().getResponseCode();
-			} else if (name.equalsIgnoreCase("threadGroup")) {
+			} else if (name.equalsIgnoreCase("thread_group")) {
 				value = event.getThreadGroup();
 				
 			// try to find it as a plain'ol variable.

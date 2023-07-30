@@ -29,7 +29,7 @@ public class AbstractUpdaterTest {
 	@Test
 	public void testKeywords() {
 		BaseCollectorConfig base = TestUtilities.simpleCounterCfg();
-		base.setLabels(new String[] {"label","code"});
+		base.setLabels(new String[] {"label","code", "thread_group"});
 		ListenerCollectorConfig cfg = new ListenerCollectorConfig(base);
 		
 		TestUpdater u = new TestUpdater(cfg);
@@ -42,8 +42,8 @@ public class AbstractUpdaterTest {
 		String[] labels = u.labelValues(event);
 		
 
-		Assert.assertTrue(labels.length == 2);
-		Assert.assertArrayEquals(new String[] {"test_label", "204"}, labels);
+		Assert.assertTrue(labels.length == 3);
+		Assert.assertArrayEquals(new String[] {"test_label", "204", "test_tg"}, labels);
 	}
 	
 	@Test
