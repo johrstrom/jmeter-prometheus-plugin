@@ -113,6 +113,7 @@ public class PrometheusListenerTest {
 		long latency = 1532;
 		int responseSize = 1342;
 		int samplesOccurred = 0;
+		double expectedCreated = System.currentTimeMillis() / 1000.0;
 
 		ResultAndVariables res = TestUtilities.resultWithLabels();
 		res.result.setConnectTime(connectTime);
@@ -155,42 +156,42 @@ public class PrometheusListenerTest {
 
 			// histograms
 			case "test_hist_rtime":
-				assertOnHistogram(reg.getOrCreateAndRegister(cfg), elapsedTime * samplesOccurred, samplesOccurred,
+				assertOnHistogram(reg.getOrCreateAndRegister(cfg), elapsedTime * samplesOccurred, samplesOccurred, expectedCreated,
 						elapsedTime);
 				break;
 			case "test_hist_rsize":
-				assertOnHistogram(reg.getOrCreateAndRegister(cfg), responseSize * samplesOccurred, samplesOccurred,
+				assertOnHistogram(reg.getOrCreateAndRegister(cfg), responseSize * samplesOccurred, samplesOccurred, expectedCreated,
 						responseSize);
 				break;
 			case "test_hist_latency":
-				assertOnHistogram(reg.getOrCreateAndRegister(cfg), latency * samplesOccurred, samplesOccurred, latency);
+				assertOnHistogram(reg.getOrCreateAndRegister(cfg), latency * samplesOccurred, samplesOccurred, expectedCreated, latency);
 				break;
 			case "test_hist_idle_time":
-				assertOnHistogram(reg.getOrCreateAndRegister(cfg), idleTime * samplesOccurred, samplesOccurred,
+				assertOnHistogram(reg.getOrCreateAndRegister(cfg), idleTime * samplesOccurred, samplesOccurred, expectedCreated,
 						idleTime);
 				break;
 			case "test_hist_connect_time":
-				assertOnHistogram(reg.getOrCreateAndRegister(cfg), connectTime * samplesOccurred, samplesOccurred,
+				assertOnHistogram(reg.getOrCreateAndRegister(cfg), connectTime * samplesOccurred, samplesOccurred, expectedCreated,
 						connectTime);
 				break;
 
 			// summaries
 			case "test_summary_rtime":
-				assertOnSummary(reg.getOrCreateAndRegister(cfg), elapsedTime * samplesOccurred, samplesOccurred,
+				assertOnSummary(reg.getOrCreateAndRegister(cfg), elapsedTime * samplesOccurred, samplesOccurred, expectedCreated,
 						elapsedTime);
 				break;
 			case "test_summary_rsize":
-				assertOnSummary(reg.getOrCreateAndRegister(cfg), responseSize * samplesOccurred, samplesOccurred,
+				assertOnSummary(reg.getOrCreateAndRegister(cfg), responseSize * samplesOccurred, samplesOccurred, expectedCreated,
 						responseSize);
 				break;
 			case "test_summary_latency":
-				assertOnSummary(reg.getOrCreateAndRegister(cfg), latency * samplesOccurred, samplesOccurred, latency);
+				assertOnSummary(reg.getOrCreateAndRegister(cfg), latency * samplesOccurred, samplesOccurred, expectedCreated, latency);
 				break;
 			case "test_summary_idle_time":
-				assertOnSummary(reg.getOrCreateAndRegister(cfg), idleTime * samplesOccurred, samplesOccurred, idleTime);
+				assertOnSummary(reg.getOrCreateAndRegister(cfg), idleTime * samplesOccurred, samplesOccurred, expectedCreated, idleTime);
 				break;
 			case "test_summary_connect_time":
-				assertOnSummary(reg.getOrCreateAndRegister(cfg), connectTime * samplesOccurred, samplesOccurred,
+				assertOnSummary(reg.getOrCreateAndRegister(cfg), connectTime * samplesOccurred, samplesOccurred, expectedCreated,
 						connectTime);
 				break;
 
@@ -215,14 +216,14 @@ public class PrometheusListenerTest {
 		Assert.assertEquals(2.0, shouldBeTwo, 0.1);
 	}
 
-	protected static void assertOnHistogram(Collector collector, double expectedSum, double expectedCount,
+	protected static void assertOnHistogram(Collector collector, double expectedSum, double expectedCount, double expectedCreated,
 			double boundary) {
 		List<MetricFamilySamples> metrics = collector.collect();
 		Assert.assertEquals(1, metrics.size());
 		MetricFamilySamples family = metrics.get(0);
 
 		// labels + Inf + count + sum
-		Assert.assertEquals(TestUtilities.EXPECTED_LABELS.length + 4, family.samples.size());
+		Assert.assertEquals(TestUtilities.EXPECTED_LABELS.length + 5, family.samples.size());
 
 		for (Sample sample : family.samples) {
 			List<String> values = sample.labelValues;
@@ -245,6 +246,10 @@ public class PrometheusListenerTest {
 				Assert.assertTrue(values.size() == labelSize && names.size() == labelSize);
 				Assert.assertEquals(expectedSum, sample.value, 0.1);
 
+			} else if (sample.name.endsWith("created")) {
+				Assert.assertTrue(values.size() == labelSize && names.size() == labelSize);
+				Assert.assertEquals(expectedCreated, sample.value, 0.1);
+
 			} else {
 				Assert.assertEquals(values.size(), labelSize + 1);
 				Assert.assertEquals(names.size(), labelSize + 1);
@@ -265,13 +270,13 @@ public class PrometheusListenerTest {
 		}
 	}
 
-	protected void assertOnSummary(Collector collector, double expectedSum, double expectedCount,
+	protected void assertOnSummary(Collector collector, double expectedSum, double expectedCount, double expectedCreated,
 			double expectedValue) {
 
 		List<MetricFamilySamples> metrics = collector.collect();
 		Assert.assertEquals(1, metrics.size());
 		MetricFamilySamples family = metrics.get(0);
-		Assert.assertEquals(5, family.samples.size()); // 3 quantiles + count + sum
+		Assert.assertEquals(6, family.samples.size()); // 3 quantiles + count + sum
 
 		for (Sample sample : family.samples) {
 			List<String> values = sample.labelValues;
@@ -291,6 +296,8 @@ public class PrometheusListenerTest {
 
 			} else if (sample.name.endsWith("sum")) {
 				Assert.assertEquals(expectedSum, sample.value, 0.1);
+			} else if (sample.name.endsWith("created")) {
+				Assert.assertEquals(expectedCreated, sample.value, 0.1);
 			} else {
 				Assert.assertEquals(values.size(), TestUtilities.EXPECTED_LABELS.length + 1);
 				Assert.assertEquals(values.size(), TestUtilities.EXPECTED_LABELS.length + 1);
